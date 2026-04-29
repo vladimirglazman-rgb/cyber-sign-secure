@@ -9,7 +9,15 @@ export type DocumentRow = {
   status: "pending" | "signed" | "cancelled";
   subject: string;
   created_at: string;
-  recipients?: { id: string; name: string; email: string; signing_token: string | null; status: string }[];
+  recipients?: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string | null;
+    delivery_method: "email" | "sms";
+    signing_token: string | null;
+    status: string;
+  }[];
 };
 
 export type DashboardData = {
@@ -21,31 +29,43 @@ export type DashboardData = {
 export const listMyDocuments = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<DashboardData> => {
-    const { supabase, userId } = context;
-
-    const [{ data: docs }, { data: profile }] = await Promise.all([
-      supabase
-        .from("documents")
-        .select("id, file_name, status, subject, created_at, recipients(id, name, email, signing_token, status)")
-        .order("created_at", { ascending: false })
-        .limit(50),
-      supabase.from("profiles").select("full_name").eq("id", userId).maybeSingle(),
-    ]);
-
-    const documents = (docs ?? []) as DocumentRow[];
-    const stats = {
-      total: documents.length,
-      signed: documents.filter((d) => d.status === "signed").length,
-      pending: documents.filter((d) => d.status === "pending").length,
-      cancelled: documents.filter((d) => d.status === "cancelled").length,
-    };
-
-    return { documents, stats, profile: profile ?? null };
+    try {
+      const { supabase, userId } = context;
+      const [docsRes, profileRes] = await Promise.all([
+        supabase
+          .from("documents")
+          .select(
+            "id, file_name, status, subject, created_at, recipients(id, name, email, phone, delivery_method, signing_token, status)",
+          )
+          .order("created_at", { ascending: false })
+          .limit(50),
+        supabase.from("profiles").select("full_name").eq("id", userId).maybeSingle(),
+      ]);
+      if (docsRes.error) console.error("DASHBOARD_DOCS_ERROR", docsRes.error);
+      if (profileRes.error) console.error("DASHBOARD_PROFILE_ERROR", profileRes.error);
+      const documents = (docsRes.data ?? []) as DocumentRow[];
+      const stats = {
+        total: documents.length,
+        signed: documents.filter((d) => d.status === "signed").length,
+        pending: documents.filter((d) => d.status === "pending").length,
+        cancelled: documents.filter((d) => d.status === "cancelled").length,
+      };
+      return { documents, stats, profile: profileRes.data ?? null };
+    } catch (err) {
+      console.error("LIST_MY_DOCUMENTS_FAILED", err);
+      return {
+        documents: [],
+        stats: { total: 0, signed: 0, pending: 0, cancelled: 0 },
+        profile: null,
+      };
+    }
   });
 
 const recipientSchema = z.object({
   name: z.string().min(1).max(120),
-  email: z.string().email().max(200),
+  email: z.string().email().max(200).or(z.literal("")),
+  phone: z.string().max(40).optional().nullable(),
+  deliveryMethod: z.enum(["email", "sms"]).default("email"),
   role: z.enum(["signer", "cc"]),
   verificationType: z.enum(["id_number", "phone"]),
   verificationValue: z.string().min(4).max(40),
@@ -65,9 +85,10 @@ export const createSignatureRequest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => createSchema.parse(data))
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
+    try {
+      const { supabase, userId } = context;
 
-    const { data: doc, error: docErr } = await supabase
+      const { data: doc, error: docErr } = await supabase
       .from("documents")
       .insert({
         owner_id: userId,
@@ -82,26 +103,34 @@ export const createSignatureRequest = createServerFn({ method: "POST" })
       .select("id")
       .single();
 
-    if (docErr || !doc) {
-      throw new Error(docErr?.message ?? "Failed to create document");
+      if (docErr || !doc) {
+        console.error("DOCUMENT_INSERT_ERROR", docErr);
+        throw new Error("שמירת המסמך נכשלה");
+      }
+
+      const rows = data.recipients.map((r, idx) => ({
+        document_id: doc.id,
+        name: r.name,
+        email: r.email,
+        phone: r.phone?.trim() || null,
+        delivery_method: r.deliveryMethod,
+        role: r.role,
+        signing_order: data.signInOrder ? idx + 1 : null,
+        verification_type: r.verificationType,
+        verification_value_hash: createHash("sha256")
+          .update(r.verificationValue.trim())
+          .digest("hex"),
+      }));
+
+      const { error: recErr } = await supabase.from("recipients").insert(rows);
+      if (recErr) {
+        console.error("RECIPIENTS_INSERT_ERROR", recErr);
+        throw new Error("שמירת הנמענים נכשלה");
+      }
+
+      return { id: doc.id };
+    } catch (err) {
+      console.error("CREATE_SIGNATURE_REQUEST_FAILED", err);
+      throw err instanceof Error ? err : new Error("שליחה נכשלה");
     }
-
-    const rows = data.recipients.map((r, idx) => ({
-      document_id: doc.id,
-      name: r.name,
-      email: r.email,
-      role: r.role,
-      signing_order: data.signInOrder ? idx + 1 : null,
-      verification_type: r.verificationType,
-      verification_value_hash: createHash("sha256")
-        .update(r.verificationValue.trim())
-        .digest("hex"),
-    }));
-
-    const { error: recErr } = await supabase.from("recipients").insert(rows);
-    if (recErr) {
-      throw new Error(recErr.message);
-    }
-
-    return { id: doc.id };
   });
