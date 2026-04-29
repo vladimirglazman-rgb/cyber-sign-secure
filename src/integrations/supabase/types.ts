@@ -85,27 +85,51 @@ export type Database = {
           email: string
           id: string
           name: string
+          opened_at: string | null
           role: Database["public"]["Enums"]["recipient_role"]
+          signature_data_url: string | null
+          signed_at: string | null
+          signed_ip: string | null
+          signed_user_agent: string | null
           signing_order: number | null
+          signing_token: string | null
           status: Database["public"]["Enums"]["recipient_status"]
+          verification_type: string | null
+          verification_value_hash: string | null
         }
         Insert: {
           document_id: string
           email: string
           id?: string
           name: string
+          opened_at?: string | null
           role?: Database["public"]["Enums"]["recipient_role"]
+          signature_data_url?: string | null
+          signed_at?: string | null
+          signed_ip?: string | null
+          signed_user_agent?: string | null
           signing_order?: number | null
+          signing_token?: string | null
           status?: Database["public"]["Enums"]["recipient_status"]
+          verification_type?: string | null
+          verification_value_hash?: string | null
         }
         Update: {
           document_id?: string
           email?: string
           id?: string
           name?: string
+          opened_at?: string | null
           role?: Database["public"]["Enums"]["recipient_role"]
+          signature_data_url?: string | null
+          signed_at?: string | null
+          signed_ip?: string | null
+          signed_user_agent?: string | null
           signing_order?: number | null
+          signing_token?: string | null
           status?: Database["public"]["Enums"]["recipient_status"]
+          verification_type?: string | null
+          verification_value_hash?: string | null
         }
         Relationships: [
           {
@@ -140,12 +164,50 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_signing_context: {
+        Args: { _token: string; _verification: string }
+        Returns: {
+          already_signed: boolean
+          document_id: string
+          file_name: string
+          file_path: string
+          message: string
+          recipient_id: string
+          subject: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      mark_recipient_opened: {
+        Args: { _token: string; _verification: string }
+        Returns: undefined
+      }
+      peek_signing_token: {
+        Args: { _token: string }
+        Returns: {
+          already_signed: boolean
+          document_subject: string
+          recipient_name: string
+          verification_type: string
+        }[]
+      }
+      sign_recipient: {
+        Args: {
+          _ip: string
+          _signature: string
+          _token: string
+          _ua: string
+          _verification: string
+        }
+        Returns: {
+          all_signed: boolean
+          out_document_id: string
+        }[]
       }
     }
     Enums: {
