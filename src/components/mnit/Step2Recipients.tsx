@@ -1,5 +1,5 @@
-import { Plus, Trash2, User, ShieldCheck } from "lucide-react";
-import type { SignatureRequestApi, VerificationType } from "@/hooks/use-signature-request";
+import { Plus, Trash2, User, ShieldCheck, Mail, MessageCircle, Phone } from "lucide-react";
+import type { SignatureRequestApi, VerificationType, DeliveryMethod } from "@/hooks/use-signature-request";
 import { StepCard } from "./StepCard";
 export function Step2Recipients({ api }: { api: SignatureRequestApi }) {
   return (
@@ -23,6 +23,44 @@ export function Step2Recipients({ api }: { api: SignatureRequestApi }) {
               <button type="button" onClick={() => api.removeRecipient(r.id)} className="rounded-md p-2 text-muted-foreground hover:bg-destructive/15 hover:text-destructive" aria-label="הסר נמען">
                 <Trash2 className="h-4 w-4" />
               </button>
+            </div>
+            <div className="mt-2 grid grid-cols-1 gap-2 md:grid-cols-[200px_1fr]">
+              <div className="flex items-center gap-1.5 rounded-md border border-primary/20 bg-background/50 px-2 py-1.5">
+                {r.deliveryMethod === "sms" ? (
+                  <MessageCircle className="h-3.5 w-3.5 text-primary" />
+                ) : (
+                  <Mail className="h-3.5 w-3.5 text-primary" />
+                )}
+                <span className="text-[11px] text-muted-foreground">שיטת שליחה</span>
+                <select
+                  value={r.deliveryMethod}
+                  onChange={(e) => {
+                    const dm = e.target.value as DeliveryMethod;
+                    api.updateRecipient(r.id, {
+                      deliveryMethod: dm,
+                      ...(dm === "sms" ? { verificationType: "phone" as VerificationType } : {}),
+                    });
+                  }}
+                  className="ms-auto bg-transparent text-xs text-foreground outline-none"
+                >
+                  <option value="email">אימייל</option>
+                  <option value="sms">SMS / וואטסאפ</option>
+                </select>
+              </div>
+              {r.deliveryMethod === "sms" ? (
+                <div className="relative">
+                  <Phone className="absolute end-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    dir="ltr"
+                    value={r.phone}
+                    onChange={(e) => api.updateRecipient(r.id, { phone: e.target.value })}
+                    placeholder="05X-XXXXXXX"
+                    className="w-full rounded-md border border-primary/20 bg-background/50 pe-8 ps-3 py-1.5 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+              ) : (
+                <div className="text-[11px] text-muted-foreground self-center">הקישור יישלח לאימייל שלמעלה</div>
+              )}
             </div>
             <div className="mt-2 grid grid-cols-1 gap-2 md:grid-cols-[160px_1fr]">
               <div className="flex items-center gap-1.5 rounded-md border border-primary/20 bg-background/50 px-2 py-1.5">
