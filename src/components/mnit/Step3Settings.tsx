@@ -1,16 +1,23 @@
 import type { SignatureRequestApi, ReminderDays } from "@/hooks/use-signature-request";
 import { StepCard } from "./StepCard";
+import { AiRefineButton } from "./AiRefineButton";
 export function Step3Settings({ api }: { api: SignatureRequestApi }) {
   return (
     <StepCard step={3} title="הגדרות" description="נושא, הודעה ותזכורות">
       <div className="flex flex-col gap-4">
         <div>
-          <label className="mb-1 block text-xs font-medium text-muted-foreground">נושא</label>
+          <div className="mb-1 flex items-center justify-between">
+            <label className="text-xs font-medium text-muted-foreground">נושא</label>
+            <AiRefineButton field="subject" value={api.subject} onApply={api.setSubject} />
+          </div>
           <input value={api.subject} onChange={(e) => api.setSubject(e.target.value)} placeholder="חתימה על הסכם שירותים"
             className="w-full rounded-md border border-primary/20 bg-background/50 px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
         </div>
         <div>
-          <label className="mb-1 block text-xs font-medium text-muted-foreground">הודעה</label>
+          <div className="mb-1 flex items-center justify-between">
+            <label className="text-xs font-medium text-muted-foreground">הודעה</label>
+            <AiRefineButton field="message" value={api.message} contextSubject={api.subject} onApply={api.setMessage} />
+          </div>
           <textarea value={api.message} onChange={(e) => api.setMessage(e.target.value)} rows={3} placeholder="הודעה אישית לנמענים…"
             className="w-full resize-none rounded-md border border-primary/20 bg-background/50 px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
         </div>

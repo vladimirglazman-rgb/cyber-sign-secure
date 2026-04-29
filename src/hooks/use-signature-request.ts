@@ -9,11 +9,15 @@ export type UploadedFile = {
 
 export type RecipientRole = "signer" | "cc";
 
+export type VerificationType = "id_number" | "phone";
+
 export type Recipient = {
   id: string;
   name: string;
   email: string;
   role: RecipientRole;
+  verificationType: VerificationType;
+  verificationValue: string;
 };
 
 export type ReminderDays = 1 | 3 | 7;
@@ -26,6 +30,8 @@ const emptyRecipient = (): Recipient => ({
   name: "",
   email: "",
   role: "signer",
+  verificationType: "id_number",
+  verificationValue: "",
 });
 
 export function useSignatureRequest() {
@@ -88,7 +94,10 @@ export function useSignatureRequest() {
   const canSend = useMemo(() => {
     const hasFile = files.length > 0;
     const hasValidRecipient = recipients.some(
-      (r) => r.name.trim().length > 0 && emailRe.test(r.email.trim())
+      (r) =>
+        r.name.trim().length > 0 &&
+        emailRe.test(r.email.trim()) &&
+        r.verificationValue.trim().length >= 4
     );
     const hasSubject = subject.trim().length > 0;
     return hasFile && hasValidRecipient && hasSubject;
