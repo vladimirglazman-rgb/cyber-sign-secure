@@ -1,4 +1,4 @@
-import { FileText, Link2, Check } from "lucide-react";
+import { FileText, Link2, Check, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import type { DocumentRow } from "@/server/documents.functions";
@@ -25,6 +25,17 @@ export function ActivityItem({ doc }: { doc: DocumentRow }) {
       toast.error("העתקה נכשלה");
     }
   };
+  const sendWhatsApp = (token: string, phone: string | null | undefined) => {
+    const url = `${window.location.origin}/sign/${token}`;
+    const text = `היי, מצורף מסמך לחתימתך ב-MNIT Sign: ${url}`;
+    const digits = (phone ?? "").replace(/\D/g, "");
+    let intl = digits;
+    if (digits.startsWith("0")) intl = `972${digits.slice(1)}`;
+    const wa = intl
+      ? `https://wa.me/${intl}?text=${encodeURIComponent(text)}`
+      : `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(wa, "_blank", "noopener,noreferrer");
+  };
   return (
     <li className="flex flex-col gap-2 rounded-lg border border-primary/10 bg-primary/5 p-2.5">
       <div className="flex items-center gap-3">
@@ -48,11 +59,20 @@ export function ActivityItem({ doc }: { doc: DocumentRow }) {
               <button
                 type="button"
                 onClick={() => r.signing_token && copy(r.signing_token, r.name)}
-                className="inline-flex items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] text-primary transition hover:bg-primary/20"
+                className="inline-flex items-center gap-1 rounded-md border border-primary/60 bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary glow-aqua transition hover:bg-primary/25"
                 title="העתק קישור חתימה"
               >
                 {copiedId === r.signing_token ? <Check className="h-3 w-3" /> : <Link2 className="h-3 w-3" />}
                 {copiedId === r.signing_token ? "הועתק" : "העתק קישור"}
+              </button>
+              <button
+                type="button"
+                onClick={() => r.signing_token && sendWhatsApp(r.signing_token, r.phone)}
+                className="inline-flex items-center gap-1 rounded-md border border-emerald-400/40 bg-emerald-400/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-200 transition hover:bg-emerald-400/20"
+                title="שלח בוואטסאפ"
+              >
+                <MessageCircle className="h-3 w-3" />
+                וואטסאפ
               </button>
             </li>
           ))}
