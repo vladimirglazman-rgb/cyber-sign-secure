@@ -1,7 +1,22 @@
+import { useEffect } from "react";
 import { Plus, Trash2, User, ShieldCheck, Mail, MessageCircle, Phone } from "lucide-react";
 import type { SignatureRequestApi, VerificationType, DeliveryMethod } from "@/hooks/use-signature-request";
 import { StepCard } from "./StepCard";
 export function Step2Recipients({ api }: { api: SignatureRequestApi }) {
+  // Sync verification value to phone when verifying by phone via SMS
+  useEffect(() => {
+    api.recipients.forEach((r) => {
+      if (
+        r.verificationType === "phone" &&
+        r.deliveryMethod === "sms" &&
+        r.phone &&
+        r.phone !== r.verificationValue
+      ) {
+        api.updateRecipient(r.id, { verificationValue: r.phone });
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [api.recipients]);
   return (
     <StepCard step={2} title="נמענים" description="הוסף את האנשים שיחתמו על המסמך">
       <div className="flex flex-col gap-3">
@@ -13,8 +28,14 @@ export function Step2Recipients({ api }: { api: SignatureRequestApi }) {
                 <input value={r.name} onChange={(e) => api.updateRecipient(r.id, { name: e.target.value })} placeholder={`שם נמען ${idx + 1}`}
                   className="w-full rounded-md border border-primary/20 bg-background/50 pe-8 ps-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
               </div>
-              <input type="email" dir="ltr" value={r.email} onChange={(e) => api.updateRecipient(r.id, { email: e.target.value })} placeholder="email@example.com"
-                className="w-full rounded-md border border-primary/20 bg-background/50 px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+              <input
+                type="email"
+                dir="ltr"
+                value={r.email}
+                onChange={(e) => api.updateRecipient(r.id, { email: e.target.value })}
+                placeholder="email@example.com"
+                className={`w-full rounded-md border bg-background/50 px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary ${r.deliveryMethod === "email" ? "border-primary/20" : "border-primary/10 opacity-70"}`}
+              />
               <select value={r.role} onChange={(e) => api.updateRecipient(r.id, { role: e.target.value as "signer" | "cc" })}
                 className="rounded-md border border-primary/20 bg-background/50 px-3 py-2 text-sm text-foreground outline-none focus:border-primary">
                 <option value="signer">חותם</option>
@@ -47,20 +68,21 @@ export function Step2Recipients({ api }: { api: SignatureRequestApi }) {
                   <option value="sms">SMS / וואטסאפ</option>
                 </select>
               </div>
-              {r.deliveryMethod === "sms" ? (
-                <div className="relative">
-                  <Phone className="absolute end-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <input
-                    dir="ltr"
-                    value={r.phone}
-                    onChange={(e) => api.updateRecipient(r.id, { phone: e.target.value })}
-                    placeholder="05X-XXXXXXX"
-                    className="w-full rounded-md border border-primary/20 bg-background/50 pe-8 ps-3 py-1.5 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-                  />
-                </div>
-              ) : (
-                <div className="text-[11px] text-muted-foreground self-center">הקישור יישלח לאימייל שלמעלה</div>
-              )}
+              <div className="relative">
+                <Phone className="absolute end-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  dir="ltr"
+                  value={r.phone}
+                  onChange={(e) => api.updateRecipient(r.id, { phone: e.target.value })}
+                  placeholder="מספר טלפון 05X-XXXXXXX"
+                  required={r.deliveryMethod === "sms"}
+                  className={`w-full rounded-md border bg-background/50 pe-8 ps-3 py-1.5 text-sm text-foreground outline-none focus:ring-1 focus:ring-primary ${
+                    r.deliveryMethod === "sms"
+                      ? "border-primary focus:border-primary glow-aqua"
+                      : "border-primary/20 focus:border-primary"
+                  }`}
+                />
+              </div>
             </div>
             <div className="mt-2 grid grid-cols-1 gap-2 md:grid-cols-[160px_1fr]">
               <div className="flex items-center gap-1.5 rounded-md border border-primary/20 bg-background/50 px-2 py-1.5">

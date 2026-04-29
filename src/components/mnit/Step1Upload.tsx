@@ -21,26 +21,41 @@ export function Step1Upload({ api, setPath, removePath }: { api: SignatureReques
     for (const file of arr) {
       try {
         setBusy(file.name);
-        const { data: userData, error: userErr } = await supabase.auth.getUser();
-        if (userErr || !userData?.user) {
-          console.error("UPLOAD_FAILED_UNAUTHENTICATED", userErr);
-          toast.error("יש להתחבר מחדש כדי להעלות קבצים");
+        const { data: sessionData } = await supabase.auth.getSession();
+        const userId = sessionData.session?.user?.id;
+        if (!userId) {
+          console.error("UPLOAD_FAILED_UNAUTHENTICATED");
+          toast.error("חובה להיות מחובר כדי להעלות קובץ");
           continue;
         }
-        const userId = userData.user.id;
+        // Always rename — guarantees Hebrew/non-ASCII filenames don't break the path
         const dot = file.name.lastIndexOf(".");
         const rawExt = dot >= 0 ? file.name.slice(dot).toLowerCase() : "";
         const ext = /^\.[a-z0-9]{1,8}$/.test(rawExt) ? rawExt : ".pdf";
-        const uuid = (crypto as Crypto & { randomUUID?: () => string }).randomUUID?.()
-          ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+        const uuid =
+          (crypto as Crypto & { randomUUID?: () => string }).randomUUID?.() ??
+          `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
         const path = `${userId}/${Date.now()}_${uuid}${ext}`;
-        const contentType = ext === ".pdf" ? "application/pdf" : (file.type || "application/octet-stream");
-        const { error } = await supabase.storage.from("contracts").upload(path, file, { contentType, upsert: false });
-        if (error) throw error;
+        const contentType =
+          ext === ".pdf" ? "application/pdf" : file.type || "application/octet-stream";
+        const { error } = await supabase.storage
+          .from("contracts")
+          .upload(path, file, { contentType, upsert: false });
+        if (error) {
+          const status = (error as { statusCode?: string | number }).statusCode;
+          if (String(status) === "403") {
+            console.error("STORAGE_POLICY_ERROR", error);
+            toast.error("נפלה שגיאת הרשאות באחסון, אנא פנה למנהל");
+          } else {
+            console.error("UPLOAD_FAILED", error);
+            toast.error(`שגיאה בהעלאת הקובץ: ${error.message ?? ""}`);
+          }
+          continue;
+        }
         const [id] = api.addFiles([file]);
         if (id) setPath(id, path);
       } catch (e) {
-        const err = e as { message?: string; statusCode?: string | number };
+        const err = e as { message?: string };
         console.error("UPLOAD_FAILED", err);
         toast.error(`שגיאה בהעלאת הקובץ${err?.message ? `: ${err.message}` : ""}`);
       }

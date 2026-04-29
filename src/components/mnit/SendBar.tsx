@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import type { SignatureRequestApi } from "@/hooks/use-signature-request";
 import { isValidEmail } from "@/hooks/use-signature-request";
 import { createSignatureRequest } from "@/server/documents.functions";
+import { getAuthHeaders } from "@/lib/auth-headers";
 export function SendBar({ api, paths, resetPaths }: { api: SignatureRequestApi; paths: Record<string, string>; resetPaths: () => void }) {
   const [sending, setSending] = useState(false);
   const qc = useQueryClient();
@@ -14,26 +15,44 @@ export function SendBar({ api, paths, resetPaths }: { api: SignatureRequestApi; 
     const filePath = paths[file.id];
     if (!filePath) { toast.error("הקובץ עדיין מועלה"); return; }
     const valid = api.recipients
-      .filter((r) => r.name.trim() && isValidEmail(r.email) && r.verificationValue.trim().length >= 4)
+      .filter((r) => {
+        if (!r.name.trim() || r.verificationValue.trim().length < 4) return false;
+        if (r.deliveryMethod === "sms") return r.phone.trim().length >= 7;
+        return isValidEmail(r.email);
+      })
       .map((r) => ({
         name: r.name.trim(),
         email: r.email.trim(),
+        phone: r.phone.trim() || null,
+        deliveryMethod: r.deliveryMethod,
         role: r.role,
         verificationType: r.verificationType,
-        verificationValue: r.verificationValue.trim(),
+        verificationValue:
+          r.verificationType === "phone" && r.deliveryMethod === "sms" && r.phone.trim()
+            ? r.phone.trim()
+            : r.verificationValue.trim(),
       }));
-    if (valid.length === 0) { toast.error("יש להוסיף לפחות נמען אחד עם אימייל תקין"); return; }
+    if (valid.length === 0) {
+      toast.error("יש להוסיף לפחות נמען אחד עם פרטים תקינים");
+      return;
+    }
     try {
       setSending(true);
-      await createSignatureRequest({ data: {
-        filePath, fileName: file.name, subject: api.subject.trim(),
-        message: api.message.trim() || null, signInOrder: api.signInOrder,
-        reminderDays: api.remindersEnabled ? api.reminderDays : null, recipients: valid,
-      }});
+      await createSignatureRequest({
+        headers: await getAuthHeaders(),
+        data: {
+          filePath, fileName: file.name, subject: api.subject.trim(),
+          message: api.message.trim() || null, signInOrder: api.signInOrder,
+          reminderDays: api.remindersEnabled ? api.reminderDays : null, recipients: valid,
+        },
+      });
       toast.success("הבקשה נשלחה לחתימה בהצלחה");
       api.reset(); resetPaths();
       qc.invalidateQueries({ queryKey: ["dashboard"] });
-    } catch (e) { console.error(e); toast.error("אירעה שגיאה, נסה שוב"); }
+    } catch (e) {
+      console.error("SEND_FAILED", e);
+      toast.error(e instanceof Error ? e.message : "אירעה שגיאה, נסה שוב");
+    }
     finally { setSending(false); }
   };
   return (

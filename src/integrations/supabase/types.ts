@@ -81,11 +81,13 @@ export type Database = {
       }
       recipients: {
         Row: {
+          delivery_method: string
           document_id: string
           email: string
           id: string
           name: string
           opened_at: string | null
+          phone: string | null
           role: Database["public"]["Enums"]["recipient_role"]
           signature_data_url: string | null
           signed_at: string | null
@@ -98,11 +100,13 @@ export type Database = {
           verification_value_hash: string | null
         }
         Insert: {
+          delivery_method?: string
           document_id: string
           email: string
           id?: string
           name: string
           opened_at?: string | null
+          phone?: string | null
           role?: Database["public"]["Enums"]["recipient_role"]
           signature_data_url?: string | null
           signed_at?: string | null
@@ -115,11 +119,13 @@ export type Database = {
           verification_value_hash?: string | null
         }
         Update: {
+          delivery_method?: string
           document_id?: string
           email?: string
           id?: string
           name?: string
           opened_at?: string | null
+          phone?: string | null
           role?: Database["public"]["Enums"]["recipient_role"]
           signature_data_url?: string | null
           signed_at?: string | null
