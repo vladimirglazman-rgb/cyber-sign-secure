@@ -11,15 +11,19 @@ export function useDashboard() {
   });
 
   useEffect(() => {
-    const channel = supabase
-      .channel("dashboard-realtime")
-      .on("postgres_changes", { event: "*", schema: "public", table: "documents" }, () => {
-        qc.invalidateQueries({ queryKey: ["dashboard"] });
-      })
-      .on("postgres_changes", { event: "*", schema: "public", table: "recipients" }, () => {
-        qc.invalidateQueries({ queryKey: ["dashboard"] });
-      })
-      .subscribe();
+    const channelName = `dashboard-realtime-${Math.random().toString(36).slice(2)}`;
+    const channel = supabase.channel(channelName);
+    channel.on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "documents" },
+      () => qc.invalidateQueries({ queryKey: ["dashboard"] }),
+    );
+    channel.on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "recipients" },
+      () => qc.invalidateQueries({ queryKey: ["dashboard"] }),
+    );
+    channel.subscribe();
     return () => {
       supabase.removeChannel(channel);
     };
