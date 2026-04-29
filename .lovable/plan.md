@@ -1,125 +1,135 @@
 
-# Phase 1 — MNIT Sign: Build (approved)
+# Phase 2 — MNIT Sign: AI Refinement & Client Signing Flow
 
-Connect the Cyber-Legal UI to Lovable Cloud (Supabase). Add auth, persist documents/recipients, store PDFs, bind the sidebar to real data. Hebrew RTL throughout.
+Adds AI text refinement in Step 3, a token-protected public client signing route with drawn signatures and audit log, realtime sidebar updates, and a line-numbers toggle in the document preview. Hebrew RTL throughout. Cyber-Legal aesthetic preserved (aqua glow, glassmorphism, animated grid).
 
-## 1. Infrastructure
+## 1. Database migration
 
-- Enable Lovable Cloud → provisions `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, service role, and `src/integrations/supabase/{client,client.server,auth-middleware}.ts`.
-- Disable email confirmation in auth settings (instant signup → login).
+Extend `recipients` with signing/audit columns and add public RPCs that are the **only** anonymous-callable surface (RLS on the table itself stays locked to owners).
 
-## 2. Database migration (single file)
+New columns on `recipients`:
+- `signing_token text unique` — random 24-byte hex (default `encode(gen_random_bytes(24),'hex')`).
+- `verification_type text check in ('id_number','phone')`.
+- `verification_value_hash text` — sha256 of the ID/phone (never plaintext).
+- `signed_at timestamptz`, `signed_ip text`, `signed_user_agent text`.
+- `signature_data_url text` — drawn PNG dataURL (size-limited 50–200KB in RPC).
+- `opened_at timestamptz` — first verified view.
 
-**Enums**
-- `app_role` → `'admin' | 'freelancer'`
-- `document_status` → `'pending' | 'signed' | 'cancelled'`
-- `recipient_role` → `'signer' | 'cc'`
-- `recipient_status` → `'waiting' | 'signed'`
+Three SECURITY DEFINER RPCs granted to `anon`/`authenticated`:
+- `peek_signing_token(_token)` → `{ verification_type, recipient_name, document_subject }` for the verification screen.
+- `get_signing_context(_token, _verification)` → recipient/document row only on hash match.
+- `sign_recipient(_token, _verification, _signature, _ip, _ua)` → updates the recipient, flips the document to `signed` when all signers complete; returns `{ document_id, all_signed }`.
+- `mark_recipient_opened(_token, _verification)` → first-open timestamp.
 
-**Tables**
-- `profiles(id uuid PK → auth.users on delete cascade, full_name text, created_at timestamptz default now())`
-- `user_roles(id uuid PK default gen_random_uuid(), user_id uuid → auth.users on delete cascade, role app_role not null, unique(user_id, role))` — roles **never** on profiles (privilege-escalation safety).
-- `documents(id uuid PK default gen_random_uuid(), owner_id uuid → profiles on delete cascade, file_name text, file_path text, status document_status default 'pending', subject text, message text, sign_in_order bool default false, reminder_days int, created_at timestamptz default now())`
-- `recipients(id uuid PK default gen_random_uuid(), document_id uuid → documents on delete cascade, name text, email text, role recipient_role default 'signer', status recipient_status default 'waiting', signing_order int)`
+Realtime: add `documents` and `recipients` to `supabase_realtime` publication and set `replica identity full`.
 
-**Functions / triggers**
-- `public.has_role(_user_id uuid, _role app_role) returns boolean` — `SECURITY DEFINER`, used in RLS to avoid recursion.
-- `public.handle_new_user()` — `SECURITY DEFINER` trigger on `auth.users insert` → inserts `profiles` row + default `user_roles('freelancer')`.
+Indexes: `recipients_signing_token_idx`.
 
-**Storage**
-- Private bucket `contracts`. Path layout enforced by RLS: `contracts/{auth.uid()}/{timestamp}_{safeName}`.
+## 2. AI refinement (Step 3)
 
-## 3. Row-Level Security
+`src/server/ai.functions.ts` exports `refineText`, an auth-protected server fn:
+- Input: `{ field: 'subject'|'message', text: string, contextSubject?: string }` (Zod, ≤2000 chars).
+- Calls Lovable AI Gateway (`google/gemini-3-flash-preview`) with a Hebrew system prompt: professional, legally-sound, concise; return ONLY the refined text (no preamble).
+- Surfaces 429 ("חרגת ממכסת הבקשות") and 402 ("נדרש מילוי קרדיטים").
 
-Enable RLS on all four tables.
+`src/components/mnit/AiRefineButton.tsx` — Sparkles button + suggestion panel:
+- Click → loading state (cyan pulsing `animate-pulse-glow`).
+- Result rendered in a glass card below the field with original vs. suggestion (simple side-by-side, NOT word-level diff to keep it lightweight).
+- Buttons: **"החל"** / **"בטל"**.
 
-- `profiles`: select/update own row.
-- `user_roles`: select own; only admins write (via `has_role`).
-- `documents`: full CRUD where `owner_id = auth.uid()`.
-- `recipients`: CRUD allowed when parent `document.owner_id = auth.uid()`.
-- `storage.objects` on `contracts`: `insert/select/delete` only when first path segment = `auth.uid()`.
+`Step3Settings.tsx` — wires the button next to the subject and message labels.
 
-## 4. Auth (Hebrew, Cyber-Legal)
+## 3. Per-recipient verification (Step 2)
 
-- `src/routes/auth.tsx` — tabs `התחברות` / `הרשמה`, glassmorphic card, Aqua-glow CTA.
-  - `signUp({ ..., options: { emailRedirectTo: window.location.origin } })`
-  - `signInWithPassword`.
-- `src/routes/_authenticated.tsx` — pathless layout guard. `onAuthStateChange` listener set up **before** `getSession()`; redirects to `/auth` if no session.
-- Move dashboard → `src/routes/_authenticated/index.tsx` (replaces placeholder `index.tsx`).
-- `TopBar` shows real `full_name` from `profiles` + logout button.
+Each row in `Step2Recipients.tsx` gets two more controls:
+- Select: "אימות לפי" → `ת.ז.` / `טלפון`.
+- Input: "ערך אימות" (the actual ID/phone number; basic length validation).
 
-## 5. Server functions (`src/server/`)
+`use-signature-request.ts` — recipients gain `verificationType` and `verificationValue`. `canSend` requires both.
 
-All authenticated fns use `requireSupabaseAuth` so RLS applies as the user.
+`createSignatureRequest` server fn — hashes `verification_value` with `sha256` server-side and stores the hash + type when inserting recipient rows.
 
-- `documents.functions.ts`
-  - `listMyDocuments()` → `{ documents, stats: { total, signed, pending, cancelled } }`
-  - `createSignatureRequest({ filePath, fileName, subject, message, signInOrder, reminderDays, recipients })` → inserts the `documents` row + `recipients` rows; returns new doc id.
-- `storage.functions.ts`
-  - `getUploadTarget({ fileName })` → returns safe `{ path: '<uid>/<ts>_<safeName>' }`. The browser uploads directly via `supabase.storage.from('contracts').upload(path, file)` — no large-payload pass-through.
+## 4. Public client signing route
 
-Zod validation on every input (`subject` 1–200, `recipients` 1–20, valid email, `reminderDays ∈ {1,3,7}`).
+New routes (NOT under `_authenticated`):
 
-## 6. Components (rebuild Phase 0, data-bound)
+`src/routes/sign.$token.tsx` — three local stages with smooth transitions:
 
-`src/components/mnit/`
-- `AnimatedGrid.tsx` — drifting cyber-grid background.
-- `TopBar.tsx` *(edit)* — user name, logout.
-- `Sidebar.tsx` — branding + **StatTile** grid (סה״כ / נחתמו / ממתינים / בוטלו) + **Recent Activity** with Hebrew status chips. Driven by TanStack Query via `useDashboard`.
-- `StatTile.tsx`, `ActivityItem.tsx`.
-- `Workspace.tsx` — 3-col grid `[280px_1fr_360px]`, stacks <768px (RTL via `dir="rtl"` on `__root.tsx`, logical `ms-*` / `pe-*` utilities throughout).
-- `StepCard.tsx` — glass panel header with step number + title.
-- `Step1Upload.tsx` — drag-and-drop zone (validate ≤20MB, types: pdf/doc/docx/png/jpg). On drop: `getUploadTarget` → upload → store `{path, name}` in local state.
-- `Step2Recipients.tsx` — dynamic rows (שם / אימייל / תפקיד), `הוסף נמען`, remove button.
-- `Step3Settings.tsx` — נושא, הודעה, סדר חתימה, תזכורות (1/3/7 ימים).
-- `DocumentPreview.tsx` — framed glass panel with placeholder mockup that reacts to chosen file name.
-- `SendBar.tsx` — disabled until valid; on click → `createSignatureRequest`, `toast.success('הבקשה נשלחה לחתימה בהצלחה')`, reset form, invalidate `['dashboard']` query.
+```text
+[1] Verify ID/Phone  →  [2] Document viewer + "Sign Here"  →  [3] Success
+```
 
-`src/hooks/`
-- `use-signature-request.ts` *(keep)* — local form state + `canSend`.
-- `use-dashboard.ts` *(new)* — `useQuery(['dashboard', userId], listMyDocuments)`.
+Stage 1 — Verification:
+- On mount: call `peek_signing_token` (anon) to get the recipient name and verification type → render Hebrew prompt.
+- Submit → call `verifySigner` server fn (no auth middleware) which calls `get_signing_context`. Cache verification value in component state for subsequent calls. Wrong → toast "פרטי אימות שגויים". Right → call `mark_recipient_opened`, advance.
 
-## 7. Hebrew copy reference
+Stage 2 — Document viewer:
+- Server fn `getSignedDocumentUrl` (no auth, but re-validates token+verification) returns a 10-minute signed URL via `supabaseAdmin.storage.from('contracts').createSignedUrl(file_path, 600)`.
+- Render in `<iframe>` for PDFs / `<img>` for images. One overlay button "חתום כאן" (mock single zone for Phase 2) opens the modal.
+
+Stage 3 — `SignatureModal` (Shadcn Dialog):
+- `<canvas>` 480×180 with pointer events; aqua stroke; "נקה" / "בטל" / "חתום ושלח".
+- Submit → `submitSignature` server fn captures `x-forwarded-for` + `user-agent` and calls `sign_recipient` RPC.
+- Success → success screen + toast "המסמך נחתם בהצלחה".
+
+`SignatureCanvas.tsx` — small reusable drawing component (pointer events, dpi-aware, `toDataURL('image/png')`).
+
+## 5. Realtime sidebar
+
+`use-dashboard.ts` — after `useQuery`, subscribe to two channels filtered by `owner_id` for `documents` and a join-style filter for `recipients`. On any payload → `queryClient.invalidateQueries(['dashboard'])`. Cleanup on unmount.
+
+## 6. Line numbers toggle
+
+`DocumentPreview.tsx` — small `Hash` icon button in the header toggles a state. When on, each placeholder line is prefixed by `<span class="font-display text-[10px] text-primary text-glow">{nn}</span>`.
+
+## 7. File map
+
+```text
+supabase migration                            (recipient cols, 4 RPCs, realtime, indexes)
+src/server/ai.functions.ts                    (refineText)
+src/server/signing.functions.ts               (peekToken, verifySigner, getSignedDocumentUrl, submitSignature)
+src/server/documents.functions.ts             (edit — hash & store verification on recipients)
+src/routes/sign.$token.tsx                    (3-stage public flow)
+src/components/mnit/SignatureCanvas.tsx       (canvas drawing)
+src/components/mnit/SignatureModal.tsx        (Dialog wrapper)
+src/components/mnit/AiRefineButton.tsx        (sparkle button + suggestion panel)
+src/components/mnit/Step2Recipients.tsx       (edit — verification fields)
+src/components/mnit/Step3Settings.tsx         (edit — wire AiRefineButton)
+src/components/mnit/DocumentPreview.tsx       (edit — line-numbers toggle)
+src/hooks/use-signature-request.ts            (edit — verification fields, canSend)
+src/hooks/use-dashboard.ts                    (edit — realtime subscription)
+```
+
+## 8. Hebrew copy reference
 
 | Key | Hebrew |
 |---|---|
-| Send CTA | שלח לחתימה |
-| Stats | סה״כ / נחתמו / ממתינים / בוטלו |
-| Steps | העלאת מסמך / נמענים / הגדרות |
-| Empty state | עדיין אין מסמכים — העלה את הראשון |
-| Toast success | הבקשה נשלחה לחתימה בהצלחה |
-| Toast error | אירעה שגיאה, נסה שוב |
-| Auth tabs | התחברות / הרשמה |
-| Auth fields | שם מלא / אימייל / סיסמה |
-| Logout | התנתק |
+| AI button | שכלל עם AI |
+| AI loading | מנתח את הטקסט… |
+| Apply / Discard | החל / בטל |
+| Step 2 verify type | אימות לפי |
+| Step 2 verify value | ערך אימות (ת.ז. / טלפון) |
+| Sign route title | חתימה דיגיטלית |
+| Verify prompt | אנא הזן את מספר הזהות / הטלפון לאימות |
+| Wrong creds | פרטי אימות שגויים |
+| Sign here | חתום כאן |
+| Modal title | חתום במסגרת |
+| Clear | נקה |
+| Submit signature | חתום ושלח |
+| Sign success | המסמך נחתם בהצלחה |
+| Line numbers | מספרי שורות |
+| Sidebar realtime | (שקוף — invalidates query) |
 
-## 8. Out of scope (Phase 2+)
+## 9. Acceptance criteria
 
-Real PDF rendering, outbound signature emails to recipients, templates, admin pages, password reset.
+1. Click "שכלל עם AI" on subject/message → loading shimmer → suggestion card with "החל" / "בטל"; applying replaces field text.
+2. Step 2 requires `ת.ז.` / `טלפון` value per recipient; sending stores it as sha256 hash.
+3. Visiting `/sign/<token>` shows the verification screen in Hebrew RTL; wrong value → toast; correct → document viewer + "חתום כאן".
+4. Drawing & submitting flips that recipient to `signed`, records IP/UA/timestamp/dataURL. When all signers complete, document → `signed`.
+5. Sender's sidebar stats update **without reload** when a client signs (Realtime).
+6. Line-numbers toggle in preview shows glowing cyan numbers.
+7. RLS still blocks cross-user access on `documents`/`recipients` tables; the only public surface is the four token RPCs.
 
-## 9. File map
+## 10. Out of scope (Phase 3+)
 
-```text
-supabase migration               (enums, tables, RLS, trigger, has_role, contracts bucket + policies)
-src/routes/
-  auth.tsx
-  _authenticated.tsx
-  _authenticated/index.tsx       (dashboard; replaces placeholder index)
-src/components/mnit/
-  AnimatedGrid.tsx, TopBar.tsx (edit), Sidebar.tsx, StatTile.tsx, ActivityItem.tsx,
-  Workspace.tsx, StepCard.tsx, Step1Upload.tsx, Step2Recipients.tsx,
-  Step3Settings.tsx, DocumentPreview.tsx, SendBar.tsx
-src/server/
-  documents.functions.ts, documents.server.ts, storage.functions.ts
-src/hooks/
-  use-dashboard.ts (new), use-signature-request.ts (keep)
-src/styles.css                   (verify .cyber-grid / .glass-panel / .glow-aqua present)
-```
-
-## 10. Acceptance criteria
-
-1. Logged-out visit to `/` → redirect to `/auth`. Signup auto-creates `profiles` + `user_roles('freelancer')` and logs in immediately (no email confirm).
-2. Step 1 drop stores file under `contracts/<uid>/...` and shows a chip with the filename.
-3. "שלח לחתימה" inserts `documents` + N `recipients`, fires Hebrew success toast, resets the form, sidebar stats increment without reload.
-4. RLS verified by signing in as a second user — only their own docs/stats appear.
-5. No console errors; existing dynamic-import preview crash is gone; cyber-grid + Aqua-glow + glass panels render in RTL.
+Real PDF rendering with click-anywhere zones, email/SMS delivery to recipients, OTP, embedding the rendered signature into the original PDF, downloadable certificate of completion.
