@@ -45,11 +45,9 @@ export function useSignatureRequest() {
       size: f.size,
       type: f.type || "application/octet-stream",
     }));
-    setFiles((prev) => {
-      const next = [...prev, ...incoming];
-      return next;
-    });
+    setFiles((prev) => [...prev, ...incoming]);
     setSelectedFileId((cur) => cur ?? incoming[0]?.id ?? null);
+    return incoming.map((f) => f.id);
   }, []);
 
   const removeFile = useCallback((id: string) => {
