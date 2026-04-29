@@ -13,8 +13,15 @@ export function SendBar({ api, paths, resetPaths }: { api: SignatureRequestApi; 
     if (!file) { toast.error("יש להעלות קובץ"); return; }
     const filePath = paths[file.id];
     if (!filePath) { toast.error("הקובץ עדיין מועלה"); return; }
-    const valid = api.recipients.filter((r) => r.name.trim() && isValidEmail(r.email))
-      .map((r) => ({ name: r.name.trim(), email: r.email.trim(), role: r.role }));
+    const valid = api.recipients
+      .filter((r) => r.name.trim() && isValidEmail(r.email) && r.verificationValue.trim().length >= 4)
+      .map((r) => ({
+        name: r.name.trim(),
+        email: r.email.trim(),
+        role: r.role,
+        verificationType: r.verificationType,
+        verificationValue: r.verificationValue.trim(),
+      }));
     if (valid.length === 0) { toast.error("יש להוסיף לפחות נמען אחד עם אימייל תקין"); return; }
     try {
       setSending(true);

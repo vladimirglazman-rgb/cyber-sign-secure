@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { createHash } from "crypto";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export type DocumentRow = {
@@ -45,6 +46,8 @@ const recipientSchema = z.object({
   name: z.string().min(1).max(120),
   email: z.string().email().max(200),
   role: z.enum(["signer", "cc"]),
+  verificationType: z.enum(["id_number", "phone"]),
+  verificationValue: z.string().min(4).max(40),
 });
 
 const createSchema = z.object({
@@ -88,6 +91,10 @@ export const createSignatureRequest = createServerFn({ method: "POST" })
       email: r.email,
       role: r.role,
       signing_order: data.signInOrder ? idx + 1 : null,
+      verification_type: r.verificationType,
+      verification_value_hash: createHash("sha256")
+        .update(r.verificationValue.trim())
+        .digest("hex"),
     }));
 
     const { error: recErr } = await supabase.from("recipients").insert(rows);
