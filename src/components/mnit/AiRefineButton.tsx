@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Sparkles, Loader2, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { refineText } from "@/server/ai.functions";
+import { getAuthHeaders } from "@/lib/auth-headers";
 
 type Props = {
   field: "subject" | "message";
@@ -23,6 +24,7 @@ export function AiRefineButton({ field, value, contextSubject, onApply }: Props)
       setBusy(true);
       setSuggestion(null);
       const { suggestion: s } = await refineText({
+        headers: await getAuthHeaders(),
         data: { field, text: value.trim(), contextSubject: contextSubject?.trim() || null },
       });
       setSuggestion(s);
