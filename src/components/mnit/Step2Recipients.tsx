@@ -15,7 +15,8 @@ export function Step2Recipients({ api }: { api: SignatureRequestApi }) {
         api.updateRecipient(r.id, { verificationValue: r.phone });
       }
     });
-  }, [api]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [api.recipients]);
   return (
     <StepCard step={2} title="נמענים" description="הוסף את האנשים שיחתמו על המסמך">
       <div className="flex flex-col gap-3">
