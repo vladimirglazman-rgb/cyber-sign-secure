@@ -1,6 +1,24 @@
 import { Bell, ShieldCheck } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useDashboard } from "@/hooks/use-dashboard";
+import { supabase } from "@/integrations/supabase/client";
 
 export function TopBar() {
+  const { data } = useDashboard();
+  const [email, setEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? null));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      setEmail(session?.user?.email ?? null);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  const fullName = data?.profile?.full_name?.trim();
+  const displayName = fullName && fullName.length > 0 ? fullName : email ?? "משתמש";
+  const initial = (displayName[0] ?? "?").toUpperCase();
+
   return (
     <header className="glass-panel mx-4 mt-4 flex items-center justify-between px-5 py-3">
       <div className="flex items-center gap-3">
@@ -28,10 +46,10 @@ export function TopBar() {
         </button>
         <div className="flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 ps-1 pe-3 py-1">
           <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-primary/70 to-primary/30 text-xs font-bold text-background">
-            A
+            {initial}
           </div>
           <div className="flex flex-col leading-tight">
-            <span className="text-xs font-semibold text-foreground">Alex</span>
+            <span className="text-xs font-semibold text-foreground max-w-[160px] truncate">{displayName}</span>
             <span className="text-[10px] text-muted-foreground">Freelancer</span>
           </div>
         </div>
