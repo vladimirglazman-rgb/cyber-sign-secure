@@ -1,4 +1,5 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Toaster } from "@/components/ui/sonner";
 
 import appCss from "../styles.css?url";
 
@@ -29,14 +30,14 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "MNIT Sign — חתימה דיגיטלית מאובטחת" },
+      { name: "description", content: "פלטפורמת חתימה דיגיטלית עתידנית לפרילנסרים — מאובטחת, מהירה ומקצועית." },
+      { name: "author", content: "MNIT" },
+      { property: "og:title", content: "MNIT Sign" },
+      { property: "og:description", content: "Cyber-Legal digital signatures for freelancers." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:site", content: "@MNITSign" },
     ],
     links: [
       {
@@ -52,12 +53,14 @@ export const Route = createRootRoute({
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="he" dir="rtl" className="dark">
       <head>
         <HeadContent />
       </head>
-      <body>
-        {children}
+      <body className="font-body">
+        <div className="cyber-grid" aria-hidden="true" />
+        <div className="relative z-10">{children}</div>
+        <Toaster />
         <Scripts />
       </body>
     </html>
