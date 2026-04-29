@@ -65,8 +65,8 @@ export const submitSignature = createServerFn({ method: "POST" })
     const ip =
       req?.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
       req?.headers.get("x-real-ip") ??
-      null;
-    const ua = req?.headers.get("user-agent") ?? null;
+      "";
+    const ua = req?.headers.get("user-agent") ?? "";
 
     const { data: rows, error } = await supabaseAdmin.rpc("sign_recipient", {
       _token: data.token,
