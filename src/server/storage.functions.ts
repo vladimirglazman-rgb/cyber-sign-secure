@@ -11,7 +11,14 @@ export const getUploadTarget = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => schema.parse(data))
   .handler(async ({ data, context }) => {
     const { userId } = context;
-    const safe = data.fileName.replace(/[^\w.\-\u0590-\u05FF]+/g, "_").slice(-120);
-    const path = `${userId}/${Date.now()}_${safe}`;
+    // Strip non-ASCII (Hebrew etc.) — Supabase Storage keys must be URL-safe ASCII.
+    const dot = data.fileName.lastIndexOf(".");
+    const ext = dot >= 0 ? data.fileName.slice(dot).replace(/[^.\w]+/g, "").toLowerCase() : "";
+    const base = (dot >= 0 ? data.fileName.slice(0, dot) : data.fileName)
+      .replace(/[^\w.\-]+/g, "_")
+      .replace(/_+/g, "_")
+      .replace(/^_|_$/g, "")
+      .slice(0, 60) || "document";
+    const path = `${userId}/${Date.now()}_${base}${ext || ".pdf"}`;
     return { path };
   });
