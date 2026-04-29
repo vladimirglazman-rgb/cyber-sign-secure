@@ -2,12 +2,24 @@ import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { listMyDocuments } from "@/server/documents.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { getAuthHeaders } from "@/lib/auth-headers";
 
 export function useDashboard() {
   const qc = useQueryClient();
   const query = useQuery({
     queryKey: ["dashboard"],
-    queryFn: () => listMyDocuments(),
+    queryFn: async () => {
+      try {
+        return await listMyDocuments({ headers: await getAuthHeaders() });
+      } catch (error) {
+        console.error("DASHBOARD_LOAD_FAILED", error);
+        return {
+          documents: [],
+          stats: { total: 0, signed: 0, pending: 0, cancelled: 0 },
+          profile: null,
+        };
+      }
+    },
   });
 
   useEffect(() => {
