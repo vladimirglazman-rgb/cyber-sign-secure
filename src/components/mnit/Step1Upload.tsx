@@ -2,7 +2,6 @@ import { useCallback, useRef, useState } from "react";
 import { UploadCloud, X, FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { getUploadTarget } from "@/server/storage.functions";
 import type { SignatureRequestApi } from "@/hooks/use-signature-request";
 import { StepCard } from "./StepCard";
 const MAX = 20 * 1024 * 1024;
@@ -22,12 +21,29 @@ export function Step1Upload({ api, setPath, removePath }: { api: SignatureReques
     for (const file of arr) {
       try {
         setBusy(file.name);
-        const { path } = await getUploadTarget({ data: { fileName: file.name } });
-        const { error } = await supabase.storage.from("contracts").upload(path, file, { contentType: file.type || "application/octet-stream", upsert: false });
+        const { data: userData, error: userErr } = await supabase.auth.getUser();
+        if (userErr || !userData?.user) {
+          console.error("UPLOAD_FAILED_UNAUTHENTICATED", userErr);
+          toast.error("יש להתחבר מחדש כדי להעלות קבצים");
+          continue;
+        }
+        const userId = userData.user.id;
+        const dot = file.name.lastIndexOf(".");
+        const rawExt = dot >= 0 ? file.name.slice(dot).toLowerCase() : "";
+        const ext = /^\.[a-z0-9]{1,8}$/.test(rawExt) ? rawExt : ".pdf";
+        const uuid = (crypto as Crypto & { randomUUID?: () => string }).randomUUID?.()
+          ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+        const path = `${userId}/${Date.now()}_${uuid}${ext}`;
+        const contentType = ext === ".pdf" ? "application/pdf" : (file.type || "application/octet-stream");
+        const { error } = await supabase.storage.from("contracts").upload(path, file, { contentType, upsert: false });
         if (error) throw error;
         const [id] = api.addFiles([file]);
         if (id) setPath(id, path);
-      } catch (e) { console.error(e); toast.error("שגיאה בהעלאת הקובץ"); }
+      } catch (e) {
+        const err = e as { message?: string; statusCode?: string | number };
+        console.error("UPLOAD_FAILED", err);
+        toast.error(`שגיאה בהעלאת הקובץ${err?.message ? `: ${err.message}` : ""}`);
+      }
       finally { setBusy(null); }
     }
   }, [api, setPath]);
