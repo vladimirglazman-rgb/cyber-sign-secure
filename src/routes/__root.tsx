@@ -38,11 +38,15 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       { title: "MNIT Sign — חתימה דיגיטלית מאובטחת" },
       { name: "description", content: "פלטפורמת חתימה דיגיטלית עתידנית לפרילנסרים — מאובטחת, מהירה ומקצועית." },
       { name: "author", content: "MNIT" },
-      { property: "og:title", content: "MNIT Sign" },
-      { property: "og:description", content: "Cyber-Legal digital signatures for freelancers." },
+      { property: "og:title", content: "MNIT Sign — חתימה דיגיטלית מאובטחת" },
+      { property: "og:description", content: "פלטפורמת חתימה דיגיטלית עתידנית לפרילנסרים — מאובטחת, מהירה ומקצועית." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@MNITSign" },
+      { name: "twitter:title", content: "MNIT Sign — חתימה דיגיטלית מאובטחת" },
+      { name: "twitter:description", content: "פלטפורמת חתימה דיגיטלית עתידנית לפרילנסרים — מאובטחת, מהירה ומקצועית." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/10edd029-b9b8-40ab-9e01-17fbc7a1ccf2/id-preview-fac2c980--a6ced882-7d67-405c-9a37-beedfecb62c6.lovable.app-1777498354934.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/10edd029-b9b8-40ab-9e01-17fbc7a1ccf2/id-preview-fac2c980--a6ced882-7d67-405c-9a37-beedfecb62c6.lovable.app-1777498354934.png" },
     ],
     links: [
       {
