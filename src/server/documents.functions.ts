@@ -9,6 +9,7 @@ export type DocumentRow = {
   status: "pending" | "signed" | "cancelled";
   subject: string;
   created_at: string;
+  recipients?: { id: string; name: string; email: string; signing_token: string | null; status: string }[];
 };
 
 export type DashboardData = {
@@ -25,7 +26,7 @@ export const listMyDocuments = createServerFn({ method: "GET" })
     const [{ data: docs }, { data: profile }] = await Promise.all([
       supabase
         .from("documents")
-        .select("id, file_name, status, subject, created_at")
+        .select("id, file_name, status, subject, created_at, recipients(id, name, email, signing_token, status)")
         .order("created_at", { ascending: false })
         .limit(50),
       supabase.from("profiles").select("full_name").eq("id", userId).maybeSingle(),

@@ -11,10 +11,14 @@ export type RecipientRole = "signer" | "cc";
 
 export type VerificationType = "id_number" | "phone";
 
+export type DeliveryMethod = "email" | "sms";
+
 export type Recipient = {
   id: string;
   name: string;
   email: string;
+  phone: string;
+  deliveryMethod: DeliveryMethod;
   role: RecipientRole;
   verificationType: VerificationType;
   verificationValue: string;
@@ -29,6 +33,8 @@ const emptyRecipient = (): Recipient => ({
   id: uid(),
   name: "",
   email: "",
+  phone: "",
+  deliveryMethod: "email",
   role: "signer",
   verificationType: "id_number",
   verificationValue: "",
@@ -96,7 +102,9 @@ export function useSignatureRequest() {
     const hasValidRecipient = recipients.some(
       (r) =>
         r.name.trim().length > 0 &&
-        emailRe.test(r.email.trim()) &&
+        (r.deliveryMethod === "sms"
+          ? r.phone.trim().length >= 7
+          : emailRe.test(r.email.trim())) &&
         r.verificationValue.trim().length >= 4
     );
     const hasSubject = subject.trim().length > 0;
