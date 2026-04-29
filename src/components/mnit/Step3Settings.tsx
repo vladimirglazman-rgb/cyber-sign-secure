@@ -1,0 +1,40 @@
+import type { SignatureRequestApi, ReminderDays } from "@/hooks/use-signature-request";
+import { StepCard } from "./StepCard";
+export function Step3Settings({ api }: { api: SignatureRequestApi }) {
+  return (
+    <StepCard step={3} title="הגדרות" description="נושא, הודעה ותזכורות">
+      <div className="flex flex-col gap-4">
+        <div>
+          <label className="mb-1 block text-xs font-medium text-muted-foreground">נושא</label>
+          <input value={api.subject} onChange={(e) => api.setSubject(e.target.value)} placeholder="חתימה על הסכם שירותים"
+            className="w-full rounded-md border border-primary/20 bg-background/50 px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-medium text-muted-foreground">הודעה</label>
+          <textarea value={api.message} onChange={(e) => api.setMessage(e.target.value)} rows={3} placeholder="הודעה אישית לנמענים…"
+            className="w-full resize-none rounded-md border border-primary/20 bg-background/50 px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+        </div>
+        <label className="flex items-center justify-between rounded-lg border border-primary/15 bg-primary/5 p-3">
+          <span className="text-sm text-foreground">חתימה לפי סדר הנמענים</span>
+          <input type="checkbox" checked={api.signInOrder} onChange={(e) => api.setSignInOrder(e.target.checked)} className="h-4 w-4 accent-primary" />
+        </label>
+        <div className="rounded-lg border border-primary/15 bg-primary/5 p-3">
+          <label className="flex items-center justify-between">
+            <span className="text-sm text-foreground">תזכורת אוטומטית</span>
+            <input type="checkbox" checked={api.remindersEnabled} onChange={(e) => api.setRemindersEnabled(e.target.checked)} className="h-4 w-4 accent-primary" />
+          </label>
+          {api.remindersEnabled && (
+            <div className="mt-3 flex gap-2">
+              {[1, 3, 7].map((d) => (
+                <button key={d} type="button" onClick={() => api.setReminderDays(d as ReminderDays)}
+                  className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition ${api.reminderDays === d ? "bg-primary text-primary-foreground glow-aqua" : "border border-primary/20 bg-background/50 text-foreground hover:border-primary"}`}>
+                  כל {d} ימים
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </StepCard>
+  );
+}
