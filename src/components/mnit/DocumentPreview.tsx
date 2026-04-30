@@ -18,7 +18,7 @@ export function DocumentPreview({
 }) {
   const file = api.selectedFile;
   const [opening, setOpening] = useState(false);
-  const [proxyUrl, setProxyUrl] = useState<string | null>(null);
+  const [proxyUrlState, setProxyUrlState] = useState<{ path: string; url: string } | null>(null);
   const blobUrl = useMemo(() => {
     if (file?.file) return URL.createObjectURL(file.file);
     return null;
@@ -35,7 +35,7 @@ export function DocumentPreview({
   // Build a same-origin proxy URL (bypasses ad-blockers that block *.supabase.co).
   useEffect(() => {
     let cancelled = false;
-    setProxyUrl(null);
+    setProxyUrlState(null);
     if (!remotePath) return;
     (async () => {
       try {
@@ -46,7 +46,7 @@ export function DocumentPreview({
           .split("/")
           .map(encodeURIComponent)
           .join("/")}?token=${encodeURIComponent(token)}`;
-        if (!cancelled) setProxyUrl(url);
+        if (!cancelled) setProxyUrlState({ path: remotePath, url });
       } catch (e) {
         console.error("INLINE_PROXY_URL_FAILED", e);
       }
@@ -56,7 +56,9 @@ export function DocumentPreview({
     };
   }, [remotePath]);
   // Prefer same-origin proxy URL. Fall back to local blob until upload completes.
-  const previewSrc = proxyUrl ?? blobUrl;
+  const currentProxyUrl = proxyUrlState?.path === remotePath ? proxyUrlState.url : null;
+  const previewSrc = currentProxyUrl ?? blobUrl;
+  const previewKey = file ? `${file.id}:${previewSrc ?? "pending"}` : "empty";
   const openInNewTab = async () => {
     try {
       setOpening(true);
@@ -119,6 +121,7 @@ export function DocumentPreview({
                     <ImagePreview src={previewSrc} name={file.name} />
                   ) : isPdf ? (
                     <PdfPreview
+                      previewKey={previewKey}
                       src={previewSrc}
                       name={file.name}
                       onOpenExternal={openInNewTab}
