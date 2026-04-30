@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-  Download,
+  CheckCircle2,
   ExternalLink,
   FileText,
   Loader2,
@@ -29,8 +29,6 @@ export function DocumentPreview({
     };
   }, [blobUrl]);
   const ext = (file?.ext || file?.name.split(".").pop() || "").toLowerCase();
-  const isImage = ["png", "jpg", "jpeg", "gif", "webp"].includes(ext);
-  const isPdf = ext === "pdf" || file?.type === "application/pdf";
   const remotePath = file ? paths?.[file.id] : undefined;
   // Build a same-origin proxy URL (bypasses ad-blockers that block *.supabase.co).
   useEffect(() => {
@@ -58,7 +56,6 @@ export function DocumentPreview({
   // Prefer same-origin proxy URL. Fall back to local blob until upload completes.
   const currentProxyUrl = proxyUrlState && proxyUrlState.path === remotePath ? proxyUrlState.url : null;
   const previewSrc = currentProxyUrl ?? blobUrl;
-  const previewKey = file ? `${file.id}:${previewSrc ?? "pending"}` : "empty";
   const openInNewTab = async () => {
     try {
       setOpening(true);
@@ -97,45 +94,13 @@ export function DocumentPreview({
       </header>
       <div className="relative flex-1 overflow-hidden rounded-lg border border-primary/30 bg-gradient-to-b from-background/60 to-background/20 p-5">
         {file ? (
-          <>
-            <div className="mb-3 flex items-center gap-2 border-b border-primary/20 pb-2">
-              <FileText className="h-4 w-4 text-primary" />
-              <span className="truncate text-xs font-medium text-foreground">{file.name}</span>
-            </div>
-            <div className="relative h-[calc(100%-2.5rem)] w-full overflow-hidden rounded-md border border-primary/20 bg-background/60">
-                <button
-                  type="button"
-                  onClick={openInNewTab}
-                  disabled={opening || (!remotePath && !blobUrl)}
-                  className="absolute end-2 top-2 z-20 inline-flex items-center gap-1 rounded-md border border-primary/50 bg-background/85 px-2 py-1 text-[10px] font-semibold text-primary glow-aqua backdrop-blur transition hover:bg-primary/10 disabled:opacity-60"
-                >
-                  {opening ? (
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                  ) : (
-                    <ExternalLink className="h-3 w-3" />
-                  )}
-                  פתח בלשונית חדשה
-                </button>
-                {previewSrc ? (
-                  isImage ? (
-                    <ImagePreview src={previewSrc} name={file.name} />
-                  ) : isPdf ? (
-                    <PdfPreview
-                      previewKey={previewKey}
-                      src={previewSrc}
-                      name={file.name}
-                      onOpenExternal={openInNewTab}
-                    />
-                  ) : blobUrl ? (
-                    <FileCard file={file} blobUrl={blobUrl} />
-                  ) : (
-                    <PreviewLoader />
-                  )
-                ) : (
-                  <PreviewLoader />
-                )}
-            </div>
-          </>
+          <SuccessCard
+            file={file}
+            ext={ext}
+            ready={Boolean(previewSrc)}
+            opening={opening}
+            onOpen={openInNewTab}
+          />
         ) : (
           <div className="flex h-full flex-col items-center justify-center text-center">
             <FileText className="h-10 w-10 text-primary/40" />
@@ -147,113 +112,73 @@ export function DocumentPreview({
   );
 }
 
-function ImagePreview({ src, name }: { src: string; name: string }) {
-  const [loading, setLoading] = useState(true);
-  return (
-    <>
-      {loading && <PreviewLoader />}
-      <img
-        src={src}
-        alt={name}
-        onLoad={() => setLoading(false)}
-        onError={() => setLoading(false)}
-        className="h-full w-full object-contain"
-      />
-    </>
-  );
-}
-
-function PdfPreview({
-  previewKey,
-  src,
-  name,
-  onOpenExternal,
+function SuccessCard({
+  file,
+  ext,
+  ready,
+  opening,
+  onOpen,
 }: {
-  previewKey: string;
-  src: string;
-  name: string;
-  onOpenExternal?: () => void | Promise<void>;
+  file: UploadedFile;
+  ext: string;
+  ready: boolean;
+  opening: boolean;
+  onOpen: () => void | Promise<void>;
 }) {
-  const [loading, setLoading] = useState(true);
-  const [failed, setFailed] = useState(false);
-  // Safety net: if neither onLoad nor onError fires within 4s, drop the spinner.
-  useEffect(() => {
-    setLoading(true);
-    setFailed(false);
-    const t = window.setTimeout(() => setLoading(false), 4000);
-    return () => window.clearTimeout(t);
-  }, [src]);
-  if (failed) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
-        <FileText className="h-10 w-10 text-primary/60" />
-        <p className="text-xs text-muted-foreground">
-          הדפדפן לא הצליח להציג את ה-PDF כאן. ניתן לפתוח אותו בלשונית חדשה.
-        </p>
-        <button
-          type="button"
-          onClick={() => onOpenExternal?.()}
-          className="inline-flex items-center gap-1.5 rounded-md border border-primary/60 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary glow-aqua hover:bg-primary/20"
+  const extLabel = (ext || "FILE").toUpperCase();
+  return (
+    <div className="flex h-full flex-col items-center justify-center gap-6 p-6 text-center">
+      <div className="relative">
+        <div className="absolute inset-0 rounded-full bg-emerald-400/20 blur-2xl" />
+        <div
+          className="relative flex h-24 w-24 items-center justify-center rounded-full border-2 border-emerald-400/70 bg-emerald-400/10"
+          style={{
+            boxShadow:
+              "0 0 0 1px rgba(52,211,153,0.6), 0 0 24px rgba(52,211,153,0.55), 0 0 60px rgba(52,211,153,0.35)",
+          }}
         >
-          <ExternalLink className="h-3.5 w-3.5" /> פתח בלשונית חדשה
-        </button>
+          <CheckCircle2
+            className="h-14 w-14 text-emerald-300"
+            style={{ filter: "drop-shadow(0 0 10px rgba(52,211,153,0.8))" }}
+          />
+        </div>
       </div>
-    );
-  }
-  return (
-    <>
-      {loading && <PreviewLoader />}
-      <iframe
-        key={previewKey}
-        src={`${src}#toolbar=0&navpanes=0`}
-        title={name}
-        onLoad={() => setLoading(false)}
-        onError={() => {
-          setLoading(false);
-          setFailed(true);
-        }}
-        className="h-full w-full bg-background"
-      />
-    </>
-  );
-}
 
-function FileCard({ file, blobUrl }: { file: UploadedFile; blobUrl: string }) {
-  const ext = (file.ext || file.name.split(".").pop() || "FILE").toUpperCase();
-  return (
-    <div className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center">
-      <div className="relative flex h-28 w-24 flex-col items-center justify-center rounded-lg border-2 border-primary/50 bg-gradient-to-b from-primary/15 to-primary/5 glow-aqua">
-        <FileText className="h-8 w-8 text-primary icon-glow" />
-        <span className="mt-1 font-display text-[11px] font-bold tracking-wider text-primary text-glow">
-          {ext}
-        </span>
-      </div>
-      <div className="space-y-0.5">
-        <p className="truncate text-sm font-semibold text-foreground" title={file.name}>
-          {file.name}
+      <div className="space-y-1.5">
+        <p className="font-display text-xs uppercase tracking-[0.3em] text-emerald-300">
+          המסמך הועלה בהצלחה
         </p>
+        <div className="flex items-center justify-center gap-2">
+          <FileText className="h-4 w-4 text-primary icon-glow" />
+          <p
+            className="max-w-[28ch] truncate text-base font-semibold text-foreground"
+            title={file.name}
+          >
+            {file.name}
+          </p>
+        </div>
         <p className="text-[11px] text-muted-foreground">
-          {(file.size / 1024).toFixed(0)} KB · לא ניתן לצפות במסמכי {ext} בדפדפן
+          {extLabel} · {(file.size / 1024).toFixed(0)} KB
         </p>
       </div>
-      <a
-        href={blobUrl}
-        download={file.name}
-        className="inline-flex items-center gap-2 rounded-md border border-primary/60 bg-primary/10 px-4 py-2 text-xs font-semibold text-primary glow-aqua hover:bg-primary/20"
-      >
-        <Download className="h-3.5 w-3.5" /> הורד וצפה
-      </a>
-    </div>
-  );
-}
 
-function PreviewLoader() {
-  return (
-    <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/40 backdrop-blur-sm">
-      <div className="flex flex-col items-center gap-2 text-primary">
-        <Loader2 className="h-5 w-5 animate-spin" />
-        <span className="text-xs text-glow">Loading Document...</span>
-      </div>
+      <button
+        type="button"
+        onClick={() => onOpen()}
+        disabled={opening || !ready}
+        className="group relative inline-flex items-center gap-2 rounded-lg border border-primary/70 bg-primary/15 px-6 py-3 text-sm font-semibold text-primary glow-aqua animate-pulse-glow transition hover:bg-primary/25 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {opening ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <ExternalLink className="h-4 w-4 icon-glow" />
+        )}
+        <span className="text-glow">פתח מסמך מקורי</span>
+      </button>
+
+      <p className="max-w-xs text-[11px] leading-relaxed text-muted-foreground">
+        המסמך נפתח בלשונית חדשה לתצוגה מאובטחת ללא חסימות דפדפן.
+      </p>
     </div>
   );
 }
