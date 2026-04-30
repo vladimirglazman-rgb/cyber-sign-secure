@@ -74,6 +74,12 @@ const recipientSchema = z.object({
 const createSchema = z.object({
   filePath: z.string().min(1).max(500),
   fileName: z.string().min(1).max(200),
+  fileType: z
+    .string()
+    .min(1)
+    .max(12)
+    .regex(/^[a-z0-9]+$/i)
+    .default("pdf"),
   subject: z.string().min(1).max(200),
   message: z.string().max(2000).optional().nullable(),
   signInOrder: z.boolean(),
@@ -94,12 +100,13 @@ export const createSignatureRequest = createServerFn({ method: "POST" })
           owner_id: userId,
           file_name: data.fileName,
           file_path: data.filePath,
+          file_type: data.fileType.toLowerCase(),
           subject: data.subject,
           message: data.message ?? null,
           sign_in_order: data.signInOrder,
           reminder_days: data.reminderDays,
           status: "pending",
-        })
+        } as never)
         .select("id")
         .single();
 
