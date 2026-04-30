@@ -151,7 +151,15 @@ function ImagePreview({ src, name }: { src: string; name: string }) {
   );
 }
 
-function PdfPreview({ src, name }: { src: string; name: string }) {
+function PdfPreview({
+  src,
+  name,
+  onOpenExternal,
+}: {
+  src: string;
+  name: string;
+  onOpenExternal?: () => void | Promise<void>;
+}) {
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   // Safety net: if neither onLoad nor onError fires within 4s, drop the spinner.
@@ -166,14 +174,13 @@ function PdfPreview({ src, name }: { src: string; name: string }) {
         <p className="text-xs text-muted-foreground">
           הדפדפן לא הצליח להציג את ה-PDF כאן. ניתן לפתוח אותו בלשונית חדשה.
         </p>
-        <a
-          href={src}
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          type="button"
+          onClick={() => onOpenExternal?.()}
           className="inline-flex items-center gap-1.5 rounded-md border border-primary/60 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary glow-aqua hover:bg-primary/20"
         >
           <ExternalLink className="h-3.5 w-3.5" /> פתח בלשונית חדשה
-        </a>
+        </button>
       </div>
     );
   }
