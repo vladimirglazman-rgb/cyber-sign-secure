@@ -21,6 +21,7 @@ export function DocumentPreview({
   const file = api.selectedFile;
   const [showLines, setShowLines] = useState(false);
   const [opening, setOpening] = useState(false);
+  const [signedUrl, setSignedUrl] = useState<string | null>(null);
   const blobUrl = useMemo(() => {
     if (file?.file) return URL.createObjectURL(file.file);
     return null;
@@ -34,6 +35,28 @@ export function DocumentPreview({
   const isImage = ["png", "jpg", "jpeg", "gif", "webp"].includes(ext);
   const isPdf = ext === "pdf" || file?.type === "application/pdf";
   const remotePath = file ? paths?.[file.id] : undefined;
+  // Fetch a fresh signed URL whenever the remote path changes (PDFs only need it for inline preview).
+  useEffect(() => {
+    let cancelled = false;
+    setSignedUrl(null);
+    if (!remotePath || !isPdf) return;
+    (async () => {
+      try {
+        const { url } = await getOwnerSignedUrl({
+          headers: await getAuthHeaders(),
+          data: { filePath: remotePath },
+        });
+        if (!cancelled) setSignedUrl(url);
+      } catch (e) {
+        console.error("INLINE_SIGNED_URL_FAILED", e);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [remotePath, isPdf]);
+  // Prefer signed HTTPS URL (Chrome-safe). Fall back to local blob until upload completes.
+  const pdfSrc = signedUrl ?? blobUrl;
   const openInNewTab = async () => {
     if (!remotePath) {
       // Fallback: open the local blob (older browsers may block this).
@@ -98,7 +121,11 @@ export function DocumentPreview({
                 {isImage ? (
                   <ImagePreview src={blobUrl} name={file.name} />
                 ) : isPdf ? (
-                  <PdfPreview src={blobUrl} name={file.name} onOpenExternal={openInNewTab} />
+                  <PdfPreview
+                    src={pdfSrc ?? blobUrl}
+                    name={file.name}
+                    onOpenExternal={openInNewTab}
+                  />
                 ) : (
                   <FileCard file={file} blobUrl={blobUrl} />
                 )}
