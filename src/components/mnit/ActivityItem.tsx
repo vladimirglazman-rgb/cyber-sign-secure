@@ -61,6 +61,11 @@ export function ActivityItem({ doc }: { doc: DocumentRow }) {
             {label[doc.status]}
           </span>
           <span className="text-[10px] text-muted-foreground">{date}</span>
+          {doc.version && (
+            <span className="font-display text-[9px] tracking-wider text-primary/80 text-glow">
+              גרסה {doc.version}
+            </span>
+          )}
         </div>
       </div>
       {pendingSigners.length > 0 && (

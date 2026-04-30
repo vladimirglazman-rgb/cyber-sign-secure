@@ -2,6 +2,7 @@ import { CheckCircle2, Clock, FileText, XCircle } from "lucide-react";
 import { StatTile } from "./StatTile";
 import { ActivityItem } from "./ActivityItem";
 import { useDashboard } from "@/hooks/use-dashboard";
+import { APP_VERSION } from "@/lib/app-version";
 export function Sidebar() {
   const { data, isLoading } = useDashboard();
   const stats = data?.stats ?? { total: 0, signed: 0, pending: 0, cancelled: 0 };
@@ -29,6 +30,13 @@ export function Sidebar() {
           </ul>
         )}
       </section>
+      <div
+        className="mt-auto inline-flex items-center justify-center gap-2 self-start rounded-md border border-primary/40 bg-primary/5 px-2.5 py-1 font-display text-[10px] tracking-[0.18em] text-primary glow-aqua"
+        title="גרסת תוכנה"
+      >
+        <span className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_6px_var(--primary)]" />
+        גרסת תוכנה: {APP_VERSION}
+      </div>
     </aside>
   );
 }

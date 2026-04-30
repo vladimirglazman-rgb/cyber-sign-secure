@@ -9,6 +9,7 @@ export type DocumentRow = {
   status: "pending" | "signed" | "cancelled";
   subject: string;
   created_at: string;
+  version?: string | null;
   recipients?: {
     id: string;
     name: string;
@@ -35,7 +36,7 @@ export const listMyDocuments = createServerFn({ method: "GET" })
         supabase
           .from("documents")
           .select(
-            "id, file_name, status, subject, created_at, recipients(id, name, email, phone, delivery_method, signing_token, status)",
+            "id, file_name, status, subject, created_at, version, recipients(id, name, email, phone, delivery_method, signing_token, status)",
           )
           .order("created_at", { ascending: false })
           .limit(50),
@@ -85,6 +86,7 @@ const createSchema = z.object({
   signInOrder: z.boolean(),
   reminderDays: z.union([z.literal(1), z.literal(3), z.literal(7)]).nullable(),
   recipients: z.array(recipientSchema).min(1).max(20),
+  version: z.string().min(1).max(40).optional().nullable(),
 });
 
 export const createSignatureRequest = createServerFn({ method: "POST" })
@@ -105,6 +107,7 @@ export const createSignatureRequest = createServerFn({ method: "POST" })
           message: data.message ?? null,
           sign_in_order: data.signInOrder,
           reminder_days: data.reminderDays,
+          version: data.version ?? "v1.0.4",
           status: "pending",
         } as never)
         .select("id")
@@ -143,4 +146,36 @@ export const createSignatureRequest = createServerFn({ method: "POST" })
       console.error("CREATE_SIGNATURE_REQUEST_FAILED", err);
       throw err instanceof Error ? err : new Error("שליחה נכשלה");
     }
+  });
+
+const signedUrlSchema = z.object({ filePath: z.string().min(1).max(500) });
+
+export const getOwnerSignedUrl = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => signedUrlSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    // Ensure the file path belongs to a document owned by the caller.
+    const { data: doc, error } = await supabase
+      .from("documents")
+      .select("id, owner_id, file_path")
+      .eq("file_path", data.filePath)
+      .maybeSingle();
+    // Allow newly-uploaded files (not yet persisted) only if path is under user's prefix.
+    const ownsByPath = data.filePath.startsWith(`${userId}/`);
+    if (error) console.error("SIGNED_URL_LOOKUP_ERROR", error);
+    if (doc && doc.owner_id !== userId) {
+      throw new Error("Forbidden");
+    }
+    if (!doc && !ownsByPath) {
+      throw new Error("Forbidden");
+    }
+    const { data: signed, error: sErr } = await supabase.storage
+      .from("contracts")
+      .createSignedUrl(data.filePath, 60);
+    if (sErr || !signed?.signedUrl) {
+      console.error("SIGNED_URL_ERROR", sErr);
+      throw new Error("יצירת קישור נכשלה");
+    }
+    return { url: signed.signedUrl };
   });

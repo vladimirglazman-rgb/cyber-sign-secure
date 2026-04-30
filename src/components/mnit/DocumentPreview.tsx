@@ -8,9 +8,19 @@ import {
   ScanLine,
 } from "lucide-react";
 import type { SignatureRequestApi, UploadedFile } from "@/hooks/use-signature-request";
-export function DocumentPreview({ api }: { api: SignatureRequestApi }) {
+import { toast } from "sonner";
+import { getOwnerSignedUrl } from "@/server/documents.functions";
+import { getAuthHeaders } from "@/lib/auth-headers";
+export function DocumentPreview({
+  api,
+  paths,
+}: {
+  api: SignatureRequestApi;
+  paths?: Record<string, string>;
+}) {
   const file = api.selectedFile;
   const [showLines, setShowLines] = useState(false);
+  const [opening, setOpening] = useState(false);
   const blobUrl = useMemo(() => {
     if (file?.file) return URL.createObjectURL(file.file);
     return null;
@@ -23,6 +33,28 @@ export function DocumentPreview({ api }: { api: SignatureRequestApi }) {
   const ext = (file?.ext || file?.name.split(".").pop() || "").toLowerCase();
   const isImage = ["png", "jpg", "jpeg", "gif", "webp"].includes(ext);
   const isPdf = ext === "pdf" || file?.type === "application/pdf";
+  const remotePath = file ? paths?.[file.id] : undefined;
+  const openInNewTab = async () => {
+    if (!remotePath) {
+      // Fallback: open the local blob (older browsers may block this).
+      if (blobUrl) window.open(blobUrl, "_blank", "noopener,noreferrer");
+      else toast.error("הקובץ עדיין לא הועלה");
+      return;
+    }
+    try {
+      setOpening(true);
+      const { url } = await getOwnerSignedUrl({
+        headers: await getAuthHeaders(),
+        data: { filePath: remotePath },
+      });
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (e) {
+      console.error("OPEN_NEW_TAB_FAILED", e);
+      toast.error("פתיחת הקובץ נכשלה");
+    } finally {
+      setOpening(false);
+    }
+  };
   return (
     <div className="glass-panel flex h-full flex-col p-4">
       <header className="mb-3 flex items-center justify-between">
@@ -50,19 +82,23 @@ export function DocumentPreview({ api }: { api: SignatureRequestApi }) {
             </div>
             {blobUrl ? (
               <div className="relative h-[calc(100%-2.5rem)] w-full overflow-hidden rounded-md border border-primary/20 bg-background/60">
-                <a
-                  href={blobUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="absolute end-2 top-2 z-20 inline-flex items-center gap-1 rounded-md border border-primary/50 bg-background/85 px-2 py-1 text-[10px] font-semibold text-primary glow-aqua backdrop-blur transition hover:bg-primary/10"
+                <button
+                  type="button"
+                  onClick={openInNewTab}
+                  disabled={opening}
+                  className="absolute end-2 top-2 z-20 inline-flex items-center gap-1 rounded-md border border-primary/50 bg-background/85 px-2 py-1 text-[10px] font-semibold text-primary glow-aqua backdrop-blur transition hover:bg-primary/10 disabled:opacity-60"
                 >
-                  <ExternalLink className="h-3 w-3" />
+                  {opening ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <ExternalLink className="h-3 w-3" />
+                  )}
                   פתח בלשונית חדשה
-                </a>
+                </button>
                 {isImage ? (
                   <ImagePreview src={blobUrl} name={file.name} />
                 ) : isPdf ? (
-                  <PdfPreview src={blobUrl} name={file.name} />
+                  <PdfPreview src={blobUrl} name={file.name} onOpenExternal={openInNewTab} />
                 ) : (
                   <FileCard file={file} blobUrl={blobUrl} />
                 )}
@@ -115,7 +151,15 @@ function ImagePreview({ src, name }: { src: string; name: string }) {
   );
 }
 
-function PdfPreview({ src, name }: { src: string; name: string }) {
+function PdfPreview({
+  src,
+  name,
+  onOpenExternal,
+}: {
+  src: string;
+  name: string;
+  onOpenExternal?: () => void | Promise<void>;
+}) {
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   // Safety net: if neither onLoad nor onError fires within 4s, drop the spinner.
@@ -130,14 +174,13 @@ function PdfPreview({ src, name }: { src: string; name: string }) {
         <p className="text-xs text-muted-foreground">
           הדפדפן לא הצליח להציג את ה-PDF כאן. ניתן לפתוח אותו בלשונית חדשה.
         </p>
-        <a
-          href={src}
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          type="button"
+          onClick={() => onOpenExternal?.()}
           className="inline-flex items-center gap-1.5 rounded-md border border-primary/60 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary glow-aqua hover:bg-primary/20"
         >
           <ExternalLink className="h-3.5 w-3.5" /> פתח בלשונית חדשה
-        </a>
+        </button>
       </div>
     );
   }

@@ -6,6 +6,7 @@ import type { SignatureRequestApi } from "@/hooks/use-signature-request";
 import { isValidEmail } from "@/hooks/use-signature-request";
 import { createSignatureRequest } from "@/server/documents.functions";
 import { getAuthHeaders } from "@/lib/auth-headers";
+import { APP_VERSION } from "@/lib/app-version";
 export function SendBar({
   api,
   paths,
@@ -86,6 +87,7 @@ export function SendBar({
           signInOrder: api.signInOrder,
           reminderDays: api.remindersEnabled ? api.reminderDays : null,
           recipients: valid,
+          version: APP_VERSION,
         },
       });
       const links = (created.recipients ?? [])
