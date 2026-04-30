@@ -19,6 +19,7 @@ export type Database = {
           created_at: string
           file_name: string
           file_path: string
+          file_type: string
           id: string
           message: string | null
           owner_id: string
@@ -31,6 +32,7 @@ export type Database = {
           created_at?: string
           file_name: string
           file_path: string
+          file_type?: string
           id?: string
           message?: string | null
           owner_id: string
@@ -43,6 +45,7 @@ export type Database = {
           created_at?: string
           file_name?: string
           file_path?: string
+          file_type?: string
           id?: string
           message?: string | null
           owner_id?: string

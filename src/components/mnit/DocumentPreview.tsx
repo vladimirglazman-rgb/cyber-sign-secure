@@ -1,11 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
-import { ExternalLink, FileText, Hash, Loader2, ScanLine } from "lucide-react";
-import type { SignatureRequestApi } from "@/hooks/use-signature-request";
+import {
+  Download,
+  ExternalLink,
+  FileText,
+  Hash,
+  Loader2,
+  ScanLine,
+} from "lucide-react";
+import type { SignatureRequestApi, UploadedFile } from "@/hooks/use-signature-request";
 export function DocumentPreview({ api }: { api: SignatureRequestApi }) {
   const file = api.selectedFile;
   const [showLines, setShowLines] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [previewFailed, setPreviewFailed] = useState(false);
   const blobUrl = useMemo(() => {
     if (file?.file) return URL.createObjectURL(file.file);
     return null;
@@ -15,15 +20,9 @@ export function DocumentPreview({ api }: { api: SignatureRequestApi }) {
       if (blobUrl) URL.revokeObjectURL(blobUrl);
     };
   }, [blobUrl]);
-  useEffect(() => {
-    setPreviewFailed(false);
-    setLoading(!!blobUrl);
-    if (!blobUrl) return;
-    const timer = window.setTimeout(() => setLoading(false), 2500);
-    return () => window.clearTimeout(timer);
-  }, [blobUrl]);
-  const isImage = !!file && /\.(png|jpe?g|gif|webp)$/i.test(file.name);
-  const isPdf = !!file && (/\.pdf$/i.test(file.name) || file.type === "application/pdf");
+  const ext = (file?.ext || file?.name.split(".").pop() || "").toLowerCase();
+  const isImage = ["png", "jpg", "jpeg", "gif", "webp"].includes(ext);
+  const isPdf = ext === "pdf" || file?.type === "application/pdf";
   return (
     <div className="glass-panel flex h-full flex-col p-4">
       <header className="mb-3 flex items-center justify-between">
@@ -49,7 +48,7 @@ export function DocumentPreview({ api }: { api: SignatureRequestApi }) {
               <FileText className="h-4 w-4 text-primary" />
               <span className="truncate text-xs font-medium text-foreground">{file.name}</span>
             </div>
-            {blobUrl && (isPdf || isImage) ? (
+            {blobUrl ? (
               <div className="relative h-[calc(100%-2.5rem)] w-full overflow-hidden rounded-md border border-primary/20 bg-background/60">
                 <a
                   href={blobUrl}
@@ -60,44 +59,12 @@ export function DocumentPreview({ api }: { api: SignatureRequestApi }) {
                   <ExternalLink className="h-3 w-3" />
                   פתח בלשונית חדשה
                 </a>
-                {loading && (
-                  <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/40 backdrop-blur-sm">
-                    <div className="flex flex-col items-center gap-2 text-primary">
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                      <span className="text-xs text-glow">Loading Document...</span>
-                    </div>
-                  </div>
-                )}
-                {previewFailed && (
-                  <div className="absolute inset-x-3 bottom-3 z-20 rounded-md border border-primary/30 bg-background/90 p-2 text-center text-xs text-muted-foreground backdrop-blur">
-                    לא ניתן להציג את המסמך כאן. ניתן לפתוח אותו בלשונית חדשה.
-                  </div>
-                )}
                 {isImage ? (
-                  <img
-                    src={blobUrl}
-                    alt={file.name}
-                    onLoad={() => setLoading(false)}
-                    onError={() => {
-                      setLoading(false);
-                      setPreviewFailed(true);
-                    }}
-                    className="h-full w-full object-contain"
-                  />
+                  <ImagePreview src={blobUrl} name={file.name} />
+                ) : isPdf ? (
+                  <PdfPreview src={blobUrl} name={file.name} />
                 ) : (
-                  <object
-                    data={blobUrl}
-                    type="application/pdf"
-                    title={file.name}
-                    className="h-full w-full bg-background"
-                  >
-                    <iframe
-                      src={blobUrl}
-                      title={file.name}
-                      onLoad={() => setLoading(false)}
-                      className="h-full w-full bg-background"
-                    />
-                  </object>
+                  <FileCard file={file} blobUrl={blobUrl} />
                 )}
               </div>
             ) : (
@@ -127,6 +94,106 @@ export function DocumentPreview({ api }: { api: SignatureRequestApi }) {
             <p className="mt-3 text-xs text-muted-foreground">העלה מסמך כדי לראות תצוגה מקדימה</p>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+function ImagePreview({ src, name }: { src: string; name: string }) {
+  const [loading, setLoading] = useState(true);
+  return (
+    <>
+      {loading && <PreviewLoader />}
+      <img
+        src={src}
+        alt={name}
+        onLoad={() => setLoading(false)}
+        onError={() => setLoading(false)}
+        className="h-full w-full object-contain"
+      />
+    </>
+  );
+}
+
+function PdfPreview({ src, name }: { src: string; name: string }) {
+  const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
+  // Safety net: if neither onLoad nor onError fires within 4s, drop the spinner.
+  useEffect(() => {
+    const t = window.setTimeout(() => setLoading(false), 4000);
+    return () => window.clearTimeout(t);
+  }, [src]);
+  if (failed) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
+        <FileText className="h-10 w-10 text-primary/60" />
+        <p className="text-xs text-muted-foreground">
+          הדפדפן לא הצליח להציג את ה-PDF כאן. ניתן לפתוח אותו בלשונית חדשה.
+        </p>
+        <a
+          href={src}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 rounded-md border border-primary/60 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary glow-aqua hover:bg-primary/20"
+        >
+          <ExternalLink className="h-3.5 w-3.5" /> פתח בלשונית חדשה
+        </a>
+      </div>
+    );
+  }
+  return (
+    <>
+      {loading && <PreviewLoader />}
+      <embed
+        src={`${src}#toolbar=0&navpanes=0`}
+        type="application/pdf"
+        title={name}
+        onLoad={() => setLoading(false)}
+        onError={() => {
+          setLoading(false);
+          setFailed(true);
+        }}
+        className="h-full w-full bg-background"
+      />
+    </>
+  );
+}
+
+function FileCard({ file, blobUrl }: { file: UploadedFile; blobUrl: string }) {
+  const ext = (file.ext || file.name.split(".").pop() || "FILE").toUpperCase();
+  return (
+    <div className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center">
+      <div className="relative flex h-28 w-24 flex-col items-center justify-center rounded-lg border-2 border-primary/50 bg-gradient-to-b from-primary/15 to-primary/5 glow-aqua">
+        <FileText className="h-8 w-8 text-primary icon-glow" />
+        <span className="mt-1 font-display text-[11px] font-bold tracking-wider text-primary text-glow">
+          {ext}
+        </span>
+      </div>
+      <div className="space-y-0.5">
+        <p className="truncate text-sm font-semibold text-foreground" title={file.name}>
+          {file.name}
+        </p>
+        <p className="text-[11px] text-muted-foreground">
+          {(file.size / 1024).toFixed(0)} KB · לא ניתן לצפות במסמכי {ext} בדפדפן
+        </p>
+      </div>
+      <a
+        href={blobUrl}
+        download={file.name}
+        className="inline-flex items-center gap-2 rounded-md border border-primary/60 bg-primary/10 px-4 py-2 text-xs font-semibold text-primary glow-aqua hover:bg-primary/20"
+      >
+        <Download className="h-3.5 w-3.5" /> הורד וצפה
+      </a>
+    </div>
+  );
+}
+
+function PreviewLoader() {
+  return (
+    <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/40 backdrop-blur-sm">
+      <div className="flex flex-col items-center gap-2 text-primary">
+        <Loader2 className="h-5 w-5 animate-spin" />
+        <span className="text-xs text-glow">Loading Document...</span>
       </div>
     </div>
   );

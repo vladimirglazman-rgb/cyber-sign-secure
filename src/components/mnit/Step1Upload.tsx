@@ -55,8 +55,19 @@ export function Step1Upload({
             (crypto as Crypto & { randomUUID?: () => string }).randomUUID?.() ??
             `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
           const path = `${userId}/${Date.now()}_${uuid}${ext}`;
-          const contentType =
-            ext === ".pdf" ? "application/pdf" : file.type || "application/octet-stream";
+          // Explicit MIME map — never trust the browser-supplied type for storage.
+          const MIME: Record<string, string> = {
+            ".pdf": "application/pdf",
+            ".doc": "application/msword",
+            ".docx":
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            ".png": "image/png",
+            ".jpg": "image/jpeg",
+            ".jpeg": "image/jpeg",
+            ".gif": "image/gif",
+            ".webp": "image/webp",
+          };
+          const contentType = MIME[ext] || file.type || "application/octet-stream";
           const { error } = await supabase.storage
             .from("contracts")
             .upload(path, file, { contentType, upsert: false });

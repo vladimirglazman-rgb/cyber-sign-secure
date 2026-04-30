@@ -80,6 +80,7 @@ export function SendBar({
         data: {
           filePath,
           fileName: file.name,
+          fileType: file.ext || "pdf",
           subject: api.subject.trim(),
           message: api.message.trim() || null,
           signInOrder: api.signInOrder,
