@@ -3,7 +3,6 @@ import {
   Download,
   ExternalLink,
   FileText,
-  Hash,
   Loader2,
   ScanLine,
 } from "lucide-react";
@@ -18,7 +17,6 @@ export function DocumentPreview({
   paths?: Record<string, string>;
 }) {
   const file = api.selectedFile;
-  const [showLines, setShowLines] = useState(false);
   const [opening, setOpening] = useState(false);
   const [proxyUrl, setProxyUrl] = useState<string | null>(null);
   const blobUrl = useMemo(() => {
@@ -38,7 +36,7 @@ export function DocumentPreview({
   useEffect(() => {
     let cancelled = false;
     setProxyUrl(null);
-    if (!remotePath || !isPdf) return;
+    if (!remotePath) return;
     (async () => {
       try {
         const { data } = await supabase.auth.getSession();
@@ -56,9 +54,9 @@ export function DocumentPreview({
     return () => {
       cancelled = true;
     };
-  }, [remotePath, isPdf]);
+  }, [remotePath]);
   // Prefer same-origin proxy URL. Fall back to local blob until upload completes.
-  const pdfSrc = proxyUrl ?? blobUrl;
+  const previewSrc = proxyUrl ?? blobUrl;
   const openInNewTab = async () => {
     try {
       setOpening(true);
@@ -92,14 +90,6 @@ export function DocumentPreview({
           תצוגה מקדימה
         </h3>
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setShowLines((s) => !s)}
-            title="מספרי שורות"
-            className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[10px] font-display tracking-wider transition ${showLines ? "border-primary bg-primary/15 text-primary text-glow" : "border-primary/20 text-muted-foreground hover:border-primary/40 hover:text-primary"}`}
-          >
-            <Hash className="h-3 w-3" /> שורות
-          </button>
           <ScanLine className="h-4 w-4 text-primary icon-glow" />
         </div>
       </header>
@@ -110,12 +100,11 @@ export function DocumentPreview({
               <FileText className="h-4 w-4 text-primary" />
               <span className="truncate text-xs font-medium text-foreground">{file.name}</span>
             </div>
-            {blobUrl ? (
-              <div className="relative h-[calc(100%-2.5rem)] w-full overflow-hidden rounded-md border border-primary/20 bg-background/60">
+            <div className="relative h-[calc(100%-2.5rem)] w-full overflow-hidden rounded-md border border-primary/20 bg-background/60">
                 <button
                   type="button"
                   onClick={openInNewTab}
-                  disabled={opening}
+                  disabled={opening || (!remotePath && !blobUrl)}
                   className="absolute end-2 top-2 z-20 inline-flex items-center gap-1 rounded-md border border-primary/50 bg-background/85 px-2 py-1 text-[10px] font-semibold text-primary glow-aqua backdrop-blur transition hover:bg-primary/10 disabled:opacity-60"
                 >
                   {opening ? (
@@ -125,38 +114,24 @@ export function DocumentPreview({
                   )}
                   פתח בלשונית חדשה
                 </button>
-                {isImage ? (
-                  <ImagePreview src={blobUrl} name={file.name} />
-                ) : isPdf ? (
-                  <PdfPreview
-                    src={pdfSrc ?? blobUrl}
-                    name={file.name}
-                    onOpenExternal={openInNewTab}
-                  />
-                ) : (
-                  <FileCard file={file} blobUrl={blobUrl} />
-                )}
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {Array.from({ length: 14 }).map((_, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    {showLines && (
-                      <span className="font-display text-[9px] tracking-wider text-primary text-glow w-5 shrink-0">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                    )}
-                    <div
-                      className="h-2 rounded-full bg-primary/15"
-                      style={{ width: `${60 + ((i * 13) % 35)}%` }}
+                {previewSrc ? (
+                  isImage ? (
+                    <ImagePreview src={previewSrc} name={file.name} />
+                  ) : isPdf ? (
+                    <PdfPreview
+                      src={previewSrc}
+                      name={file.name}
+                      onOpenExternal={openInNewTab}
                     />
-                  </div>
-                ))}
-                <div className="absolute bottom-4 end-4 flex h-16 w-32 items-center justify-center rounded border border-dashed border-primary/60 bg-primary/5 text-[10px] font-display tracking-wider text-primary text-glow">
-                  SIGN HERE
-                </div>
-              </div>
-            )}
+                  ) : blobUrl ? (
+                    <FileCard file={file} blobUrl={blobUrl} />
+                  ) : (
+                    <PreviewLoader />
+                  )
+                ) : (
+                  <PreviewLoader />
+                )}
+            </div>
           </>
         ) : (
           <div className="flex h-full flex-col items-center justify-center text-center">
@@ -198,6 +173,8 @@ function PdfPreview({
   const [failed, setFailed] = useState(false);
   // Safety net: if neither onLoad nor onError fires within 4s, drop the spinner.
   useEffect(() => {
+    setLoading(true);
+    setFailed(false);
     const t = window.setTimeout(() => setLoading(false), 4000);
     return () => window.clearTimeout(t);
   }, [src]);
@@ -221,9 +198,8 @@ function PdfPreview({
   return (
     <>
       {loading && <PreviewLoader />}
-      <embed
+      <iframe
         src={`${src}#toolbar=0&navpanes=0`}
-        type="application/pdf"
         title={name}
         onLoad={() => setLoading(false)}
         onError={() => {
