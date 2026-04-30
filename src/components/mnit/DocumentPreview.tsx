@@ -56,7 +56,7 @@ export function DocumentPreview({
     };
   }, [remotePath]);
   // Prefer same-origin proxy URL. Fall back to local blob until upload completes.
-  const currentProxyUrl = proxyUrlState?.path === remotePath ? proxyUrlState.url : null;
+  const currentProxyUrl = proxyUrlState && proxyUrlState.path === remotePath ? proxyUrlState.url : null;
   const previewSrc = currentProxyUrl ?? blobUrl;
   const previewKey = file ? `${file.id}:${previewSrc ?? "pending"}` : "empty";
   const openInNewTab = async () => {
@@ -164,10 +164,12 @@ function ImagePreview({ src, name }: { src: string; name: string }) {
 }
 
 function PdfPreview({
+  previewKey,
   src,
   name,
   onOpenExternal,
 }: {
+  previewKey: string;
   src: string;
   name: string;
   onOpenExternal?: () => void | Promise<void>;
@@ -202,6 +204,7 @@ function PdfPreview({
     <>
       {loading && <PreviewLoader />}
       <iframe
+        key={previewKey}
         src={`${src}#toolbar=0&navpanes=0`}
         title={name}
         onLoad={() => setLoading(false)}
