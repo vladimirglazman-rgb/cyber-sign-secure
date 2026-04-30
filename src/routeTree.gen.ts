@@ -13,6 +13,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as SignTokenRouteImport } from './routes/sign.$token'
+import { Route as ApiPreviewSplatRouteImport } from './routes/api/preview.$'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -33,16 +34,23 @@ const SignTokenRoute = SignTokenRouteImport.update({
   path: '/sign/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPreviewSplatRoute = ApiPreviewSplatRouteImport.update({
+  id: '/api/preview/$',
+  path: '/api/preview/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthRoute
   '/sign/$token': typeof SignTokenRoute
+  '/api/preview/$': typeof ApiPreviewSplatRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/sign/$token': typeof SignTokenRoute
   '/': typeof AuthenticatedIndexRoute
+  '/api/preview/$': typeof ApiPreviewSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -50,24 +58,27 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/sign/$token': typeof SignTokenRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/api/preview/$': typeof ApiPreviewSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/sign/$token'
+  fullPaths: '/' | '/auth' | '/sign/$token' | '/api/preview/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth' | '/sign/$token' | '/'
+  to: '/auth' | '/sign/$token' | '/' | '/api/preview/$'
   id:
     | '__root__'
     | '/_authenticated'
     | '/auth'
     | '/sign/$token'
     | '/_authenticated/'
+    | '/api/preview/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
   SignTokenRoute: typeof SignTokenRoute
+  ApiPreviewSplatRoute: typeof ApiPreviewSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -100,6 +111,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/preview/$': {
+      id: '/api/preview/$'
+      path: '/api/preview/$'
+      fullPath: '/api/preview/$'
+      preLoaderRoute: typeof ApiPreviewSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -119,6 +137,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
   SignTokenRoute: SignTokenRoute,
+  ApiPreviewSplatRoute: ApiPreviewSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

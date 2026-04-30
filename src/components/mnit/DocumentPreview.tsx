@@ -9,8 +9,7 @@ import {
 } from "lucide-react";
 import type { SignatureRequestApi, UploadedFile } from "@/hooks/use-signature-request";
 import { toast } from "sonner";
-import { getOwnerSignedUrl } from "@/server/documents.functions";
-import { getAuthHeaders } from "@/lib/auth-headers";
+import { supabase } from "@/integrations/supabase/client";
 export function DocumentPreview({
   api,
   paths,
@@ -21,7 +20,7 @@ export function DocumentPreview({
   const file = api.selectedFile;
   const [showLines, setShowLines] = useState(false);
   const [opening, setOpening] = useState(false);
-  const [signedUrl, setSignedUrl] = useState<string | null>(null);
+  const [proxyUrl, setProxyUrl] = useState<string | null>(null);
   const blobUrl = useMemo(() => {
     if (file?.file) return URL.createObjectURL(file.file);
     return null;
@@ -35,41 +34,49 @@ export function DocumentPreview({
   const isImage = ["png", "jpg", "jpeg", "gif", "webp"].includes(ext);
   const isPdf = ext === "pdf" || file?.type === "application/pdf";
   const remotePath = file ? paths?.[file.id] : undefined;
-  // Fetch a fresh signed URL whenever the remote path changes (PDFs only need it for inline preview).
+  // Build a same-origin proxy URL (bypasses ad-blockers that block *.supabase.co).
   useEffect(() => {
     let cancelled = false;
-    setSignedUrl(null);
+    setProxyUrl(null);
     if (!remotePath || !isPdf) return;
     (async () => {
       try {
-        const { url } = await getOwnerSignedUrl({
-          headers: await getAuthHeaders(),
-          data: { filePath: remotePath },
-        });
-        if (!cancelled) setSignedUrl(url);
+        const { data } = await supabase.auth.getSession();
+        const token = data.session?.access_token;
+        if (!token) return;
+        const url = `/api/preview/${remotePath
+          .split("/")
+          .map(encodeURIComponent)
+          .join("/")}?token=${encodeURIComponent(token)}`;
+        if (!cancelled) setProxyUrl(url);
       } catch (e) {
-        console.error("INLINE_SIGNED_URL_FAILED", e);
+        console.error("INLINE_PROXY_URL_FAILED", e);
       }
     })();
     return () => {
       cancelled = true;
     };
   }, [remotePath, isPdf]);
-  // Prefer signed HTTPS URL (Chrome-safe). Fall back to local blob until upload completes.
-  const pdfSrc = signedUrl ?? blobUrl;
+  // Prefer same-origin proxy URL. Fall back to local blob until upload completes.
+  const pdfSrc = proxyUrl ?? blobUrl;
   const openInNewTab = async () => {
-    if (!remotePath) {
-      // Fallback: open the local blob (older browsers may block this).
-      if (blobUrl) window.open(blobUrl, "_blank", "noopener,noreferrer");
-      else toast.error("הקובץ עדיין לא הועלה");
-      return;
-    }
     try {
       setOpening(true);
-      const { url } = await getOwnerSignedUrl({
-        headers: await getAuthHeaders(),
-        data: { filePath: remotePath },
-      });
+      if (!remotePath) {
+        if (blobUrl) window.open(blobUrl, "_blank", "noopener,noreferrer");
+        else toast.error("הקובץ עדיין לא הועלה");
+        return;
+      }
+      const { data } = await supabase.auth.getSession();
+      const token = data.session?.access_token;
+      if (!token) {
+        toast.error("חובה להיות מחובר");
+        return;
+      }
+      const url = `/api/preview/${remotePath
+        .split("/")
+        .map(encodeURIComponent)
+        .join("/")}?token=${encodeURIComponent(token)}`;
       window.open(url, "_blank", "noopener,noreferrer");
     } catch (e) {
       console.error("OPEN_NEW_TAB_FAILED", e);
