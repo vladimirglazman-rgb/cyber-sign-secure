@@ -5,6 +5,7 @@ export type UploadedFile = {
   name: string;
   size: number;
   type: string;
+  ext: string;
   file?: File;
 };
 
@@ -52,13 +53,18 @@ export function useSignatureRequest() {
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
 
   const addFiles = useCallback((list: FileList | File[]) => {
-    const incoming = Array.from(list).map((f) => ({
-      id: uid(),
-      name: f.name,
-      size: f.size,
-      type: f.type || "application/octet-stream",
-      file: f,
-    }));
+    const incoming = Array.from(list).map((f) => {
+      const dot = f.name.lastIndexOf(".");
+      const ext = dot >= 0 ? f.name.slice(dot + 1).toLowerCase() : "";
+      return {
+        id: uid(),
+        name: f.name,
+        size: f.size,
+        type: f.type || "application/octet-stream",
+        ext,
+        file: f,
+      };
+    });
     setFiles((prev) => [...prev, ...incoming]);
     setSelectedFileId((cur) => cur ?? incoming[0]?.id ?? null);
     return incoming.map((f) => f.id);
