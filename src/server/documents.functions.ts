@@ -147,3 +147,35 @@ export const createSignatureRequest = createServerFn({ method: "POST" })
       throw err instanceof Error ? err : new Error("שליחה נכשלה");
     }
   });
+
+const signedUrlSchema = z.object({ filePath: z.string().min(1).max(500) });
+
+export const getOwnerSignedUrl = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => signedUrlSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    // Ensure the file path belongs to a document owned by the caller.
+    const { data: doc, error } = await supabase
+      .from("documents")
+      .select("id, owner_id, file_path")
+      .eq("file_path", data.filePath)
+      .maybeSingle();
+    // Allow newly-uploaded files (not yet persisted) only if path is under user's prefix.
+    const ownsByPath = data.filePath.startsWith(`${userId}/`);
+    if (error) console.error("SIGNED_URL_LOOKUP_ERROR", error);
+    if (doc && doc.owner_id !== userId) {
+      throw new Error("Forbidden");
+    }
+    if (!doc && !ownsByPath) {
+      throw new Error("Forbidden");
+    }
+    const { data: signed, error: sErr } = await supabase.storage
+      .from("contracts")
+      .createSignedUrl(data.filePath, 60);
+    if (sErr || !signed?.signedUrl) {
+      console.error("SIGNED_URL_ERROR", sErr);
+      throw new Error("יצירת קישור נכשלה");
+    }
+    return { url: signed.signedUrl };
+  });
