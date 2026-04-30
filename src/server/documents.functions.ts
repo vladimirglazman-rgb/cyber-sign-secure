@@ -122,13 +122,16 @@ export const createSignatureRequest = createServerFn({ method: "POST" })
           .digest("hex"),
       }));
 
-      const { error: recErr } = await supabase.from("recipients").insert(rows);
-      if (recErr) {
+      const { data: recipients, error: recErr } = await supabase
+        .from("recipients")
+        .insert(rows)
+        .select("id, name, email, phone, delivery_method, signing_token");
+      if (recErr || !recipients) {
         console.error("RECIPIENTS_INSERT_ERROR", recErr);
         throw new Error("שמירת הנמענים נכשלה");
       }
 
-      return { id: doc.id };
+      return { id: doc.id, fileName: data.fileName, recipients };
     } catch (err) {
       console.error("CREATE_SIGNATURE_REQUEST_FAILED", err);
       throw err instanceof Error ? err : new Error("שליחה נכשלה");
