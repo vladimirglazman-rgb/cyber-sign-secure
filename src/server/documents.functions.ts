@@ -86,6 +86,7 @@ const createSchema = z.object({
   signInOrder: z.boolean(),
   reminderDays: z.union([z.literal(1), z.literal(3), z.literal(7)]).nullable(),
   recipients: z.array(recipientSchema).min(1).max(20),
+  version: z.string().min(1).max(40).optional().nullable(),
 });
 
 export const createSignatureRequest = createServerFn({ method: "POST" })
@@ -106,6 +107,7 @@ export const createSignatureRequest = createServerFn({ method: "POST" })
           message: data.message ?? null,
           sign_in_order: data.signInOrder,
           reminder_days: data.reminderDays,
+          version: data.version ?? "v1.0.4",
           status: "pending",
         } as never)
         .select("id")
