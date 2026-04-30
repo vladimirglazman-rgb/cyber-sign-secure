@@ -89,19 +89,19 @@ export const createSignatureRequest = createServerFn({ method: "POST" })
       const { supabase, userId } = context;
 
       const { data: doc, error: docErr } = await supabase
-      .from("documents")
-      .insert({
-        owner_id: userId,
-        file_name: data.fileName,
-        file_path: data.filePath,
-        subject: data.subject,
-        message: data.message ?? null,
-        sign_in_order: data.signInOrder,
-        reminder_days: data.reminderDays,
-        status: "pending",
-      })
-      .select("id")
-      .single();
+        .from("documents")
+        .insert({
+          owner_id: userId,
+          file_name: data.fileName,
+          file_path: data.filePath,
+          subject: data.subject,
+          message: data.message ?? null,
+          sign_in_order: data.signInOrder,
+          reminder_days: data.reminderDays,
+          status: "pending",
+        })
+        .select("id")
+        .single();
 
       if (docErr || !doc) {
         console.error("DOCUMENT_INSERT_ERROR", docErr);
@@ -122,13 +122,16 @@ export const createSignatureRequest = createServerFn({ method: "POST" })
           .digest("hex"),
       }));
 
-      const { error: recErr } = await supabase.from("recipients").insert(rows);
-      if (recErr) {
+      const { data: recipients, error: recErr } = await supabase
+        .from("recipients")
+        .insert(rows)
+        .select("id, name, email, phone, delivery_method, signing_token");
+      if (recErr || !recipients) {
         console.error("RECIPIENTS_INSERT_ERROR", recErr);
         throw new Error("שמירת הנמענים נכשלה");
       }
 
-      return { id: doc.id };
+      return { id: doc.id, fileName: data.fileName, recipients };
     } catch (err) {
       console.error("CREATE_SIGNATURE_REQUEST_FAILED", err);
       throw err instanceof Error ? err : new Error("שליחה נכשלה");
