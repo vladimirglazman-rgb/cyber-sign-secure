@@ -19,18 +19,19 @@ export function ActivityItem({ doc }: { doc: DocumentRow }) {
     try {
       await navigator.clipboard.writeText(url);
       setCopiedId(token);
-      toast.success(`הקישור של ${name} הועתק`);
+      toast.success("הקישור הועתק בהצלחה", { description: name });
       setTimeout(() => setCopiedId((c) => (c === token ? null : c)), 1500);
     } catch {
       toast.error("העתקה נכשלה");
     }
   };
-  const sendWhatsApp = (token: string, phone: string | null | undefined) => {
+  const sendWhatsApp = (token: string, phone: string | null | undefined, name: string) => {
     const url = `${window.location.origin}/sign/${token}`;
-    const text = `היי, מצורף מסמך לחתימתך ב-MNIT Sign: ${url}`;
+    const text = `שלום ${name}, מצורף מסמך ${doc.file_name} לחתימתך ב-MNIT Sign. ניתן לחתום כאן: ${url}`;
     const digits = (phone ?? "").replace(/\D/g, "");
     let intl = digits;
     if (digits.startsWith("0")) intl = `972${digits.slice(1)}`;
+    if (digits.startsWith("00972")) intl = digits.slice(2);
     const wa = intl
       ? `https://wa.me/${intl}?text=${encodeURIComponent(text)}`
       : `https://wa.me/?text=${encodeURIComponent(text)}`;
@@ -67,7 +68,7 @@ export function ActivityItem({ doc }: { doc: DocumentRow }) {
               </button>
               <button
                 type="button"
-                onClick={() => r.signing_token && sendWhatsApp(r.signing_token, r.phone)}
+                onClick={() => r.signing_token && sendWhatsApp(r.signing_token, r.phone, r.name)}
                 className="inline-flex items-center gap-1 rounded-md border border-emerald-400/40 bg-emerald-400/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-200 transition hover:bg-emerald-400/20"
                 title="שלח בוואטסאפ"
               >
