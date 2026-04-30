@@ -27,6 +27,7 @@ export type Database = {
           sign_in_order: boolean
           status: Database["public"]["Enums"]["document_status"]
           subject: string
+          version: string
         }
         Insert: {
           created_at?: string
@@ -40,6 +41,7 @@ export type Database = {
           sign_in_order?: boolean
           status?: Database["public"]["Enums"]["document_status"]
           subject: string
+          version?: string
         }
         Update: {
           created_at?: string
@@ -53,6 +55,7 @@ export type Database = {
           sign_in_order?: boolean
           status?: Database["public"]["Enums"]["document_status"]
           subject?: string
+          version?: string
         }
         Relationships: [
           {
