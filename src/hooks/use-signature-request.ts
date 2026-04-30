@@ -5,6 +5,7 @@ export type UploadedFile = {
   name: string;
   size: number;
   type: string;
+  file?: File;
 };
 
 export type RecipientRole = "signer" | "cc";
@@ -56,6 +57,7 @@ export function useSignatureRequest() {
       name: f.name,
       size: f.size,
       type: f.type || "application/octet-stream",
+      file: f,
     }));
     setFiles((prev) => [...prev, ...incoming]);
     setSelectedFileId((cur) => cur ?? incoming[0]?.id ?? null);
