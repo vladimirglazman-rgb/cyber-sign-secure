@@ -9,6 +9,7 @@ export type DocumentRow = {
   status: "pending" | "signed" | "cancelled";
   subject: string;
   created_at: string;
+  version?: string | null;
   recipients?: {
     id: string;
     name: string;
@@ -35,7 +36,7 @@ export const listMyDocuments = createServerFn({ method: "GET" })
         supabase
           .from("documents")
           .select(
-            "id, file_name, status, subject, created_at, recipients(id, name, email, phone, delivery_method, signing_token, status)",
+            "id, file_name, status, subject, created_at, version, recipients(id, name, email, phone, delivery_method, signing_token, status)",
           )
           .order("created_at", { ascending: false })
           .limit(50),
