@@ -89,19 +89,19 @@ export const createSignatureRequest = createServerFn({ method: "POST" })
       const { supabase, userId } = context;
 
       const { data: doc, error: docErr } = await supabase
-      .from("documents")
-      .insert({
-        owner_id: userId,
-        file_name: data.fileName,
-        file_path: data.filePath,
-        subject: data.subject,
-        message: data.message ?? null,
-        sign_in_order: data.signInOrder,
-        reminder_days: data.reminderDays,
-        status: "pending",
-      })
-      .select("id")
-      .single();
+        .from("documents")
+        .insert({
+          owner_id: userId,
+          file_name: data.fileName,
+          file_path: data.filePath,
+          subject: data.subject,
+          message: data.message ?? null,
+          sign_in_order: data.signInOrder,
+          reminder_days: data.reminderDays,
+          status: "pending",
+        })
+        .select("id")
+        .single();
 
       if (docErr || !doc) {
         console.error("DOCUMENT_INSERT_ERROR", docErr);

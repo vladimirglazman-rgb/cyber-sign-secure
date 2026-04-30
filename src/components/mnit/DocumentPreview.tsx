@@ -11,7 +11,9 @@ export function DocumentPreview({ api }: { api: SignatureRequestApi }) {
     return null;
   }, [file?.file]);
   useEffect(() => {
-    return () => { if (blobUrl) URL.revokeObjectURL(blobUrl); };
+    return () => {
+      if (blobUrl) URL.revokeObjectURL(blobUrl);
+    };
   }, [blobUrl]);
   useEffect(() => {
     setPreviewFailed(false);
@@ -25,7 +27,9 @@ export function DocumentPreview({ api }: { api: SignatureRequestApi }) {
   return (
     <div className="glass-panel flex h-full flex-col p-4">
       <header className="mb-3 flex items-center justify-between">
-        <h3 className="font-display text-sm uppercase tracking-[0.2em] text-primary text-glow">תצוגה מקדימה</h3>
+        <h3 className="font-display text-sm uppercase tracking-[0.2em] text-primary text-glow">
+          תצוגה מקדימה
+        </h3>
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -74,7 +78,10 @@ export function DocumentPreview({ api }: { api: SignatureRequestApi }) {
                     src={blobUrl}
                     alt={file.name}
                     onLoad={() => setLoading(false)}
-                    onError={() => { setLoading(false); setPreviewFailed(true); }}
+                    onError={() => {
+                      setLoading(false);
+                      setPreviewFailed(true);
+                    }}
                     className="h-full w-full object-contain"
                   />
                 ) : (
@@ -95,17 +102,22 @@ export function DocumentPreview({ api }: { api: SignatureRequestApi }) {
               </div>
             ) : (
               <div className="space-y-2">
-              {Array.from({ length: 14 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  {showLines && (
-                    <span className="font-display text-[9px] tracking-wider text-primary text-glow w-5 shrink-0">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                  )}
-                  <div className="h-2 rounded-full bg-primary/15" style={{ width: `${60 + ((i * 13) % 35)}%` }} />
+                {Array.from({ length: 14 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    {showLines && (
+                      <span className="font-display text-[9px] tracking-wider text-primary text-glow w-5 shrink-0">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                    )}
+                    <div
+                      className="h-2 rounded-full bg-primary/15"
+                      style={{ width: `${60 + ((i * 13) % 35)}%` }}
+                    />
+                  </div>
+                ))}
+                <div className="absolute bottom-4 end-4 flex h-16 w-32 items-center justify-center rounded border border-dashed border-primary/60 bg-primary/5 text-[10px] font-display tracking-wider text-primary text-glow">
+                  SIGN HERE
                 </div>
-              ))}
-              <div className="absolute bottom-4 end-4 flex h-16 w-32 items-center justify-center rounded border border-dashed border-primary/60 bg-primary/5 text-[10px] font-display tracking-wider text-primary text-glow">SIGN HERE</div>
               </div>
             )}
           </>

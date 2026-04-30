@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { CheckCircle2, ExternalLink, FileSignature, Loader2, PenTool, ShieldCheck } from "lucide-react";
+import {
+  CheckCircle2,
+  ExternalLink,
+  FileSignature,
+  Loader2,
+  PenTool,
+  ShieldCheck,
+} from "lucide-react";
 import { toast } from "sonner";
 import { peekToken, verifySigner } from "@/server/signing.functions";
 import { SignatureModal } from "@/components/mnit/SignatureModal";
@@ -18,8 +25,19 @@ export const Route = createFileRoute("/sign/$token")({
 
 type Stage = "verify" | "view" | "done";
 
-type Peek = { verification_type: "id_number" | "phone"; recipient_name: string; document_subject: string; already_signed: boolean };
-type Ctx = { fileName: string; subject: string; message: string | null; alreadySigned: boolean; fileUrl: string | null };
+type Peek = {
+  verification_type: "id_number" | "phone";
+  recipient_name: string;
+  document_subject: string;
+  already_signed: boolean;
+};
+type Ctx = {
+  fileName: string;
+  subject: string;
+  message: string | null;
+  alreadySigned: boolean;
+  fileUrl: string | null;
+};
 
 function SignPage() {
   const { token } = Route.useParams();
@@ -34,13 +52,22 @@ function SignPage() {
   useEffect(() => {
     let active = true;
     peekToken({ data: { token } })
-      .then((p) => { if (active) setPeek(p as Peek); })
-      .catch((e) => { if (active) setPeekErr(e instanceof Error ? e.message : "הקישור לא תקין"); });
-    return () => { active = false; };
+      .then((p) => {
+        if (active) setPeek(p as Peek);
+      })
+      .catch((e) => {
+        if (active) setPeekErr(e instanceof Error ? e.message : "הקישור לא תקין");
+      });
+    return () => {
+      active = false;
+    };
   }, [token]);
 
   const verify = async () => {
-    if (verification.trim().length < 4) { toast.error("יש להזין ערך אימות תקין"); return; }
+    if (verification.trim().length < 4) {
+      toast.error("יש להזין ערך אימות תקין");
+      return;
+    }
     try {
       setBusy(true);
       const c = await verifySigner({ data: { token, verification: verification.trim() } });
@@ -57,7 +84,9 @@ function SignPage() {
     <div className="relative min-h-screen px-4 py-8" dir="rtl">
       <div className="mx-auto flex max-w-3xl flex-col gap-6">
         <header className="flex items-center justify-between">
-          <div className="font-display text-xl tracking-[0.25em] text-primary text-glow">MNIT · SIGN</div>
+          <div className="font-display text-xl tracking-[0.25em] text-primary text-glow">
+            MNIT · SIGN
+          </div>
           <div className="flex items-center gap-1.5 rounded-md border border-primary/20 px-2.5 py-1 text-[11px] text-primary">
             <ShieldCheck className="h-3.5 w-3.5" /> חתימה מאובטחת
           </div>
@@ -97,7 +126,19 @@ function SignPage() {
   );
 }
 
-function VerifyCard({ peek, value, onChange, onSubmit, busy }: { peek: Peek; value: string; onChange: (v: string) => void; onSubmit: () => void; busy: boolean }) {
+function VerifyCard({
+  peek,
+  value,
+  onChange,
+  onSubmit,
+  busy,
+}: {
+  peek: Peek;
+  value: string;
+  onChange: (v: string) => void;
+  onSubmit: () => void;
+  busy: boolean;
+}) {
   const isId = peek.verification_type === "id_number";
   return (
     <section className="glass-panel p-6">
@@ -106,15 +147,20 @@ function VerifyCard({ peek, value, onChange, onSubmit, busy }: { peek: Peek; val
         <h1 className="font-display text-lg text-primary text-glow">אימות זהות</h1>
       </div>
       <p className="mb-4 text-sm text-muted-foreground">
-        שלום <span className="text-foreground">{peek.recipient_name}</span>, אנא הזן את {isId ? "מספר תעודת הזהות" : "מספר הטלפון"} שלך כדי לצפות במסמך:
+        שלום <span className="text-foreground">{peek.recipient_name}</span>, אנא הזן את{" "}
+        {isId ? "מספר תעודת הזהות" : "מספר הטלפון"} שלך כדי לצפות במסמך:
       </p>
-      <p className="mb-4 text-xs text-muted-foreground">נושא הפנייה: <span className="text-foreground">{peek.document_subject}</span></p>
+      <p className="mb-4 text-xs text-muted-foreground">
+        נושא הפנייה: <span className="text-foreground">{peek.document_subject}</span>
+      </p>
       <input
         dir="ltr"
         autoFocus
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        onKeyDown={(e) => { if (e.key === "Enter") onSubmit(); }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") onSubmit();
+        }}
         placeholder={isId ? "ת.ז." : "טלפון"}
         className="mb-4 w-full rounded-md border border-primary/30 bg-background/50 px-3 py-2.5 text-base text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary"
       />
@@ -150,7 +196,9 @@ function ViewerCard({ ctx, onSign }: { ctx: Ctx; onSign: () => void }) {
       </div>
       <p className="mb-4 truncate text-xs text-muted-foreground">{ctx.fileName}</p>
       {ctx.message && (
-        <p className="mb-4 rounded-md border border-primary/15 bg-primary/5 p-3 text-sm text-foreground">{ctx.message}</p>
+        <p className="mb-4 rounded-md border border-primary/15 bg-primary/5 p-3 text-sm text-foreground">
+          {ctx.message}
+        </p>
       )}
 
       <div className="relative min-h-[55vh] overflow-hidden rounded-lg border border-primary/30 bg-background/30">
@@ -174,15 +222,31 @@ function ViewerCard({ ctx, onSign }: { ctx: Ctx; onSign: () => void }) {
               </div>
             )}
             {isImage ? (
-              <img src={ctx.fileUrl} alt={ctx.fileName} onLoad={() => setLoading(false)} className="h-[60vh] w-full object-contain" />
+              <img
+                src={ctx.fileUrl}
+                alt={ctx.fileName}
+                onLoad={() => setLoading(false)}
+                className="h-[60vh] w-full object-contain"
+              />
             ) : (
-              <object data={ctx.fileUrl} type="application/pdf" className="h-[60vh] w-full bg-background">
-                <iframe src={ctx.fileUrl} title={ctx.fileName} onLoad={() => setLoading(false)} className="h-[60vh] w-full bg-background" />
+              <object
+                data={ctx.fileUrl}
+                type="application/pdf"
+                className="h-[60vh] w-full bg-background"
+              >
+                <iframe
+                  src={ctx.fileUrl}
+                  title={ctx.fileName}
+                  onLoad={() => setLoading(false)}
+                  className="h-[60vh] w-full bg-background"
+                />
               </object>
             )}
           </>
-          ) : (
-          <div className="flex h-[40vh] items-center justify-center text-sm text-muted-foreground">לא ניתן לטעון את המסמך</div>
+        ) : (
+          <div className="flex h-[40vh] items-center justify-center text-sm text-muted-foreground">
+            לא ניתן לטעון את המסמך
+          </div>
         )}
       </div>
 
@@ -202,7 +266,9 @@ function SuccessCard({ subject }: { subject: string }) {
     <section className="glass-panel flex flex-col items-center p-10 text-center">
       <CheckCircle2 className="mb-4 h-16 w-16 text-primary icon-glow" />
       <h1 className="font-display text-xl text-primary text-glow">המסמך נחתם בהצלחה</h1>
-      <p className="mt-2 text-sm text-muted-foreground">תודה על חתימתך על "{subject}". ניתן לסגור חלון זה.</p>
+      <p className="mt-2 text-sm text-muted-foreground">
+        תודה על חתימתך על "{subject}". ניתן לסגור חלון זה.
+      </p>
     </section>
   );
 }
