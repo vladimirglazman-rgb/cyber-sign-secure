@@ -146,7 +146,7 @@ function SuccessCard({
 
       <div className="space-y-1.5">
         <p className="font-display text-xs uppercase tracking-[0.3em] text-emerald-300">
-          המסמך הועלה בהצלחה
+          המסמך נטען ומוכן לשליחה
         </p>
         <div className="flex items-center justify-center gap-2">
           <FileText className="h-4 w-4 text-primary icon-glow" />
