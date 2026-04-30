@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Loader2, ShieldCheck, FileSignature, CheckCircle2, PenTool } from "lucide-react";
+import { CheckCircle2, ExternalLink, FileSignature, Loader2, PenTool, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { peekToken, verifySigner } from "@/server/signing.functions";
 import { SignatureModal } from "@/components/mnit/SignatureModal";
@@ -132,6 +132,14 @@ function VerifyCard({ peek, value, onChange, onSubmit, busy }: { peek: Peek; val
 }
 
 function ViewerCard({ ctx, onSign }: { ctx: Ctx; onSign: () => void }) {
+  const [loading, setLoading] = useState(!!ctx.fileUrl);
+  const isImage = /\.(png|jpe?g|gif|webp)$/i.test(ctx.fileName);
+  useEffect(() => {
+    setLoading(!!ctx.fileUrl);
+    if (!ctx.fileUrl) return;
+    const timer = window.setTimeout(() => setLoading(false), 2500);
+    return () => window.clearTimeout(timer);
+  }, [ctx.fileUrl]);
   return (
     <section className="glass-panel p-6">
       <div className="mb-3 flex items-center justify-between">
@@ -145,14 +153,35 @@ function ViewerCard({ ctx, onSign }: { ctx: Ctx; onSign: () => void }) {
         <p className="mb-4 rounded-md border border-primary/15 bg-primary/5 p-3 text-sm text-foreground">{ctx.message}</p>
       )}
 
-      <div className="relative overflow-hidden rounded-lg border border-primary/30 bg-background/30">
+      <div className="relative min-h-[55vh] overflow-hidden rounded-lg border border-primary/30 bg-background/30">
         {ctx.fileUrl ? (
-          ctx.fileUrl.match(/\.(png|jpe?g)(\?|$)/i) ? (
-            <img src={ctx.fileUrl} alt={ctx.fileName} className="max-h-[60vh] w-full object-contain" />
+          <>
+            <a
+              href={ctx.fileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute end-2 top-2 z-20 inline-flex items-center gap-1 rounded-md border border-primary/50 bg-background/85 px-2 py-1 text-[10px] font-semibold text-primary glow-aqua backdrop-blur transition hover:bg-primary/10"
+            >
+              <ExternalLink className="h-3 w-3" />
+              פתח בלשונית חדשה
+            </a>
+            {loading && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/50 backdrop-blur-sm">
+                <div className="flex flex-col items-center gap-2 text-primary">
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <span className="text-xs text-glow">Loading Document...</span>
+                </div>
+              </div>
+            )}
+            {isImage ? (
+              <img src={ctx.fileUrl} alt={ctx.fileName} onLoad={() => setLoading(false)} className="h-[60vh] w-full object-contain" />
+            ) : (
+              <object data={ctx.fileUrl} type="application/pdf" className="h-[60vh] w-full bg-background">
+                <iframe src={ctx.fileUrl} title={ctx.fileName} onLoad={() => setLoading(false)} className="h-[60vh] w-full bg-background" />
+              </object>
+            )}
+          </>
           ) : (
-            <iframe src={ctx.fileUrl} title={ctx.fileName} className="h-[60vh] w-full" />
-          )
-        ) : (
           <div className="flex h-[40vh] items-center justify-center text-sm text-muted-foreground">לא ניתן לטעון את המסמך</div>
         )}
       </div>
