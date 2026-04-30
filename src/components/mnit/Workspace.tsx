@@ -22,7 +22,7 @@ export function Workspace() {
         <SendBar api={api} paths={paths} resetPaths={resetPaths} />
       </div>
       <div className="md:sticky md:top-4 md:h-[calc(100vh-9rem)]">
-        <DocumentPreview api={api} />
+        <DocumentPreview api={api} paths={paths} />
       </div>
     </div>
   );
