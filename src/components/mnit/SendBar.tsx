@@ -28,7 +28,7 @@ export function SendBar({
     fileName: string;
   }) => {
     const url = `${window.location.origin}/sign/${item.token}`;
-    const text = `שלום ${item.name}, מצורף מסמך ${item.fileName} לחתימתך ב-MNIT Sign. ניתן לחתום כאן: ${url}`;
+    const text = `שלום, ממתין לך מסמך לחתימה דיגיטלית מאת MNIT Sign. לחתימה מאובטחת לחץ כאן: ${url}`;
     const digits = (item.phone ?? "").replace(/\D/g, "");
     let intl = digits;
     if (digits.startsWith("0")) intl = `972${digits.slice(1)}`;
@@ -100,6 +100,11 @@ export function SendBar({
           fileName: created.fileName,
         }));
       setShareLinks(links);
+      // Auto-open WhatsApp for the first recipient that has a phone number.
+      const autoTarget = links.find((l) => (l.phone ?? "").replace(/\D/g, "").length >= 7);
+      if (autoTarget) {
+        openWhatsApp(autoTarget);
+      }
       toast.success("הבקשה נוצרה בהצלחה", {
         description: "ניתן לשלוח כעת בוואטסאפ או להעתיק קישור מהפעילות",
       });
