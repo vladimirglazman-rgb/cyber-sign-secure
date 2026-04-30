@@ -18,7 +18,9 @@ export function Step1Upload({ api, setPath, removePath }: { api: SignatureReques
   };
   const upload = useCallback(async (list: FileList | File[]) => {
     const arr = Array.from(list).filter(validate);
-    for (const file of arr) {
+    const ids = api.addFiles(arr);
+    for (const [index, file] of arr.entries()) {
+      const id = ids[index];
       try {
         setBusy(file.name);
         const { data: sessionData } = await supabase.auth.getSession();
@@ -26,6 +28,7 @@ export function Step1Upload({ api, setPath, removePath }: { api: SignatureReques
         if (!userId) {
           console.error("UPLOAD_FAILED_UNAUTHENTICATED");
           toast.error("חובה להיות מחובר כדי להעלות קובץ");
+          if (id) api.removeFile(id);
           continue;
         }
         // Always rename — guarantees Hebrew/non-ASCII filenames don't break the path
@@ -50,14 +53,15 @@ export function Step1Upload({ api, setPath, removePath }: { api: SignatureReques
             console.error("UPLOAD_FAILED", error);
             toast.error(`שגיאה בהעלאת הקובץ: ${error.message ?? ""}`);
           }
+          if (id) api.removeFile(id);
           continue;
         }
-        const [id] = api.addFiles([file]);
         if (id) setPath(id, path);
       } catch (e) {
         const err = e as { message?: string };
         console.error("UPLOAD_FAILED", err);
         toast.error(`שגיאה בהעלאת הקובץ${err?.message ? `: ${err.message}` : ""}`);
+        if (id) api.removeFile(id);
       }
       finally { setBusy(null); }
     }
