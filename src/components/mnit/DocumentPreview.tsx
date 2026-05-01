@@ -64,15 +64,19 @@ export function DocumentPreview({
     const rect = e.currentTarget.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
     const y = (e.clientY - rect.top) / rect.height;
-    api.updateRecipient(recipient.id, {
-      signatureCoordinates: {
+    const next = [
+      ...(recipient.signatureCoordinates ?? []),
+      {
         pageNumber: 1,
         x: Math.max(0, Math.min(1, x)),
         y: Math.max(0, Math.min(1, y)),
       },
+    ];
+    api.updateRecipient(recipient.id, {
+      signatureCoordinates: next,
     });
   };
-  const coords = recipient?.signatureCoordinates ?? null;
+  const coords = recipient?.signatureCoordinates ?? [];
 
   return (
     <div className="glass-panel flex h-full flex-col p-4">
@@ -107,10 +111,11 @@ export function DocumentPreview({
                   לא ניתן להציג את המסמך כאן. לחץ במקום הרצוי כדי למקם חתימה.
                 </div>
               </object>
-              {coords && (
+              {coords.map((c, i) => (
                 <div
+                  key={i}
                   className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full"
-                  style={{ left: `${coords.x * 100}%`, top: `${coords.y * 100}%` }}
+                  style={{ left: `${c.x * 100}%`, top: `${c.y * 100}%` }}
                 >
                   <MapPin
                     className="h-7 w-7 text-primary"
@@ -121,7 +126,7 @@ export function DocumentPreview({
                     fill="hsl(var(--primary) / 0.35)"
                   />
                 </div>
-              )}
+              ))}
               {openHref && (
                 <a
                   href={openHref}
@@ -147,13 +152,10 @@ export function DocumentPreview({
       </div>
       {file && recipient && (
         <div className="mt-2 text-[11px] text-muted-foreground">
-          {coords ? (
-            <>
-              חתימה ממוקמת · עמוד {coords.pageNumber} · X {(coords.x * 100).toFixed(1)}% · Y{" "}
-              {(coords.y * 100).toFixed(1)}%
-            </>
+          {coords.length > 0 ? (
+            <>{coords.length} מיקומי חתימה נבחרו</>
           ) : (
-            <>טרם נבחר מיקום חתימה</>
+            <>טרם נבחר מיקום חתימה — לחץ על המסמך כדי להוסיף</>
           )}
         </div>
       )}

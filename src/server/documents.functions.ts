@@ -71,11 +71,14 @@ const recipientSchema = z.object({
   verificationType: z.enum(["id_number", "phone"]),
   verificationValue: z.string().min(4).max(40),
   signatureCoordinates: z
-    .object({
-      pageNumber: z.number().int().min(1).max(2000),
-      x: z.number().min(0).max(1),
-      y: z.number().min(0).max(1),
-    })
+    .array(
+      z.object({
+        pageNumber: z.number().int().min(1).max(2000),
+        x: z.number().min(0).max(1),
+        y: z.number().min(0).max(1),
+      }),
+    )
+    .max(50)
     .nullable()
     .optional(),
 });
@@ -138,7 +141,7 @@ export const createSignatureRequest = createServerFn({ method: "POST" })
         verification_value_hash: createHash("sha256")
           .update(r.verificationValue.trim())
           .digest("hex"),
-        signature_coordinates: r.signatureCoordinates ?? null,
+        signature_coordinates: r.signatureCoordinates ?? [],
       }));
 
       const { data: recipients, error: recErr } = await supabase
@@ -292,13 +295,15 @@ export const downloadSignedDocument = createServerFn({ method: "POST" })
 
     for (const r of recipients ?? []) {
       const sigUrl = (r as { signature_data_url: string | null }).signature_data_url;
-      const coords = (r as { signature_coordinates: { pageNumber: number; x: number; y: number } | null })
-        .signature_coordinates;
-      if (!sigUrl || !coords) continue;
-
-      const idx = Math.max(0, Math.min(pages.length - 1, coords.pageNumber - 1));
-      const page = pages[idx];
-      if (!page) continue;
+      const rawCoords = (r as {
+        signature_coordinates:
+          | { pageNumber: number; x: number; y: number }[]
+          | { pageNumber: number; x: number; y: number }
+          | null;
+      }).signature_coordinates;
+      if (!sigUrl || !rawCoords) continue;
+      const coordsList = Array.isArray(rawCoords) ? rawCoords : [rawCoords];
+      if (coordsList.length === 0) continue;
 
       const commaIdx = sigUrl.indexOf(",");
       if (commaIdx < 0) continue;
@@ -310,19 +315,23 @@ export const downloadSignedDocument = createServerFn({ method: "POST" })
         ? await pdfDoc.embedJpg(imgBytes)
         : await pdfDoc.embedPng(imgBytes);
 
-      const { width: pw, height: ph } = page.getSize();
-      // Coords are top-left fractional from the UI; convert to pdf-lib (origin bottom-left).
-      const xPx = coords.x * pw;
-      const yPxFromTop = coords.y * ph;
-      const drawX = Math.max(0, Math.min(pw - SIG_W, xPx - SIG_W / 2));
-      const drawY = Math.max(0, Math.min(ph - SIG_H, ph - yPxFromTop - SIG_H / 2));
-
-      page.drawImage(image, {
-        x: drawX,
-        y: drawY,
-        width: SIG_W,
-        height: SIG_H,
-      });
+      for (const coords of coordsList) {
+        const idx = Math.max(0, Math.min(pages.length - 1, coords.pageNumber - 1));
+        const page = pages[idx];
+        if (!page) continue;
+        const { width: pw, height: ph } = page.getSize();
+        // Coords are top-left fractional from the UI; convert to pdf-lib (origin bottom-left).
+        const xPx = coords.x * pw;
+        const yPxFromTop = coords.y * ph;
+        const drawX = Math.max(0, Math.min(pw - SIG_W, xPx - SIG_W / 2));
+        const drawY = Math.max(0, Math.min(ph - SIG_H, ph - yPxFromTop - SIG_H / 2));
+        page.drawImage(image, {
+          x: drawX,
+          y: drawY,
+          width: SIG_W,
+          height: SIG_H,
+        });
+      }
     }
 
     const stamped = await pdfDoc.save();
