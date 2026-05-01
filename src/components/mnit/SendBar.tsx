@@ -69,6 +69,7 @@ export function SendBar({
           r.verificationType === "phone" && r.deliveryMethod === "sms" && r.phone.trim()
             ? r.phone.trim()
             : r.verificationValue.trim(),
+        signatureCoordinates: r.signatureCoordinates ?? null,
       }));
     if (valid.length === 0) {
       toast.error("יש להוסיף לפחות נמען אחד עם פרטים תקינים");
