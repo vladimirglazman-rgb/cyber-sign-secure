@@ -6,7 +6,6 @@ import {
   ScanLine,
 } from "lucide-react";
 import type { SignatureRequestApi, UploadedFile } from "@/hooks/use-signature-request";
-import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 export function DocumentPreview({
   api,
@@ -85,15 +84,11 @@ export function DocumentPreview({
 function SuccessCard({
   file,
   ext,
-  ready,
-  opening,
-  onOpen,
+  openHref,
 }: {
   file: UploadedFile;
   ext: string;
-  ready: boolean;
-  opening: boolean;
-  onOpen: () => void | Promise<void>;
+  openHref: string | null;
 }) {
   const extLabel = (ext || "FILE").toUpperCase();
   return (
@@ -132,19 +127,26 @@ function SuccessCard({
         </p>
       </div>
 
-      <button
-        type="button"
-        onClick={() => onOpen()}
-        disabled={opening || !ready}
-        className="group relative inline-flex items-center gap-2 rounded-lg border border-primary/70 bg-primary/15 px-6 py-3 text-sm font-semibold text-primary glow-aqua animate-pulse-glow transition hover:bg-primary/25 disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        {opening ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
+      {openHref ? (
+        <a
+          href={openHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group relative inline-flex items-center gap-2 rounded-lg border border-primary/70 bg-primary/15 px-6 py-3 text-sm font-semibold text-primary glow-aqua animate-pulse-glow transition hover:bg-primary/25"
+        >
           <ExternalLink className="h-4 w-4 icon-glow" />
-        )}
-        <span className="text-glow">פתח מסמך מקורי</span>
-      </button>
+          <span className="text-glow">פתח מסמך מקורי</span>
+        </a>
+      ) : (
+        <button
+          type="button"
+          disabled
+          className="group relative inline-flex cursor-not-allowed items-center gap-2 rounded-lg border border-primary/70 bg-primary/15 px-6 py-3 text-sm font-semibold text-primary glow-aqua opacity-60"
+        >
+          <ExternalLink className="h-4 w-4 icon-glow" />
+          <span className="text-glow">מכין קישור למסמך…</span>
+        </button>
+      )}
 
       <p className="max-w-xs text-[11px] leading-relaxed text-muted-foreground">
         המסמך נפתח בלשונית חדשה לתצוגה מאובטחת ללא חסימות דפדפן.
