@@ -71,11 +71,14 @@ const recipientSchema = z.object({
   verificationType: z.enum(["id_number", "phone"]),
   verificationValue: z.string().min(4).max(40),
   signatureCoordinates: z
-    .object({
-      pageNumber: z.number().int().min(1).max(2000),
-      x: z.number().min(0).max(1),
-      y: z.number().min(0).max(1),
-    })
+    .array(
+      z.object({
+        pageNumber: z.number().int().min(1).max(2000),
+        x: z.number().min(0).max(1),
+        y: z.number().min(0).max(1),
+      }),
+    )
+    .max(50)
     .nullable()
     .optional(),
 });
@@ -138,7 +141,7 @@ export const createSignatureRequest = createServerFn({ method: "POST" })
         verification_value_hash: createHash("sha256")
           .update(r.verificationValue.trim())
           .digest("hex"),
-        signature_coordinates: r.signatureCoordinates ?? null,
+        signature_coordinates: r.signatureCoordinates ?? [],
       }));
 
       const { data: recipients, error: recErr } = await supabase
