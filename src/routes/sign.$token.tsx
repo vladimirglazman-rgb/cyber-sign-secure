@@ -14,6 +14,7 @@ import {
 import { toast } from "sonner";
 import { peekToken, verifySigner, submitSignature } from "@/server/signing.functions";
 import { SignatureCanvas, type SignatureCanvasHandle } from "@/components/mnit/SignatureCanvas";
+import { SignerPdfViewer, type SigCoord } from "@/components/mnit/SignerPdfViewer";
 
 export const Route = createFileRoute("/sign/$token")({
   head: () => ({
@@ -40,6 +41,7 @@ type Ctx = {
   message: string | null;
   alreadySigned: boolean;
   fileUrl: string | null;
+  coordinates: SigCoord[];
 };
 
 function SignPage() {
@@ -73,7 +75,7 @@ function SignPage() {
     try {
       setBusy(true);
       const c = await verifySigner({ data: { token, verification: verification.trim() } });
-      setCtx(c);
+      setCtx(c as Ctx);
       setStage(c.alreadySigned ? "done" : "view");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "פרטי אימות שגויים");
@@ -221,50 +223,36 @@ function ViewerCard({
         </p>
       )}
 
-      {/* Native "Open Document" card */}
-      <div className="flex flex-col items-center gap-4 rounded-lg border border-primary/30 bg-gradient-to-b from-background/60 to-background/20 p-5 text-center">
-        <div className="relative">
-          <div className="absolute inset-0 rounded-full bg-primary/20 blur-2xl" />
-          <div
-            className="relative flex h-16 w-16 items-center justify-center rounded-full border-2 border-primary/70 bg-primary/10"
-            style={{
-              boxShadow:
-                "0 0 0 1px rgba(48,255,247,0.5), 0 0 24px rgba(48,255,247,0.45)",
-            }}
-          >
-            <FileText
-              className="h-9 w-9 text-primary"
-              style={{ filter: "drop-shadow(0 0 8px rgba(48,255,247,0.7))" }}
-            />
+      {/* Inline PDF viewer with sender's signature pins */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <FileText className="h-4 w-4 text-primary icon-glow" />
+            <p
+              className="font-display text-xs uppercase tracking-[0.2em] text-primary text-glow truncate max-w-[60vw]"
+              title={ctx.fileName}
+            >
+              {ctx.fileName}
+            </p>
           </div>
-        </div>
-        <div className="space-y-1">
-          <p className="font-display text-xs uppercase tracking-[0.25em] text-primary text-glow">
-            המסמך מוכן לצפייה
-          </p>
-          <p
-            className="max-w-[28ch] truncate text-sm font-semibold text-foreground"
-            title={ctx.fileName}
-          >
-            {ctx.fileName}
-          </p>
+          {ctx.fileUrl && (
+            <a
+              href={ctx.fileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-md border border-primary/40 px-2.5 py-1 text-[11px] text-primary hover:bg-primary/10"
+            >
+              <ExternalLink className="h-3 w-3" /> פתח בלשונית
+            </a>
+          )}
         </div>
         {ctx.fileUrl ? (
-          <a
-            href={ctx.fileUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-lg border-2 border-primary bg-primary/15 px-8 py-4 text-base font-bold text-primary glow-aqua animate-pulse-glow transition hover:bg-primary/25"
-          >
-            <ExternalLink className="h-5 w-5 icon-glow" />
-            <span className="text-glow">לחץ כאן לצפייה במסמך</span>
-          </a>
+          <SignerPdfViewer fileUrl={ctx.fileUrl} coordinates={ctx.coordinates ?? []} />
         ) : (
-          <span className="text-xs text-muted-foreground">לא ניתן לטעון את המסמך</span>
+          <div className="rounded-md border border-destructive/40 p-4 text-center text-xs text-destructive">
+            לא ניתן לטעון את המסמך
+          </div>
         )}
-        <p className="max-w-xs text-[11px] leading-relaxed text-muted-foreground">
-          המסמך ייפתח בלשונית חדשה — תצוגה נטיבית מלאה במכשיר שלך.
-        </p>
       </div>
 
       {/* Instruction */}
