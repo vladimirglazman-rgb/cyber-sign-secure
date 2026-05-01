@@ -95,6 +95,7 @@ export type Database = {
           opened_at: string | null
           phone: string | null
           role: Database["public"]["Enums"]["recipient_role"]
+          signature_coordinates: Json | null
           signature_data_url: string | null
           signed_at: string | null
           signed_ip: string | null
@@ -114,6 +115,7 @@ export type Database = {
           opened_at?: string | null
           phone?: string | null
           role?: Database["public"]["Enums"]["recipient_role"]
+          signature_coordinates?: Json | null
           signature_data_url?: string | null
           signed_at?: string | null
           signed_ip?: string | null
@@ -133,6 +135,7 @@ export type Database = {
           opened_at?: string | null
           phone?: string | null
           role?: Database["public"]["Enums"]["recipient_role"]
+          signature_coordinates?: Json | null
           signature_data_url?: string | null
           signed_at?: string | null
           signed_ip?: string | null

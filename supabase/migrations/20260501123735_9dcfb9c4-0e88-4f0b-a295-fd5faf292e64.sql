@@ -1,0 +1,1 @@
+ALTER TABLE public.recipients ADD COLUMN IF NOT EXISTS signature_coordinates JSONB DEFAULT NULL;

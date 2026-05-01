@@ -15,6 +15,12 @@ export type VerificationType = "id_number" | "phone";
 
 export type DeliveryMethod = "email" | "sms";
 
+export type SignatureCoordinates = {
+  pageNumber: number;
+  x: number;
+  y: number;
+};
+
 export type Recipient = {
   id: string;
   name: string;
@@ -24,6 +30,7 @@ export type Recipient = {
   role: RecipientRole;
   verificationType: VerificationType;
   verificationValue: string;
+  signatureCoordinates?: SignatureCoordinates | null;
 };
 
 export type ReminderDays = 1 | 3 | 7;
@@ -40,6 +47,7 @@ const emptyRecipient = (): Recipient => ({
   role: "signer",
   verificationType: "id_number",
   verificationValue: "",
+  signatureCoordinates: null,
 });
 
 export function useSignatureRequest() {
