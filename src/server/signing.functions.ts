@@ -60,11 +60,14 @@ export const verifySigner = createServerFn({ method: "POST" })
       const raw = rec?.signature_coordinates;
       if (Array.isArray(raw)) {
         coordinates = raw
-          .map((c) => ({
-            pageNumber: Number(c?.pageNumber ?? 1) || 1,
-            x: Number(c?.x ?? 0),
-            y: Number(c?.y ?? 0),
-          }))
+          .map((c) => {
+            const obj = (c && typeof c === "object" ? c : {}) as Record<string, unknown>;
+            return {
+              pageNumber: Number(obj.pageNumber ?? 1) || 1,
+              x: Number(obj.x ?? 0),
+              y: Number(obj.y ?? 0),
+            };
+          })
           .filter((c) => Number.isFinite(c.x) && Number.isFinite(c.y));
       }
     } catch (e) {
