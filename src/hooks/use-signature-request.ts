@@ -59,6 +59,7 @@ export function useSignatureRequest() {
   const [remindersEnabled, setRemindersEnabled] = useState(false);
   const [reminderDays, setReminderDays] = useState<ReminderDays>(3);
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
+  const [selectedRecipientId, setSelectedRecipientId] = useState<string | null>(null);
 
   const addFiles = useCallback((list: FileList | File[]) => {
     const incoming = Array.from(list).map((f) => {
@@ -84,7 +85,9 @@ export function useSignatureRequest() {
   }, []);
 
   const addRecipient = useCallback(() => {
-    setRecipients((prev) => [...prev, emptyRecipient()]);
+    const r = emptyRecipient();
+    setRecipients((prev) => [...prev, r]);
+    setSelectedRecipientId(r.id);
   }, []);
 
   const updateRecipient = useCallback(
@@ -100,6 +103,7 @@ export function useSignatureRequest() {
     setRecipients((prev) =>
       prev.length === 1 ? [emptyRecipient()] : prev.filter((r) => r.id !== id)
     );
+    setSelectedRecipientId((cur) => (cur === id ? null : cur));
   }, []);
 
   const reset = useCallback(() => {
@@ -111,6 +115,7 @@ export function useSignatureRequest() {
     setRemindersEnabled(false);
     setReminderDays(3);
     setSelectedFileId(null);
+    setSelectedRecipientId(null);
   }, []);
 
   const canSend = useMemo(() => {
@@ -132,6 +137,15 @@ export function useSignatureRequest() {
     [files, selectedFileId]
   );
 
+  const selectedRecipient = useMemo(
+    () =>
+      recipients.find((r) => r.id === selectedRecipientId) ??
+      recipients.find((r) => r.role === "signer") ??
+      recipients[0] ??
+      null,
+    [recipients, selectedRecipientId]
+  );
+
   return {
     files,
     recipients,
@@ -142,6 +156,8 @@ export function useSignatureRequest() {
     reminderDays,
     selectedFileId,
     selectedFile,
+    selectedRecipientId,
+    selectedRecipient,
     canSend,
     setSignInOrder,
     setSubject,
@@ -149,6 +165,7 @@ export function useSignatureRequest() {
     setRemindersEnabled,
     setReminderDays,
     setSelectedFileId,
+    setSelectedRecipientId,
     addFiles,
     removeFile,
     addRecipient,

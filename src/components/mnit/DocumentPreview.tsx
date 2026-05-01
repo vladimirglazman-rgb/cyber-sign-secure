@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CheckCircle2,
   ExternalLink,
   FileText,
   ScanLine,
+  MapPin,
 } from "lucide-react";
 import type { SignatureRequestApi, UploadedFile } from "@/hooks/use-signature-request";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +16,7 @@ export function DocumentPreview({
   paths?: Record<string, string>;
 }) {
   const file = api.selectedFile;
+  const recipient = api.selectedRecipient;
   const [proxyUrlState, setProxyUrlState] = useState<{ path: string; url: string } | null>(null);
   const blobUrl = useMemo(() => {
     if (file?.file) return URL.createObjectURL(file.file);
@@ -53,6 +55,25 @@ export function DocumentPreview({
   // Prefer same-origin proxy URL. Fall back to local blob until upload completes.
   const currentProxyUrl = proxyUrlState && proxyUrlState.path === remotePath ? proxyUrlState.url : null;
   const openHref = currentProxyUrl ?? blobUrl;
+  const isPdf = ext === "pdf";
+  const inlineSrc = isPdf ? (currentProxyUrl ?? blobUrl) : null;
+
+  const surfaceRef = useRef<HTMLDivElement | null>(null);
+  const handlePlace = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!recipient) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    api.updateRecipient(recipient.id, {
+      signatureCoordinates: {
+        pageNumber: 1,
+        x: Math.max(0, Math.min(1, x)),
+        y: Math.max(0, Math.min(1, y)),
+      },
+    });
+  };
+  const coords = recipient?.signatureCoordinates ?? null;
+
   return (
     <div className="glass-panel flex h-full flex-col p-4">
       <header className="mb-3 flex items-center justify-between">
@@ -63,13 +84,60 @@ export function DocumentPreview({
           <ScanLine className="h-4 w-4 text-primary icon-glow" />
         </div>
       </header>
+      {file && recipient && (
+        <div className="mb-2 rounded-md border border-primary/20 bg-primary/5 px-3 py-1.5 text-[11px] text-muted-foreground">
+          לחץ על המסמך כדי למקם חתימה עבור{" "}
+          <span className="text-primary text-glow">{recipient.name || "נמען"}</span>
+        </div>
+      )}
       <div className="relative flex-1 overflow-hidden rounded-lg border border-primary/30 bg-gradient-to-b from-background/60 to-background/20 p-5">
         {file ? (
-          <SuccessCard
-            file={file}
-            ext={ext}
-            openHref={openHref}
-          />
+          isPdf && inlineSrc ? (
+            <div
+              ref={surfaceRef}
+              onClick={handlePlace}
+              className="relative h-full w-full cursor-crosshair overflow-hidden rounded-md border border-primary/20 bg-background/40"
+            >
+              <object
+                data={`${inlineSrc}#toolbar=0&navpanes=0&view=FitH`}
+                type="application/pdf"
+                className="pointer-events-none h-full w-full"
+              >
+                <div className="flex h-full items-center justify-center p-4 text-center text-xs text-muted-foreground">
+                  לא ניתן להציג את המסמך כאן. לחץ במקום הרצוי כדי למקם חתימה.
+                </div>
+              </object>
+              {coords && (
+                <div
+                  className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full"
+                  style={{ left: `${coords.x * 100}%`, top: `${coords.y * 100}%` }}
+                >
+                  <MapPin
+                    className="h-7 w-7 text-primary"
+                    style={{
+                      filter:
+                        "drop-shadow(0 0 6px hsl(var(--primary))) drop-shadow(0 0 12px hsl(var(--primary)))",
+                    }}
+                    fill="hsl(var(--primary) / 0.35)"
+                  />
+                </div>
+              )}
+              {openHref && (
+                <a
+                  href={openHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute bottom-2 end-2 z-20 inline-flex items-center gap-1.5 rounded-md border border-primary/60 bg-background/80 px-2.5 py-1 text-[11px] font-semibold text-primary backdrop-blur transition hover:bg-primary/15"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <ExternalLink className="h-3 w-3" />
+                  פתח מקור
+                </a>
+              )}
+            </div>
+          ) : (
+            <SuccessCard file={file} ext={ext} openHref={openHref} />
+          )
         ) : (
           <div className="flex h-full flex-col items-center justify-center text-center">
             <FileText className="h-10 w-10 text-primary/40" />
@@ -77,6 +145,18 @@ export function DocumentPreview({
           </div>
         )}
       </div>
+      {file && recipient && (
+        <div className="mt-2 text-[11px] text-muted-foreground">
+          {coords ? (
+            <>
+              חתימה ממוקמת · עמוד {coords.pageNumber} · X {(coords.x * 100).toFixed(1)}% · Y{" "}
+              {(coords.y * 100).toFixed(1)}%
+            </>
+          ) : (
+            <>טרם נבחר מיקום חתימה</>
+          )}
+        </div>
+      )}
     </div>
   );
 }
