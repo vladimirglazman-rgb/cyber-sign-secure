@@ -188,14 +188,6 @@ function ViewerCard({
   const canvasRef = useRef<SignatureCanvasHandle>(null);
   const [busy, setBusy] = useState(false);
 
-  const openDocument = () => {
-    if (!ctx.fileUrl) {
-      toast.error("לא ניתן לטעון את המסמך");
-      return;
-    }
-    window.open(ctx.fileUrl, "_blank", "noopener,noreferrer");
-  };
-
   const submit = async () => {
     if (canvasRef.current?.isEmpty()) {
       toast.error("יש לחתום במסגרת");
@@ -257,15 +249,19 @@ function ViewerCard({
             {ctx.fileName}
           </p>
         </div>
-        <button
-          type="button"
-          onClick={openDocument}
-          disabled={!ctx.fileUrl}
-          className="inline-flex items-center gap-2 rounded-lg border border-primary/70 bg-primary/15 px-6 py-3 text-sm font-semibold text-primary glow-aqua animate-pulse-glow transition hover:bg-primary/25 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          <ExternalLink className="h-4 w-4 icon-glow" />
-          <span className="text-glow">פתח את המסמך</span>
-        </button>
+        {ctx.fileUrl ? (
+          <a
+            href={ctx.fileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg border-2 border-primary bg-primary/15 px-8 py-4 text-base font-bold text-primary glow-aqua animate-pulse-glow transition hover:bg-primary/25"
+          >
+            <ExternalLink className="h-5 w-5 icon-glow" />
+            <span className="text-glow">לחץ כאן לצפייה במסמך</span>
+          </a>
+        ) : (
+          <span className="text-xs text-muted-foreground">לא ניתן לטעון את המסמך</span>
+        )}
         <p className="max-w-xs text-[11px] leading-relaxed text-muted-foreground">
           המסמך ייפתח בלשונית חדשה — תצוגה נטיבית מלאה במכשיר שלך.
         </p>
@@ -273,7 +269,7 @@ function ViewerCard({
 
       {/* Instruction */}
       <p className="rounded-md border border-primary/15 bg-primary/5 p-3 text-center text-xs text-foreground sm:text-sm">
-        אנא קרא את המסמך בלחיצה על הכפתור מעלה, ולאחר מכן צייר את חתימתך מטה
+        לאחר קריאת המסמך, צייר את חתימתך כאן:
       </p>
 
       {/* Signature pad */}
