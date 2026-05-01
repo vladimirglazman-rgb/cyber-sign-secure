@@ -143,7 +143,7 @@ export const createSignatureRequest = createServerFn({ method: "POST" })
 
       const { data: recipients, error: recErr } = await supabase
         .from("recipients")
-        .insert(rows)
+        .insert(rows as never)
         .select("id, name, email, phone, delivery_method, signing_token");
       if (recErr || !recipients) {
         console.error("RECIPIENTS_INSERT_ERROR", recErr);
