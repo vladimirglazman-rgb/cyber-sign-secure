@@ -1,16 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   CheckCircle2,
+  Eraser,
   ExternalLink,
   FileSignature,
+  FileText,
   Loader2,
   PenTool,
+  Send,
   ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
-import { peekToken, verifySigner } from "@/server/signing.functions";
-import { SignatureModal } from "@/components/mnit/SignatureModal";
+import { peekToken, verifySigner, submitSignature } from "@/server/signing.functions";
+import { SignatureCanvas, type SignatureCanvasHandle } from "@/components/mnit/SignatureCanvas";
 
 export const Route = createFileRoute("/sign/$token")({
   head: () => ({
@@ -47,7 +50,6 @@ function SignPage() {
   const [verification, setVerification] = useState("");
   const [busy, setBusy] = useState(false);
   const [ctx, setCtx] = useState<Ctx | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -107,21 +109,16 @@ function SignPage() {
             busy={busy}
           />
         ) : stage === "view" && ctx ? (
-          <ViewerCard ctx={ctx} onSign={() => setModalOpen(true)} />
+          <ViewerCard
+            ctx={ctx}
+            token={token}
+            verification={verification.trim()}
+            onSigned={() => setStage("done")}
+          />
         ) : (
           <SuccessCard subject={peek.document_subject} />
         )}
       </div>
-
-      {ctx && (
-        <SignatureModal
-          open={modalOpen}
-          onOpenChange={setModalOpen}
-          token={token}
-          verification={verification.trim()}
-          onSigned={() => setStage("done")}
-        />
-      )}
     </div>
   );
 }
@@ -177,85 +174,136 @@ function VerifyCard({
   );
 }
 
-function ViewerCard({ ctx, onSign }: { ctx: Ctx; onSign: () => void }) {
-  const [loading, setLoading] = useState(!!ctx.fileUrl);
-  const isImage = /\.(png|jpe?g|gif|webp)$/i.test(ctx.fileName);
-  useEffect(() => {
-    setLoading(!!ctx.fileUrl);
-    if (!ctx.fileUrl) return;
-    const timer = window.setTimeout(() => setLoading(false), 2500);
-    return () => window.clearTimeout(timer);
-  }, [ctx.fileUrl]);
+function ViewerCard({
+  ctx,
+  token,
+  verification,
+  onSigned,
+}: {
+  ctx: Ctx;
+  token: string;
+  verification: string;
+  onSigned: () => void;
+}) {
+  const canvasRef = useRef<SignatureCanvasHandle>(null);
+  const [busy, setBusy] = useState(false);
+
+  const openDocument = () => {
+    if (!ctx.fileUrl) {
+      toast.error("לא ניתן לטעון את המסמך");
+      return;
+    }
+    window.open(ctx.fileUrl, "_blank", "noopener,noreferrer");
+  };
+
+  const submit = async () => {
+    if (canvasRef.current?.isEmpty()) {
+      toast.error("יש לחתום במסגרת");
+      return;
+    }
+    const dataUrl = canvasRef.current?.toDataURL() ?? "";
+    if (!dataUrl) return;
+    try {
+      setBusy(true);
+      await submitSignature({ data: { token, verification, signature: dataUrl } });
+      toast.success("המסמך נחתם בהצלחה");
+      onSigned();
+    } catch (e) {
+      console.error(e);
+      toast.error(e instanceof Error ? e.message : "שגיאה בשליחת החתימה");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
-    <section className="glass-panel p-6">
-      <div className="mb-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <FileSignature className="h-5 w-5 text-primary icon-glow" />
-          <h1 className="font-display text-lg text-primary text-glow">{ctx.subject}</h1>
-        </div>
+    <section className="glass-panel flex flex-col gap-5 p-5 sm:p-6">
+      <div className="flex items-center gap-2">
+        <FileSignature className="h-5 w-5 text-primary icon-glow" />
+        <h1 className="font-display text-lg text-primary text-glow">{ctx.subject}</h1>
       </div>
-      <p className="mb-4 truncate text-xs text-muted-foreground">{ctx.fileName}</p>
+
       {ctx.message && (
-        <p className="mb-4 rounded-md border border-primary/15 bg-primary/5 p-3 text-sm text-foreground">
+        <p className="rounded-md border border-primary/15 bg-primary/5 p-3 text-sm text-foreground">
           {ctx.message}
         </p>
       )}
 
-      <div className="relative min-h-[55vh] overflow-hidden rounded-lg border border-primary/30 bg-background/30">
-        {ctx.fileUrl ? (
-          <>
-            <a
-              href={ctx.fileUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="absolute end-2 top-2 z-20 inline-flex items-center gap-1 rounded-md border border-primary/50 bg-background/85 px-2 py-1 text-[10px] font-semibold text-primary glow-aqua backdrop-blur transition hover:bg-primary/10"
-            >
-              <ExternalLink className="h-3 w-3" />
-              פתח בלשונית חדשה
-            </a>
-            {loading && (
-              <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/50 backdrop-blur-sm">
-                <div className="flex flex-col items-center gap-2 text-primary">
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  <span className="text-xs text-glow">Loading Document...</span>
-                </div>
-              </div>
-            )}
-            {isImage ? (
-              <img
-                src={ctx.fileUrl}
-                alt={ctx.fileName}
-                onLoad={() => setLoading(false)}
-                className="h-[60vh] w-full object-contain"
-              />
-            ) : (
-              <object
-                data={ctx.fileUrl}
-                type="application/pdf"
-                className="h-[60vh] w-full bg-background"
-              >
-                <iframe
-                  src={ctx.fileUrl}
-                  title={ctx.fileName}
-                  onLoad={() => setLoading(false)}
-                  className="h-[60vh] w-full bg-background"
-                />
-              </object>
-            )}
-          </>
-        ) : (
-          <div className="flex h-[40vh] items-center justify-center text-sm text-muted-foreground">
-            לא ניתן לטעון את המסמך
+      {/* Native "Open Document" card */}
+      <div className="flex flex-col items-center gap-4 rounded-lg border border-primary/30 bg-gradient-to-b from-background/60 to-background/20 p-5 text-center">
+        <div className="relative">
+          <div className="absolute inset-0 rounded-full bg-primary/20 blur-2xl" />
+          <div
+            className="relative flex h-16 w-16 items-center justify-center rounded-full border-2 border-primary/70 bg-primary/10"
+            style={{
+              boxShadow:
+                "0 0 0 1px rgba(48,255,247,0.5), 0 0 24px rgba(48,255,247,0.45)",
+            }}
+          >
+            <FileText
+              className="h-9 w-9 text-primary"
+              style={{ filter: "drop-shadow(0 0 8px rgba(48,255,247,0.7))" }}
+            />
           </div>
-        )}
+        </div>
+        <div className="space-y-1">
+          <p className="font-display text-xs uppercase tracking-[0.25em] text-primary text-glow">
+            המסמך מוכן לצפייה
+          </p>
+          <p
+            className="max-w-[28ch] truncate text-sm font-semibold text-foreground"
+            title={ctx.fileName}
+          >
+            {ctx.fileName}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={openDocument}
+          disabled={!ctx.fileUrl}
+          className="inline-flex items-center gap-2 rounded-lg border border-primary/70 bg-primary/15 px-6 py-3 text-sm font-semibold text-primary glow-aqua animate-pulse-glow transition hover:bg-primary/25 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          <ExternalLink className="h-4 w-4 icon-glow" />
+          <span className="text-glow">פתח את המסמך</span>
+        </button>
+        <p className="max-w-xs text-[11px] leading-relaxed text-muted-foreground">
+          המסמך ייפתח בלשונית חדשה — תצוגה נטיבית מלאה במכשיר שלך.
+        </p>
+      </div>
+
+      {/* Instruction */}
+      <p className="rounded-md border border-primary/15 bg-primary/5 p-3 text-center text-xs text-foreground sm:text-sm">
+        אנא קרא את המסמך בלחיצה על הכפתור מעלה, ולאחר מכן צייר את חתימתך מטה
+      </p>
+
+      {/* Signature pad */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <PenTool className="h-4 w-4 text-primary icon-glow" />
+            <p className="font-display text-xs uppercase tracking-[0.2em] text-primary text-glow">
+              חתום כאן
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => canvasRef.current?.clear()}
+            className="inline-flex items-center gap-1.5 rounded-md border border-primary/20 px-2.5 py-1 text-[11px] text-muted-foreground hover:bg-primary/5 hover:text-foreground"
+          >
+            <Eraser className="h-3 w-3" /> נקה
+          </button>
+        </div>
+        <SignatureCanvas ref={canvasRef} />
       </div>
 
       <button
         type="button"
-        onClick={onSign}
-        className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 font-display text-sm font-bold tracking-wider text-primary-foreground glow-aqua hover:brightness-110"
+        onClick={submit}
+        disabled={busy}
+        className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 font-display text-sm font-bold tracking-wider text-primary-foreground glow-aqua hover:brightness-110 disabled:opacity-60"
       >
-        <PenTool className="h-4 w-4" /> חתום כאן
+        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+        חתום ושלח
       </button>
     </section>
   );
