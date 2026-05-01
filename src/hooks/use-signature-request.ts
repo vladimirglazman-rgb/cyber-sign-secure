@@ -15,11 +15,14 @@ export type VerificationType = "id_number" | "phone";
 
 export type DeliveryMethod = "email" | "sms";
 
-export type SignatureCoordinates = {
+export type SignatureCoordinate = {
   pageNumber: number;
   x: number;
   y: number;
 };
+
+/** Array of pin placements. Kept as a named type alias for clarity. */
+export type SignatureCoordinates = SignatureCoordinate[];
 
 export type Recipient = {
   id: string;
@@ -47,7 +50,7 @@ const emptyRecipient = (): Recipient => ({
   role: "signer",
   verificationType: "id_number",
   verificationValue: "",
-  signatureCoordinates: null,
+  signatureCoordinates: [],
 });
 
 export function useSignatureRequest() {
