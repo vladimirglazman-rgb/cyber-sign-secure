@@ -1,7 +1,8 @@
-import { FileText, Link2, Check, MessageCircle } from "lucide-react";
+import { FileText, Link2, Check, MessageCircle, Eye } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import type { DocumentRow } from "@/server/documents.functions";
+import { AuditModal } from "./AuditModal";
 const label: Record<DocumentRow["status"], string> = {
   pending: "ממתין",
   signed: "נחתם",
@@ -18,6 +19,7 @@ export function ActivityItem({ doc }: { doc: DocumentRow }) {
     month: "2-digit",
   });
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [auditOpen, setAuditOpen] = useState(false);
   const pendingSigners = (doc.recipients ?? []).filter(
     (r) => r.signing_token && r.status !== "signed",
   );
@@ -44,9 +46,15 @@ export function ActivityItem({ doc }: { doc: DocumentRow }) {
       : `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(wa, "_blank", "noopener,noreferrer");
   };
+  const isSigned = doc.status === "signed";
   return (
     <li className="flex flex-col gap-2 rounded-lg border border-primary/10 bg-primary/5 p-2.5">
-      <div className="flex items-center gap-3">
+      <div
+        className={`flex items-center gap-3 ${isSigned ? "cursor-pointer rounded-md transition hover:bg-primary/10" : ""}`}
+        onClick={isSigned ? () => setAuditOpen(true) : undefined}
+        role={isSigned ? "button" : undefined}
+        title={isSigned ? "הצג פרטי חתימה" : undefined}
+      >
         <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10 ring-1 ring-primary/30">
           <FileText className="h-4 w-4 text-primary" />
         </div>
@@ -64,6 +72,11 @@ export function ActivityItem({ doc }: { doc: DocumentRow }) {
           {doc.version && (
             <span className="font-display text-[9px] tracking-wider text-primary/80 text-glow">
               גרסה {doc.version}
+            </span>
+          )}
+          {isSigned && (
+            <span className="inline-flex items-center gap-1 text-[9px] text-primary/80">
+              <Eye className="h-2.5 w-2.5" /> פרטי חתימה
             </span>
           )}
         </div>
@@ -100,6 +113,9 @@ export function ActivityItem({ doc }: { doc: DocumentRow }) {
             </li>
           ))}
         </ul>
+      )}
+      {isSigned && (
+        <AuditModal open={auditOpen} onOpenChange={setAuditOpen} documentId={doc.id} />
       )}
     </li>
   );

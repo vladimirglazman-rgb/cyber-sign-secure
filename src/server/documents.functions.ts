@@ -179,3 +179,58 @@ export const getOwnerSignedUrl = createServerFn({ method: "POST" })
     }
     return { url: signed.signedUrl };
   });
+
+const auditSchema = z.object({ documentId: z.string().uuid() });
+
+export type SignedRecipientAudit = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  verification_type: string | null;
+  signed_at: string | null;
+  signed_ip: string | null;
+  signed_user_agent: string | null;
+  signature_data_url: string | null;
+};
+
+export type DocumentAudit = {
+  fileName: string;
+  subject: string;
+  fileUrl: string | null;
+  recipients: SignedRecipientAudit[];
+};
+
+export const getDocumentAudit = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => auditSchema.parse(data))
+  .handler(async ({ data, context }): Promise<DocumentAudit> => {
+    const { supabase, userId } = context;
+    const { data: doc, error: docErr } = await supabase
+      .from("documents")
+      .select("id, owner_id, file_name, file_path, subject")
+      .eq("id", data.documentId)
+      .maybeSingle();
+    if (docErr || !doc) throw new Error("המסמך לא נמצא");
+    if (doc.owner_id !== userId) throw new Error("Forbidden");
+
+    const { data: recipients, error: recErr } = await supabase
+      .from("recipients")
+      .select(
+        "id, name, email, phone, verification_type, signed_at, signed_ip, signed_user_agent, signature_data_url, status",
+      )
+      .eq("document_id", data.documentId)
+      .eq("status", "signed");
+    if (recErr) console.error("AUDIT_RECIPIENTS_ERROR", recErr);
+
+    const { data: signed } = await supabase.storage
+      .from("contracts")
+      .createSignedUrl(doc.file_path, 600);
+
+    return {
+      fileName: doc.file_name,
+      subject: doc.subject,
+      fileUrl: signed?.signedUrl ?? null,
+      recipients: (recipients ?? []) as SignedRecipientAudit[],
+    };
+  });
