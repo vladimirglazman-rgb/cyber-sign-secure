@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Loader2, ExternalLink, ShieldCheck, Clock, Globe, User, FileText } from "lucide-react";
+import { toast } from "sonner";
+import { Loader2, ExternalLink, ShieldCheck, Clock, Globe, User, FileText, Download } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -8,7 +9,11 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { getAuthHeaders } from "@/lib/auth-headers";
-import { getDocumentAudit, type DocumentAudit } from "@/server/documents.functions";
+import {
+  downloadSignedDocument,
+  getDocumentAudit,
+  type DocumentAudit,
+} from "@/server/documents.functions";
 
 type Props = {
   open: boolean;
@@ -25,6 +30,7 @@ export function AuditModal({ open, onOpenChange, documentId }: Props) {
   const [data, setData] = useState<DocumentAudit | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     if (!open || !documentId) return;
@@ -47,6 +53,35 @@ export function AuditModal({ open, onOpenChange, documentId }: Props) {
       cancelled = true;
     };
   }, [open, documentId]);
+
+  const handleDownload = async () => {
+    if (!documentId) return;
+    try {
+      setDownloading(true);
+      const headers = await getAuthHeaders();
+      const res = await downloadSignedDocument({ data: { documentId }, headers });
+      const bin = atob(res.base64);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      const blob = new Blob([bytes], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = res.fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "הורדת המסמך החתום נכשלה");
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const hasSignedRecipient = (data?.recipients ?? []).some(
+    (r) => r.signature_data_url,
+  );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -80,6 +115,21 @@ export function AuditModal({ open, onOpenChange, documentId }: Props) {
             <div className="flex items-center gap-2 rounded-md border border-primary/20 bg-primary/5 p-2.5 text-xs text-foreground">
               <FileText className="h-4 w-4 text-primary" />
               <span className="min-w-0 flex-1 truncate">{data.fileName}</span>
+              {hasSignedRecipient && (
+                <button
+                  type="button"
+                  onClick={handleDownload}
+                  disabled={downloading}
+                  className="inline-flex items-center gap-1 rounded-md border border-primary/60 bg-primary/15 px-2 py-1 text-[11px] font-semibold text-primary glow-aqua hover:bg-primary/25 disabled:opacity-60"
+                >
+                  {downloading ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Download className="h-3 w-3" />
+                  )}
+                  הורד מסמך חתום
+                </button>
+              )}
               {data.fileUrl && (
                 <a
                   href={data.fileUrl}
