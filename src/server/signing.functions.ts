@@ -49,12 +49,38 @@ export const verifySigner = createServerFn({ method: "POST" })
       .from("contracts")
       .createSignedUrl(row.file_path, 600);
 
+    // Fetch signature pin coordinates set by sender for this recipient
+    let coordinates: { pageNumber: number; x: number; y: number }[] = [];
+    try {
+      const { data: rec } = await supabaseAdmin
+        .from("recipients")
+        .select("signature_coordinates")
+        .eq("id", row.recipient_id)
+        .maybeSingle();
+      const raw = rec?.signature_coordinates;
+      if (Array.isArray(raw)) {
+        coordinates = raw
+          .map((c) => {
+            const obj = (c && typeof c === "object" ? c : {}) as Record<string, unknown>;
+            return {
+              pageNumber: Number(obj.pageNumber ?? 1) || 1,
+              x: Number(obj.x ?? 0),
+              y: Number(obj.y ?? 0),
+            };
+          })
+          .filter((c) => Number.isFinite(c.x) && Number.isFinite(c.y));
+      }
+    } catch (e) {
+      console.error("FETCH_COORDS_FAILED", e);
+    }
+
     return {
       fileName: row.file_name,
       subject: row.subject,
       message: row.message,
       alreadySigned: row.already_signed,
       fileUrl: signed?.signedUrl ?? null,
+      coordinates,
     };
   });
 
