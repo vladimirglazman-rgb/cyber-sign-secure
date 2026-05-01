@@ -3,7 +3,6 @@ import {
   CheckCircle2,
   ExternalLink,
   FileText,
-  Loader2,
   ScanLine,
 } from "lucide-react";
 import type { SignatureRequestApi, UploadedFile } from "@/hooks/use-signature-request";
@@ -17,7 +16,6 @@ export function DocumentPreview({
   paths?: Record<string, string>;
 }) {
   const file = api.selectedFile;
-  const [opening, setOpening] = useState(false);
   const [proxyUrlState, setProxyUrlState] = useState<{ path: string; url: string } | null>(null);
   const blobUrl = useMemo(() => {
     if (file?.file) return URL.createObjectURL(file.file);
@@ -55,33 +53,7 @@ export function DocumentPreview({
   }, [remotePath]);
   // Prefer same-origin proxy URL. Fall back to local blob until upload completes.
   const currentProxyUrl = proxyUrlState && proxyUrlState.path === remotePath ? proxyUrlState.url : null;
-  const previewSrc = currentProxyUrl ?? blobUrl;
-  const openInNewTab = async () => {
-    try {
-      setOpening(true);
-      if (!remotePath) {
-        if (blobUrl) window.open(blobUrl, "_blank", "noopener,noreferrer");
-        else toast.error("הקובץ עדיין לא הועלה");
-        return;
-      }
-      const { data } = await supabase.auth.getSession();
-      const token = data.session?.access_token;
-      if (!token) {
-        toast.error("חובה להיות מחובר");
-        return;
-      }
-      const url = `/api/preview/${remotePath
-        .split("/")
-        .map(encodeURIComponent)
-        .join("/")}?token=${encodeURIComponent(token)}`;
-      window.open(url, "_blank", "noopener,noreferrer");
-    } catch (e) {
-      console.error("OPEN_NEW_TAB_FAILED", e);
-      toast.error("פתיחת הקובץ נכשלה");
-    } finally {
-      setOpening(false);
-    }
-  };
+  const openHref = currentProxyUrl ?? blobUrl;
   return (
     <div className="glass-panel flex h-full flex-col p-4">
       <header className="mb-3 flex items-center justify-between">
@@ -97,9 +69,7 @@ export function DocumentPreview({
           <SuccessCard
             file={file}
             ext={ext}
-            ready={Boolean(previewSrc)}
-            opening={opening}
-            onOpen={openInNewTab}
+            openHref={openHref}
           />
         ) : (
           <div className="flex h-full flex-col items-center justify-center text-center">
