@@ -25,9 +25,9 @@ export const SignatureCanvas = forwardRef<SignatureCanvasHandle, { className?: s
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
       ctx.lineWidth = 2.5;
-      ctx.strokeStyle = "#30FFF7";
-      ctx.shadowColor = "rgba(48,255,247,0.6)";
-      ctx.shadowBlur = 6;
+      ctx.strokeStyle = "#003399";
+      ctx.shadowColor = "rgba(0, 51, 153, 0.25)";
+      ctx.shadowBlur = 1;
     }, []);
 
     const pos = (e: React.PointerEvent<HTMLCanvasElement>) => {
