@@ -1,6 +1,20 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ShieldCheck, ArrowLeft, Sparkles, Lock, Zap } from "lucide-react";
+import {
+  ShieldCheck,
+  ArrowLeft,
+  Sparkles,
+  Lock,
+  Zap,
+  ShieldAlert,
+  Rocket,
+  Wallet,
+  Star,
+  CheckCircle2,
+  Scale,
+  BrainCircuit,
+  Headphones,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { APP_VERSION } from "@/lib/app-version";
 
