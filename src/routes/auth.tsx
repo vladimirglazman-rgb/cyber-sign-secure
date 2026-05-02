@@ -1,9 +1,21 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ShieldCheck, Loader2 } from "lucide-react";
+import { ShieldCheck, Loader2, ShieldAlert, Rocket, Wallet, Star, CheckCircle2, Scale, BrainCircuit, Headphones } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/auth")({ component: AuthPage });
+
+const BENEFITS = [
+  { icon: ShieldAlert, title: "הגנה הכי מתקדמת", desc: "הצפנה ברמה צבאית ו-audit trail מלא." },
+  { icon: Rocket, title: "קצר ומהיר", desc: "חתימה תוך פחות מדקה." },
+  { icon: Wallet, title: "זול למשתמש", desc: "מחיר הוגן ושקוף." },
+  { icon: Star, title: "כחול לבן", desc: "מוצר ישראלי גאה." },
+  { icon: CheckCircle2, title: "פשוט ואמין", desc: "ממשק נקי וברור." },
+  { icon: Scale, title: "חוקי משפטית", desc: "תקף בכל בית משפט." },
+  { icon: BrainCircuit, title: "מבוסס AI", desc: "ניתוח חכם של מסמכים." },
+  { icon: Headphones, title: "תמיכה 24/7", desc: "אנחנו כאן בכל שעה." },
+];
+
 function AuthPage() {
   const navigate = useNavigate();
   const [mode, setMode] = useState<"login" | "signup">("login");
@@ -29,8 +41,36 @@ function AuthPage() {
     finally { setLoading(false); }
   };
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="glass-panel w-full max-w-md p-7">
+    <div className="flex min-h-screen items-center justify-center px-4 py-10">
+      <div className="grid w-full max-w-5xl gap-6 lg:grid-cols-[1.1fr_1fr]">
+        {/* Marketing side panel */}
+        <aside className="glass-panel order-2 hidden flex-col p-7 lg:order-1 lg:flex">
+          <div className="mb-5">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-primary">Why MNIT Sign</p>
+            <h2 className="mt-2 font-display text-2xl font-bold text-foreground">
+              חתימה דיגיטלית <span className="text-primary text-glow">ברמה אחרת</span>
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              הצטרפו לאלפי משתמשים שכבר מנהלים את החתימות שלהם בצורה חכמה, מאובטחת וזריזה.
+            </p>
+          </div>
+          <ul className="grid grid-cols-2 gap-3">
+            {BENEFITS.map((b) => (
+              <li key={b.title} className="group rounded-lg border border-primary/15 bg-background/40 p-3 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-[0_0_20px_rgba(48,255,247,0.25)]">
+                <div className="mb-1.5 flex items-center gap-2">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/15 ring-1 ring-primary/40">
+                    <b.icon className="h-3.5 w-3.5 text-primary icon-glow" />
+                  </span>
+                  <h3 className="font-display text-xs font-bold text-foreground">{b.title}</h3>
+                </div>
+                <p className="text-[11px] leading-snug text-muted-foreground">{b.desc}</p>
+              </li>
+            ))}
+          </ul>
+        </aside>
+
+        {/* Auth panel */}
+        <div className="glass-panel order-1 w-full p-7 lg:order-2">
         <div className="mb-6 flex items-center justify-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/50">
             <ShieldCheck className="h-6 w-6 text-primary icon-glow" />
@@ -72,6 +112,7 @@ function AuthPage() {
             {mode === "login" ? "התחבר" : "הירשם"}
           </button>
         </form>
+        </div>
       </div>
     </div>
   );
