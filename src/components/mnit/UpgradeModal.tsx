@@ -46,7 +46,8 @@ export function UpgradeModal({ open, onClose }: { open: boolean; onClose: () => 
       onClose();
     } catch (e) {
       console.error("REPORT_TRANSFER_FAILED", e);
-      toast.error("אירעה שגיאה בדיווח, נסה שוב");
+      const msg = e instanceof Error ? e.message : JSON.stringify(e);
+      toast.error(`שגיאה בדיווח: ${msg}`);
     } finally {
       setReporting(false);
     }
