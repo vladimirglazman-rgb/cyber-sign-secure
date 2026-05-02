@@ -404,6 +404,9 @@ function FullscreenPinModal({
                     className="absolute z-10 -translate-x-1/2 -translate-y-full cursor-pointer transition hover:scale-110"
                     style={{ left: `${c.x * 100}%`, top: `${c.y * 100}%` }}
                   >
+                    <span className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-sm border border-primary/50 bg-background/85 px-1.5 py-0.5 text-[10px] font-semibold text-primary text-glow">
+                      {recipientName}
+                    </span>
                     <MapPin
                       className="h-8 w-8 text-primary"
                       style={{
