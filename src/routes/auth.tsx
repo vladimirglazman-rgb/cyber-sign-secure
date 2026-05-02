@@ -11,12 +11,12 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  useEffect(() => { supabase.auth.getSession().then(({ data }) => { if (data.session) navigate({ to: "/" }); }); }, [navigate]);
+  useEffect(() => { supabase.auth.getSession().then(({ data }) => { if (data.session) navigate({ to: "/app" }); }); }, [navigate]);
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/`, data: { full_name: fullName } } });
+        const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/app`, data: { full_name: fullName } } });
         if (error) throw error;
         toast.success("נרשמת בהצלחה");
       } else {
@@ -24,7 +24,7 @@ function AuthPage() {
         if (error) throw error;
         toast.success("התחברת בהצלחה");
       }
-      navigate({ to: "/" });
+      navigate({ to: "/app" });
     } catch (err: unknown) { toast.error(err instanceof Error ? err.message : "אירעה שגיאה"); }
     finally { setLoading(false); }
   };
