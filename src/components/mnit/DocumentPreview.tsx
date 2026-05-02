@@ -8,6 +8,11 @@ import {
 } from "lucide-react";
 import type { SignatureRequestApi, UploadedFile } from "@/hooks/use-signature-request";
 import { supabase } from "@/integrations/supabase/client";
+import { Document, Page, pdfjs } from "react-pdf";
+import "react-pdf/dist/Page/AnnotationLayer.css";
+import "react-pdf/dist/Page/TextLayer.css";
+
+pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 export function DocumentPreview({
   api,
   paths,
@@ -58,8 +63,26 @@ export function DocumentPreview({
   const isPdf = ext === "pdf";
   const inlineSrc = isPdf ? (currentProxyUrl ?? blobUrl) : null;
 
-  const surfaceRef = useRef<HTMLDivElement | null>(null);
-  const handlePlace = (e: React.MouseEvent<HTMLDivElement>) => {
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const [pageWidth, setPageWidth] = useState<number>(0);
+  const [numPages, setNumPages] = useState<number>(0);
+
+  useEffect(() => {
+    if (!wrapRef.current) return;
+    const el = wrapRef.current;
+    const ro = new ResizeObserver(() => {
+      const w = el.clientWidth;
+      if (w > 0) setPageWidth(w - 16); // padding allowance
+    });
+    ro.observe(el);
+    setPageWidth(el.clientWidth - 16);
+    return () => ro.disconnect();
+  }, [inlineSrc]);
+
+  const handlePlacePage = (
+    e: React.MouseEvent<HTMLDivElement>,
+    pageNumber: number,
+  ) => {
     if (!recipient) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
@@ -67,7 +90,7 @@ export function DocumentPreview({
     const next = [
       ...(recipient.signatureCoordinates ?? []),
       {
-        pageNumber: 1,
+        pageNumber,
         x: Math.max(0, Math.min(1, x)),
         y: Math.max(0, Math.min(1, y)),
       },
@@ -98,41 +121,66 @@ export function DocumentPreview({
         {file ? (
           isPdf && inlineSrc ? (
             <div
-              ref={surfaceRef}
-              onClick={handlePlace}
-              className="relative h-full w-full cursor-crosshair overflow-hidden rounded-md border border-primary/20 bg-background/40"
+              ref={wrapRef}
+              className="relative h-full w-full overflow-auto rounded-md border border-primary/20 bg-background/40 p-2"
             >
-              <object
-                data={`${inlineSrc}#toolbar=0&navpanes=0&view=FitH`}
-                type="application/pdf"
-                className="pointer-events-none h-full w-full"
+              <Document
+                file={inlineSrc}
+                onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+                loading={
+                  <div className="flex h-full items-center justify-center p-6 text-xs text-muted-foreground">
+                    טוען מסמך…
+                  </div>
+                }
+                error={
+                  <div className="flex h-full items-center justify-center p-6 text-xs text-destructive">
+                    לא ניתן להציג את המסמך
+                  </div>
+                }
               >
-                <div className="flex h-full items-center justify-center p-4 text-center text-xs text-muted-foreground">
-                  לא ניתן להציג את המסמך כאן. לחץ במקום הרצוי כדי למקם חתימה.
-                </div>
-              </object>
-              {coords.map((c, i) => (
-                <div
-                  key={i}
-                  className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full"
-                  style={{ left: `${c.x * 100}%`, top: `${c.y * 100}%` }}
-                >
-                  <MapPin
-                    className="h-7 w-7 text-primary"
-                    style={{
-                      filter:
-                        "drop-shadow(0 0 6px hsl(var(--primary))) drop-shadow(0 0 12px hsl(var(--primary)))",
-                    }}
-                    fill="hsl(var(--primary) / 0.35)"
-                  />
-                </div>
-              ))}
+                {Array.from({ length: numPages }, (_, i) => {
+                  const pageNumber = i + 1;
+                  const pinsForPage = coords.filter(
+                    (c) => (c.pageNumber || 1) === pageNumber,
+                  );
+                  return (
+                    <div
+                      key={pageNumber}
+                      onClick={(e) => handlePlacePage(e, pageNumber)}
+                      className="relative mx-auto mb-3 w-fit cursor-crosshair"
+                    >
+                      <Page
+                        pageNumber={pageNumber}
+                        width={pageWidth || undefined}
+                        renderAnnotationLayer={false}
+                        renderTextLayer={false}
+                      />
+                      {pinsForPage.map((c, idx) => (
+                        <div
+                          key={idx}
+                          className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full"
+                          style={{ left: `${c.x * 100}%`, top: `${c.y * 100}%` }}
+                        >
+                          <MapPin
+                            className="h-7 w-7 text-primary"
+                            style={{
+                              filter:
+                                "drop-shadow(0 0 6px hsl(var(--primary))) drop-shadow(0 0 12px hsl(var(--primary)))",
+                            }}
+                            fill="hsl(var(--primary) / 0.35)"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
+              </Document>
               {openHref && (
                 <a
                   href={openHref}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="absolute bottom-2 end-2 z-20 inline-flex items-center gap-1.5 rounded-md border border-primary/60 bg-background/80 px-2.5 py-1 text-[11px] font-semibold text-primary backdrop-blur transition hover:bg-primary/15"
+                  className="sticky bottom-2 z-20 ms-auto mt-2 inline-flex w-fit items-center gap-1.5 rounded-md border border-primary/60 bg-background/80 px-2.5 py-1 text-[11px] font-semibold text-primary backdrop-blur transition hover:bg-primary/15"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <ExternalLink className="h-3 w-3" />
