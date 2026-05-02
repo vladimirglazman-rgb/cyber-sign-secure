@@ -1,6 +1,20 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ShieldCheck, ArrowLeft, Sparkles, Lock, Zap } from "lucide-react";
+import {
+  ShieldCheck,
+  ArrowLeft,
+  Sparkles,
+  Lock,
+  Zap,
+  ShieldAlert,
+  Rocket,
+  Wallet,
+  Star,
+  CheckCircle2,
+  Scale,
+  BrainCircuit,
+  Headphones,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { APP_VERSION } from "@/lib/app-version";
 
@@ -158,6 +172,50 @@ function LandingPage() {
             </div>
           ))}
         </div>
+
+        {/* Benefits grid */}
+        <section className="mt-24 w-full max-w-6xl">
+          <div className="mb-10 flex flex-col items-center text-center">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.25em] text-primary text-glow">
+              <Sparkles className="h-3.5 w-3.5" />
+              Why MNIT Sign
+            </div>
+            <h2 className="font-display text-3xl font-extrabold text-foreground md:text-4xl">
+              <span className="text-primary text-glow">8 סיבות</span> לבחור בנו
+            </h2>
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
+              פלטפורמה ישראלית, מאובטחת ומתקדמת — כל מה שצריך כדי לחתום מסמכים בלי כאבי ראש.
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { icon: ShieldAlert, title: "הגנה הכי מתקדמת", desc: "הצפנה ברמה צבאית ו-audit trail מלא לכל פעולה." },
+              { icon: Rocket, title: "קצר ומהיר", desc: "שליחה וחתימה תוך פחות מדקה — ללא טפסים מיותרים." },
+              { icon: Wallet, title: "זול למשתמש", desc: "מחיר הוגן, ללא עמלות נסתרות וללא חוזים ארוכים." },
+              { icon: Star, title: "מוצר ישראלי · כחול לבן", desc: "פותח בישראל, נתונים בישראל, תמיכה בעברית." },
+              { icon: CheckCircle2, title: "פשוט ואמין", desc: "ממשק נקי שעובד מצוין גם למי שלא טכנולוגי." },
+              { icon: Scale, title: "חוקי משפטית", desc: "תואם לחוק החתימה האלקטרונית הישראלי וה-eIDAS." },
+              { icon: BrainCircuit, title: "מבוסס AI", desc: "ניסוח חכם, אופטימיזציה ובדיקת מסמכים אוטומטית." },
+              { icon: Headphones, title: "תמיכה טכנית 24/7", desc: "צוות אנושי זמין סביב השעון בצ'אט ובטלפון." },
+            ].map((b) => (
+              <div
+                key={b.title}
+                className="glass-panel group relative p-5 text-right transition-all duration-300 hover:-translate-y-1 hover:border-primary/70 hover:shadow-[0_0_30px_rgba(48,255,247,0.35)]"
+              >
+                <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/40 transition group-hover:bg-primary/25 group-hover:ring-primary/70">
+                  <b.icon className="h-5 w-5 text-primary icon-glow" />
+                </div>
+                <h3 className="mb-1.5 font-display text-sm font-bold tracking-wide text-foreground">
+                  {b.title}
+                </h3>
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                  {b.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
       </main>
 
       <footer className="relative z-10 border-t border-primary/10 py-6 text-center text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
