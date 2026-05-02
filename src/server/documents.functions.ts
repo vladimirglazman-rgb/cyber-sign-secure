@@ -107,6 +107,24 @@ export const createSignatureRequest = createServerFn({ method: "POST" })
     try {
       const { supabase, userId } = context;
 
+      // Paywall: free tier is limited to 3 sent documents.
+      const { data: profile, error: profileErr } = await supabase
+        .from("profiles")
+        .select("subscription_tier, documents_sent_count")
+        .eq("id", userId)
+        .maybeSingle();
+      if (profileErr) {
+        console.error("PROFILE_LOOKUP_ERROR", profileErr);
+      }
+      const tier = (profile as { subscription_tier?: string } | null)?.subscription_tier ?? "free";
+      const sentCount =
+        (profile as { documents_sent_count?: number } | null)?.documents_sent_count ?? 0;
+      if (tier === "free" && sentCount >= 3) {
+        const err = new Error("LIMIT_REACHED") as Error & { code?: string };
+        err.code = "LIMIT_REACHED";
+        throw err;
+      }
+
       const { data: doc, error: docErr } = await supabase
         .from("documents")
         .insert({
@@ -151,6 +169,15 @@ export const createSignatureRequest = createServerFn({ method: "POST" })
       if (recErr || !recipients) {
         console.error("RECIPIENTS_INSERT_ERROR", recErr);
         throw new Error("שמירת הנמענים נכשלה");
+      }
+
+      // Increment usage counter only after a successful send.
+      const { error: incErr } = await supabase
+        .from("profiles")
+        .update({ documents_sent_count: sentCount + 1 } as never)
+        .eq("id", userId);
+      if (incErr) {
+        console.error("USAGE_INCREMENT_ERROR", incErr);
       }
 
       return { id: doc.id, fileName: data.fileName, recipients };
