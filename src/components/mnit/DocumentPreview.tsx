@@ -101,6 +101,18 @@ export function DocumentPreview({
   };
   const coords = recipient?.signatureCoordinates ?? [];
 
+  const handleRemovePin = (
+    e: React.MouseEvent<HTMLDivElement>,
+    pinIndex: number,
+  ) => {
+    e.stopPropagation();
+    if (!recipient) return;
+    const next = (recipient.signatureCoordinates ?? []).filter(
+      (_, i) => i !== pinIndex,
+    );
+    api.updateRecipient(recipient.id, { signatureCoordinates: next });
+  };
+
   return (
     <div className="glass-panel flex h-full flex-col p-4">
       <header className="mb-3 flex items-center justify-between">
@@ -140,9 +152,9 @@ export function DocumentPreview({
               >
                 {Array.from({ length: numPages }, (_, i) => {
                   const pageNumber = i + 1;
-                  const pinsForPage = coords.filter(
-                    (c) => (c.pageNumber || 1) === pageNumber,
-                  );
+                  const pinsForPage = coords
+                    .map((c, idx) => ({ c, idx }))
+                    .filter(({ c }) => (c.pageNumber || 1) === pageNumber);
                   return (
                     <div
                       key={pageNumber}
@@ -155,10 +167,13 @@ export function DocumentPreview({
                         renderAnnotationLayer={false}
                         renderTextLayer={false}
                       />
-                      {pinsForPage.map((c, idx) => (
+                      {pinsForPage.map(({ c, idx }) => (
                         <div
                           key={idx}
-                          className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full"
+                          role="button"
+                          title="לחץ להסרת סיכה"
+                          onClick={(e) => handleRemovePin(e, idx)}
+                          className="absolute z-10 -translate-x-1/2 -translate-y-full cursor-pointer transition hover:scale-110"
                           style={{ left: `${c.x * 100}%`, top: `${c.y * 100}%` }}
                         >
                           <MapPin

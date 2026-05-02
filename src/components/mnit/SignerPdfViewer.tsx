@@ -11,9 +11,11 @@ export type SigCoord = { pageNumber: number; x: number; y: number };
 export function SignerPdfViewer({
   fileUrl,
   coordinates,
+  onRemovePin,
 }: {
   fileUrl: string;
   coordinates: SigCoord[];
+  onRemovePin?: (index: number) => void;
 }) {
   const [numPages, setNumPages] = useState<number>(0);
   const [width, setWidth] = useState<number>(0);
@@ -52,9 +54,9 @@ export function SignerPdfViewer({
       >
         {Array.from({ length: numPages }, (_, i) => {
           const pageNumber = i + 1;
-          const pinsForPage = coordinates.filter(
-            (c) => (c.pageNumber || 1) === pageNumber,
-          );
+          const pinsForPage = coordinates
+            .map((c, idx) => ({ c, idx }))
+            .filter(({ c }) => (c.pageNumber || 1) === pageNumber);
           return (
             <div key={pageNumber} className="relative mx-auto mb-3 w-fit">
               <Page
@@ -63,10 +65,25 @@ export function SignerPdfViewer({
                 renderAnnotationLayer={false}
                 renderTextLayer={false}
               />
-              {pinsForPage.map((c, idx) => (
+              {pinsForPage.map(({ c, idx }) => (
                 <div
                   key={idx}
-                  className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full"
+                  role={onRemovePin ? "button" : undefined}
+                  title={onRemovePin ? "לחץ להסרת סיכה" : undefined}
+                  onClick={
+                    onRemovePin
+                      ? (e) => {
+                          e.stopPropagation();
+                          onRemovePin(idx);
+                        }
+                      : undefined
+                  }
+                  className={
+                    "absolute z-10 -translate-x-1/2 -translate-y-full " +
+                    (onRemovePin
+                      ? "cursor-pointer transition hover:scale-110"
+                      : "pointer-events-none")
+                  }
                   style={{ left: `${c.x * 100}%`, top: `${c.y * 100}%` }}
                 >
                   <div className="relative">
