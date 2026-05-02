@@ -14,6 +14,7 @@ import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { getRecipientColor, type RecipientColor } from "@/lib/recipient-colors";
 
 pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 export function DocumentPreview({
@@ -71,6 +72,13 @@ export function DocumentPreview({
   const [numPages, setNumPages] = useState<number>(0);
   const isMobile = useIsMobile();
   const [fsOpen, setFsOpen] = useState(false);
+
+  const recipientIndex = recipient
+    ? api.recipients.findIndex((r) => r.id === recipient.id)
+    : -1;
+  const activeColor: RecipientColor = getRecipientColor(
+    recipientIndex >= 0 ? recipientIndex : 0,
+  );
 
   useEffect(() => {
     if (!wrapRef.current) return;
@@ -135,22 +143,37 @@ export function DocumentPreview({
         </div>
       )}
       {file && api.recipients.length > 0 && (
-        <div className="mb-2 flex items-center gap-2 rounded-md border border-primary/30 bg-primary/10 px-3 py-2">
-          <span className="text-[11px] uppercase tracking-[0.18em] text-primary text-glow">
+        <div
+          className="mb-2 flex items-center gap-2 rounded-md border px-3 py-2"
+          style={{ borderColor: activeColor.border, background: activeColor.bg }}
+        >
+          <span
+            className="text-[11px] uppercase tracking-[0.18em]"
+            style={{ color: activeColor.text, textShadow: `0 0 8px ${activeColor.hex}` }}
+          >
             נמען פעיל
           </span>
           <select
             value={recipient?.id ?? ""}
             onChange={(e) => api.setSelectedRecipientId(e.target.value)}
-            className="ms-auto rounded-md border border-primary/40 bg-background/70 px-2 py-1 text-xs text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+            className="ms-auto rounded-md border bg-background/70 px-2 py-1 text-xs outline-none"
+            style={{
+              borderColor: activeColor.border,
+              color: activeColor.text,
+              boxShadow: `0 0 0 1px ${activeColor.border}, 0 0 10px ${activeColor.hex}55`,
+            }}
           >
-            {api.recipients.map((r, idx) => (
-              <option key={r.id} value={r.id}>
-                {(r.name || `נמען ${idx + 1}`) +
+            {api.recipients.map((r, idx) => {
+              const c = getRecipientColor(idx);
+              return (
+                <option key={r.id} value={r.id} style={{ color: c.hex }}>
+                  {`● ` +
+                    (r.name || `נמען ${idx + 1}`) +
                   (r.role === "cc" ? " (העתק)" : "") +
                   ` · ${(r.signatureCoordinates?.length ?? 0)} סיכות`}
               </option>
-            ))}
+              );
+            })}
           </select>
         </div>
       )}
@@ -158,7 +181,13 @@ export function DocumentPreview({
         <button
           type="button"
           onClick={() => setFsOpen(true)}
-          className="mb-2 inline-flex w-full items-center justify-center gap-2 rounded-md border border-primary/60 bg-primary/15 px-3 py-2 text-xs font-semibold text-primary glow-aqua transition hover:bg-primary/25"
+          className="mb-2 inline-flex w-full items-center justify-center gap-2 rounded-md border px-3 py-2 text-xs font-semibold transition"
+          style={{
+            borderColor: activeColor.border,
+            background: activeColor.bg,
+            color: activeColor.text,
+            boxShadow: `0 0 12px ${activeColor.hex}66`,
+          }}
         >
           <Maximize2 className="h-4 w-4" />
           סמן מקומות חתימה
@@ -187,9 +216,15 @@ export function DocumentPreview({
               >
                 {Array.from({ length: numPages }, (_, i) => {
                   const pageNumber = i + 1;
-                  const pinsForPage = coords
-                    .map((c, idx) => ({ c, idx }))
-                    .filter(({ c }) => (c.pageNumber || 1) === pageNumber);
+                  // Render pins for ALL recipients so the sender sees the full picture,
+                  // each in their own color. Selected recipient's pins glow stronger.
+                  const allPins = api.recipients.flatMap((r, rIdx) => {
+                    const color = getRecipientColor(rIdx);
+                    const isActive = recipient?.id === r.id;
+                    return (r.signatureCoordinates ?? [])
+                      .map((c, idx) => ({ c, idx, r, rIdx, color, isActive }))
+                      .filter(({ c }) => (c.pageNumber || 1) === pageNumber);
+                  });
                   return (
                     <div
                       key={pageNumber}
@@ -202,27 +237,44 @@ export function DocumentPreview({
                         renderAnnotationLayer={false}
                         renderTextLayer={false}
                       />
-                      {pinsForPage.map(({ c, idx }) => (
+                      {allPins.map(({ c, idx, r, color, isActive }) => (
                         <div
-                          key={idx}
+                          key={`${r.id}-${idx}`}
                           role="button"
                           title="לחץ להסרת סיכה"
-                          onClick={(e) => handleRemovePin(e, idx)}
-                          className="absolute z-10 -translate-x-1/2 -translate-y-full cursor-pointer transition hover:scale-110"
-                          style={{ left: `${c.x * 100}%`, top: `${c.y * 100}%` }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (!isActive) {
+                              api.setSelectedRecipientId(r.id);
+                              return;
+                            }
+                            handleRemovePin(e, idx);
+                          }}
+                          className="absolute -translate-x-1/2 -translate-y-full cursor-pointer transition hover:scale-110"
+                          style={{
+                            left: `${c.x * 100}%`,
+                            top: `${c.y * 100}%`,
+                            zIndex: isActive ? 20 : 10,
+                            opacity: isActive ? 1 : 0.55,
+                          }}
                         >
                           <span
-                            className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-sm border border-primary/50 bg-background/85 px-1.5 py-0.5 text-[10px] font-semibold text-primary text-glow"
+                            className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-sm border bg-background/85 px-1.5 py-0.5 text-[10px] font-semibold"
+                            style={{
+                              borderColor: color.border,
+                              color: color.text,
+                              textShadow: `0 0 6px ${color.hex}`,
+                            }}
                           >
-                            {recipient?.name || "נמען"}
+                            {r.name || "נמען"}
                           </span>
                           <MapPin
-                            className="h-7 w-7 text-primary"
+                            className="h-7 w-7"
                             style={{
-                              filter:
-                                "drop-shadow(0 0 6px hsl(var(--primary))) drop-shadow(0 0 12px hsl(var(--primary)))",
+                              color: color.hex,
+                              filter: isActive ? color.glowStrong : color.glow,
                             }}
-                            fill="hsl(var(--primary) / 0.35)"
+                            fill={color.fill}
                           />
                         </div>
                       ))}
@@ -265,8 +317,9 @@ export function DocumentPreview({
       {fsOpen && inlineSrc && recipient && (
         <FullscreenPinModal
           src={inlineSrc}
-          coords={coords}
-          recipientName={recipient.name || "נמען"}
+          recipients={api.recipients}
+          activeRecipientId={recipient.id}
+          onSelectRecipient={(id) => api.setSelectedRecipientId(id)}
           onPlace={(pageNumber, x, y) => {
             const next = [
               ...(recipient.signatureCoordinates ?? []),
@@ -274,11 +327,13 @@ export function DocumentPreview({
             ];
             api.updateRecipient(recipient.id, { signatureCoordinates: next });
           }}
-          onRemove={(pinIndex) => {
-            const next = (recipient.signatureCoordinates ?? []).filter(
+          onRemove={(recipientId, pinIndex) => {
+            const r = api.recipients.find((x) => x.id === recipientId);
+            if (!r) return;
+            const next = (r.signatureCoordinates ?? []).filter(
               (_, i) => i !== pinIndex,
             );
-            api.updateRecipient(recipient.id, { signatureCoordinates: next });
+            api.updateRecipient(recipientId, { signatureCoordinates: next });
           }}
           onClose={() => setFsOpen(false)}
         />
@@ -289,22 +344,34 @@ export function DocumentPreview({
 
 function FullscreenPinModal({
   src,
-  coords,
-  recipientName,
+  recipients,
+  activeRecipientId,
+  onSelectRecipient,
   onPlace,
   onRemove,
   onClose,
 }: {
   src: string;
-  coords: Array<{ pageNumber: number; x: number; y: number }>;
-  recipientName: string;
+  recipients: Array<{
+    id: string;
+    name: string;
+    role: string;
+    signatureCoordinates?: Array<{ pageNumber: number; x: number; y: number }> | null;
+  }>;
+  activeRecipientId: string;
+  onSelectRecipient: (id: string) => void;
   onPlace: (pageNumber: number, x: number, y: number) => void;
-  onRemove: (pinIndex: number) => void;
+  onRemove: (recipientId: string, pinIndex: number) => void;
   onClose: () => void;
 }) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const [pageWidth, setPageWidth] = useState<number>(0);
   const [numPages, setNumPages] = useState<number>(0);
+  const activeIdx = recipients.findIndex((r) => r.id === activeRecipientId);
+  const activeColor = getRecipientColor(activeIdx >= 0 ? activeIdx : 0);
+  const activeRecipient = recipients[activeIdx >= 0 ? activeIdx : 0];
+  const activeCount =
+    activeRecipient?.signatureCoordinates?.length ?? 0;
 
   useEffect(() => {
     if (!wrapRef.current) return;
@@ -338,20 +405,54 @@ function FullscreenPinModal({
 
   return (
     <div className="fixed inset-0 z-[100] flex flex-col bg-background">
-      <header className="flex items-center justify-between border-b border-primary/30 bg-background/95 px-4 py-3 backdrop-blur">
+      <header
+        className="flex items-center justify-between border-b bg-background/95 px-4 py-3 backdrop-blur"
+        style={{ borderColor: activeColor.border }}
+      >
         <div className="min-w-0">
-          <p className="truncate font-display text-xs uppercase tracking-[0.2em] text-primary text-glow">
+          <p
+            className="truncate font-display text-xs uppercase tracking-[0.2em]"
+            style={{ color: activeColor.text, textShadow: `0 0 8px ${activeColor.hex}` }}
+          >
             סימון מקומות חתימה
           </p>
-          <p className="truncate text-[11px] text-muted-foreground">
-            עבור <span className="text-primary">{recipientName}</span> ·{" "}
-            {coords.length} סיכות
-          </p>
+          <div className="mt-1 flex items-center gap-2">
+            <select
+              value={activeRecipientId}
+              onChange={(e) => onSelectRecipient(e.target.value)}
+              className="rounded-md border bg-background/70 px-2 py-1 text-[11px] outline-none"
+              style={{
+                borderColor: activeColor.border,
+                color: activeColor.text,
+                boxShadow: `0 0 8px ${activeColor.hex}55`,
+              }}
+            >
+              {recipients.map((r, idx) => {
+                const c = getRecipientColor(idx);
+                return (
+                  <option key={r.id} value={r.id} style={{ color: c.hex }}>
+                    {`● ` +
+                      (r.name || `נמען ${idx + 1}`) +
+                      ` · ${(r.signatureCoordinates?.length ?? 0)}`}
+                  </option>
+                );
+              })}
+            </select>
+            <span className="text-[11px] text-muted-foreground">
+              {activeCount} סיכות
+            </span>
+          </div>
         </div>
         <button
           type="button"
           onClick={onClose}
-          className="inline-flex items-center gap-1.5 rounded-md border border-primary/60 bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary glow-aqua transition hover:bg-primary/25"
+          className="inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-semibold transition"
+          style={{
+            borderColor: activeColor.border,
+            background: activeColor.bg,
+            color: activeColor.text,
+            boxShadow: `0 0 10px ${activeColor.hex}66`,
+          }}
         >
           <Check className="h-4 w-4" />
           סיום
@@ -377,9 +478,13 @@ function FullscreenPinModal({
         >
           {Array.from({ length: numPages }, (_, i) => {
             const pageNumber = i + 1;
-            const pinsForPage = coords
-              .map((c, idx) => ({ c, idx }))
-              .filter(({ c }) => (c.pageNumber || 1) === pageNumber);
+            const allPins = recipients.flatMap((r, rIdx) => {
+              const color = getRecipientColor(rIdx);
+              const isActive = r.id === activeRecipientId;
+              return (r.signatureCoordinates ?? [])
+                .map((c, idx) => ({ c, idx, r, color, isActive }))
+                .filter(({ c }) => (c.pageNumber || 1) === pageNumber);
+            });
             return (
               <div
                 key={pageNumber}
@@ -392,28 +497,44 @@ function FullscreenPinModal({
                   renderAnnotationLayer={false}
                   renderTextLayer={false}
                 />
-                {pinsForPage.map(({ c, idx }) => (
+                {allPins.map(({ c, idx, r, color, isActive }) => (
                   <div
-                    key={idx}
+                    key={`${r.id}-${idx}`}
                     role="button"
                     title="לחץ להסרת סיכה"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onRemove(idx);
+                      if (!isActive) {
+                        onSelectRecipient(r.id);
+                        return;
+                      }
+                      onRemove(r.id, idx);
                     }}
-                    className="absolute z-10 -translate-x-1/2 -translate-y-full cursor-pointer transition hover:scale-110"
-                    style={{ left: `${c.x * 100}%`, top: `${c.y * 100}%` }}
+                    className="absolute -translate-x-1/2 -translate-y-full cursor-pointer transition hover:scale-110"
+                    style={{
+                      left: `${c.x * 100}%`,
+                      top: `${c.y * 100}%`,
+                      zIndex: isActive ? 20 : 10,
+                      opacity: isActive ? 1 : 0.55,
+                    }}
                   >
-                    <span className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-sm border border-primary/50 bg-background/85 px-1.5 py-0.5 text-[10px] font-semibold text-primary text-glow">
-                      {recipientName}
+                    <span
+                      className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-sm border bg-background/85 px-1.5 py-0.5 text-[10px] font-semibold"
+                      style={{
+                        borderColor: color.border,
+                        color: color.text,
+                        textShadow: `0 0 6px ${color.hex}`,
+                      }}
+                    >
+                      {r.name || "נמען"}
                     </span>
                     <MapPin
-                      className="h-8 w-8 text-primary"
+                      className="h-8 w-8"
                       style={{
-                        filter:
-                          "drop-shadow(0 0 6px hsl(var(--primary))) drop-shadow(0 0 12px hsl(var(--primary)))",
+                        color: color.hex,
+                        filter: isActive ? color.glowStrong : color.glow,
                       }}
-                      fill="hsl(var(--primary) / 0.35)"
+                      fill={color.fill}
                     />
                   </div>
                 ))}

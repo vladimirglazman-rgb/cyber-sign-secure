@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Plus, Trash2, User, ShieldCheck, Mail, MessageCircle, Phone } from "lucide-react";
 import type { SignatureRequestApi, VerificationType, DeliveryMethod } from "@/hooks/use-signature-request";
 import { StepCard } from "./StepCard";
+import { getRecipientColor } from "@/lib/recipient-colors";
 export function Step2Recipients({ api }: { api: SignatureRequestApi }) {
   // Sync verification value to phone when verifying by phone via SMS
   useEffect(() => {
@@ -20,8 +21,29 @@ export function Step2Recipients({ api }: { api: SignatureRequestApi }) {
   return (
     <StepCard step={2} title="נמענים" description="הוסף את האנשים שיחתמו על המסמך">
       <div className="flex flex-col gap-3">
-        {api.recipients.map((r, idx) => (
-          <div key={r.id} className="rounded-lg border border-primary/15 bg-primary/5 p-3">
+        {api.recipients.map((r, idx) => {
+          const color = getRecipientColor(idx);
+          return (
+          <div
+            key={r.id}
+            className="rounded-lg border bg-primary/5 p-3"
+            style={{
+              borderColor: color.border,
+              boxShadow: `inset 4px 0 0 0 ${color.hex}, 0 0 8px ${color.hex}33`,
+            }}
+          >
+            <div className="mb-2 flex items-center gap-2">
+              <span
+                className="inline-block h-2.5 w-2.5 rounded-full"
+                style={{ background: color.hex, boxShadow: `0 0 6px ${color.hex}` }}
+              />
+              <span
+                className="text-[10px] uppercase tracking-[0.18em]"
+                style={{ color: color.text }}
+              >
+                נמען {idx + 1}
+              </span>
+            </div>
             <div className="grid grid-cols-1 gap-2 md:grid-cols-[1fr_1fr_auto_auto]">
               <div className="relative">
                 <User className="absolute end-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -106,7 +128,8 @@ export function Step2Recipients({ api }: { api: SignatureRequestApi }) {
               />
             </div>
           </div>
-        ))}
+          );
+        })}
         <button type="button" onClick={api.addRecipient} className="inline-flex items-center justify-center gap-2 rounded-lg border border-dashed border-primary/40 px-3 py-2 text-sm text-primary transition hover:bg-primary/10">
           <Plus className="h-4 w-4" />הוסף נמען
         </button>
