@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { TopBar } from "@/components/mnit/TopBar";
 import { Workspace } from "@/components/mnit/Workspace";
-export const Route = createFileRoute("/_authenticated/")({ component: Dashboard });
+export const Route = createFileRoute("/_authenticated/app")({ component: Dashboard });
 function Dashboard() {
   return (
     <div className="min-h-screen">
