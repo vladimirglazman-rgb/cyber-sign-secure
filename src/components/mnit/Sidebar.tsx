@@ -1,14 +1,33 @@
-import { CheckCircle2, Clock, FileText, XCircle } from "lucide-react";
+import { CheckCircle2, Clock, FileText, Shield, XCircle } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { StatTile } from "./StatTile";
 import { ActivityItem } from "./ActivityItem";
 import { useDashboard } from "@/hooks/use-dashboard";
+import { useIsAdmin } from "@/hooks/use-is-admin";
 import { APP_VERSION } from "@/lib/app-version";
 export function Sidebar() {
   const { data, isLoading } = useDashboard();
+  const { isAdmin } = useIsAdmin();
   const stats = data?.stats ?? { total: 0, signed: 0, pending: 0, cancelled: 0 };
   const docs = data?.documents ?? [];
   return (
     <aside className="flex flex-col gap-4">
+      {isAdmin && (
+        <Link
+          to="/admin"
+          className="glass-panel flex items-center justify-between gap-2 px-4 py-3 transition hover:border-primary/60 hover:glow-aqua"
+        >
+          <span className="flex items-center gap-2">
+            <Shield className="h-4 w-4 text-primary icon-glow" />
+            <span className="font-display text-sm tracking-wider text-primary text-glow">
+              פאנל ניהול
+            </span>
+          </span>
+          <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+            Admin
+          </span>
+        </Link>
+      )}
       <section className="glass-panel p-4">
         <h3 className="mb-3 font-display text-sm uppercase tracking-[0.2em] text-primary text-glow">סטטיסטיקה</h3>
         <div className="grid grid-cols-2 gap-2">
