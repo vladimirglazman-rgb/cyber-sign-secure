@@ -7,6 +7,7 @@ import { isValidEmail } from "@/hooks/use-signature-request";
 import { createSignatureRequest } from "@/server/documents.functions";
 import { getAuthHeaders } from "@/lib/auth-headers";
 import { APP_VERSION } from "@/lib/app-version";
+import { UpgradeModal } from "@/components/mnit/UpgradeModal";
 export function SendBar({
   api,
   paths,
@@ -17,6 +18,7 @@ export function SendBar({
   resetPaths: () => void;
 }) {
   const [sending, setSending] = useState(false);
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [shareLinks, setShareLinks] = useState<
     { id: string; name: string; phone: string | null; token: string; fileName: string }[]
   >([]);
@@ -116,9 +118,7 @@ export function SendBar({
       console.error("SEND_FAILED", e);
       const msg = e instanceof Error ? e.message : "";
       if (msg.includes("LIMIT_REACHED")) {
-        toast.error("הגעת למכסת המסמכים החינמית (3)", {
-          description: "שדרג לתוכנית בתשלום כדי להמשיך לשלוח מסמכים",
-        });
+        setUpgradeOpen(true);
       } else {
         toast.error(msg || "אירעה שגיאה, נסה שוב");
       }
@@ -160,6 +160,7 @@ export function SendBar({
           </div>
         </div>
       )}
+      <UpgradeModal open={upgradeOpen} onClose={() => setUpgradeOpen(false)} />
     </div>
   );
 }
