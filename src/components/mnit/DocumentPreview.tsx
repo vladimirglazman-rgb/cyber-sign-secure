@@ -134,6 +134,26 @@ export function DocumentPreview({
           <span className="text-primary text-glow">{recipient.name || "נמען"}</span>
         </div>
       )}
+      {file && api.recipients.length > 0 && (
+        <div className="mb-2 flex items-center gap-2 rounded-md border border-primary/30 bg-primary/10 px-3 py-2">
+          <span className="text-[11px] uppercase tracking-[0.18em] text-primary text-glow">
+            נמען פעיל
+          </span>
+          <select
+            value={recipient?.id ?? ""}
+            onChange={(e) => api.setSelectedRecipientId(e.target.value)}
+            className="ms-auto rounded-md border border-primary/40 bg-background/70 px-2 py-1 text-xs text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+          >
+            {api.recipients.map((r, idx) => (
+              <option key={r.id} value={r.id}>
+                {(r.name || `נמען ${idx + 1}`) +
+                  (r.role === "cc" ? " (העתק)" : "") +
+                  ` · ${(r.signatureCoordinates?.length ?? 0)} סיכות`}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
       {file && recipient && isPdf && inlineSrc && isMobile && (
         <button
           type="button"
@@ -191,6 +211,11 @@ export function DocumentPreview({
                           className="absolute z-10 -translate-x-1/2 -translate-y-full cursor-pointer transition hover:scale-110"
                           style={{ left: `${c.x * 100}%`, top: `${c.y * 100}%` }}
                         >
+                          <span
+                            className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-sm border border-primary/50 bg-background/85 px-1.5 py-0.5 text-[10px] font-semibold text-primary text-glow"
+                          >
+                            {recipient?.name || "נמען"}
+                          </span>
                           <MapPin
                             className="h-7 w-7 text-primary"
                             style={{
@@ -379,6 +404,9 @@ function FullscreenPinModal({
                     className="absolute z-10 -translate-x-1/2 -translate-y-full cursor-pointer transition hover:scale-110"
                     style={{ left: `${c.x * 100}%`, top: `${c.y * 100}%` }}
                   >
+                    <span className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-sm border border-primary/50 bg-background/85 px-1.5 py-0.5 text-[10px] font-semibold text-primary text-glow">
+                      {recipientName}
+                    </span>
                     <MapPin
                       className="h-8 w-8 text-primary"
                       style={{
