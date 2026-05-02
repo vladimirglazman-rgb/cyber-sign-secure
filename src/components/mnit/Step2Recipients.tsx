@@ -128,7 +128,8 @@ export function Step2Recipients({ api }: { api: SignatureRequestApi }) {
               />
             </div>
           </div>
-        ))}
+          );
+        })}
         <button type="button" onClick={api.addRecipient} className="inline-flex items-center justify-center gap-2 rounded-lg border border-dashed border-primary/40 px-3 py-2 text-sm text-primary transition hover:bg-primary/10">
           <Plus className="h-4 w-4" />הוסף נמען
         </button>
