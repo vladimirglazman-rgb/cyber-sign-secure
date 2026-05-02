@@ -114,7 +114,14 @@ export function SendBar({
       qc.invalidateQueries({ queryKey: ["dashboard"] });
     } catch (e) {
       console.error("SEND_FAILED", e);
-      toast.error(e instanceof Error ? e.message : "אירעה שגיאה, נסה שוב");
+      const msg = e instanceof Error ? e.message : "";
+      if (msg.includes("LIMIT_REACHED")) {
+        toast.error("הגעת למכסת המסמכים החינמית (3)", {
+          description: "שדרג לתוכנית בתשלום כדי להמשיך לשלוח מסמכים",
+        });
+      } else {
+        toast.error(msg || "אירעה שגיאה, נסה שוב");
+      }
     } finally {
       setSending(false);
     }
