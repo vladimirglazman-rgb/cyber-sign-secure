@@ -182,7 +182,7 @@ function LandingPage() {
               Why MNIT Sign
             </div>
             <h2 className="font-display text-3xl font-extrabold text-foreground md:text-4xl">
-              <span className="text-primary text-glow">8 סיבות</span> לבחור בנו
+              <span className="text-primary text-glow">9 סיבות</span> לבחור בנו
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
               פלטפורמה ישראלית, מאובטחת ומתקדמת — כל מה שצריך כדי לחתום מסמכים בלי כאבי ראש.
