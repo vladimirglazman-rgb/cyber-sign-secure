@@ -1,1 +1,1 @@
-export const APP_VERSION = "v1.4.2-FinalUX";
+export const APP_VERSION = "גרסת ייצור יציבה: v1.4.0-Stable";
