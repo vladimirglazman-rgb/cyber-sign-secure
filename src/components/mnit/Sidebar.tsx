@@ -75,7 +75,7 @@ export function Sidebar() {
         title="גרסת תוכנה"
       >
         <span className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_6px_var(--primary)]" />
-        גרסת תוכנה: {APP_VERSION}
+        {APP_VERSION}
       </div>
     </aside>
   );
