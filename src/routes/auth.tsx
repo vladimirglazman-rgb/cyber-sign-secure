@@ -110,7 +110,28 @@ function AuthPage() {
             <input dir="ltr" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6}
               className="w-full rounded-md border border-primary/20 bg-background/50 px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
           </div>
-          <button type="submit" disabled={loading}
+          {mode === "signup" && (
+            <label className="mt-1 flex cursor-pointer items-start gap-2 text-xs text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={agreedTerms}
+                onChange={(e) => setAgreedTerms(e.target.checked)}
+                className={`mt-0.5 h-4 w-4 cursor-pointer appearance-none rounded border border-primary/40 bg-background/50 transition checked:border-primary checked:bg-primary checked:shadow-[0_0_12px_rgba(48,255,247,0.9)] focus:outline-none focus:ring-1 focus:ring-primary`}
+              />
+              <span>
+                אני מסכים ל
+                <button
+                  type="button"
+                  onClick={() => setShowTerms(true)}
+                  className="mx-1 font-medium text-primary text-glow underline-offset-2 hover:underline"
+                >
+                  תנאי השימוש
+                </button>
+                של MNIT Sign
+              </span>
+            </label>
+          )}
+          <button type="submit" disabled={loading || (mode === "signup" && !agreedTerms)}
             className="mt-2 inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 font-display text-sm font-bold tracking-wider text-primary-foreground glow-aqua transition hover:brightness-110 disabled:opacity-50">
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
             {mode === "login" ? "התחבר" : "הירשם"}
@@ -118,6 +139,32 @@ function AuthPage() {
         </form>
         </div>
       </div>
+      {showTerms && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 p-4 backdrop-blur-md"
+          onClick={() => setShowTerms(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="glass-panel relative max-h-[85vh] w-full max-w-2xl overflow-hidden border border-primary/40 shadow-[0_0_40px_rgba(48,255,247,0.35)]"
+          >
+            <div className="flex items-center justify-between border-b border-primary/20 px-6 py-4">
+              <h2 className="font-display text-lg font-bold text-primary text-glow">תנאי השימוש</h2>
+              <button
+                onClick={() => setShowTerms(false)}
+                className="rounded-md px-2 py-1 text-sm text-muted-foreground hover:text-foreground"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="max-h-[70vh] overflow-y-auto px-6 py-4">
+              <pre className="whitespace-pre-wrap text-right font-sans text-sm leading-relaxed text-foreground/90">
+                {MNIT_LEGAL_TERMS}
+              </pre>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
