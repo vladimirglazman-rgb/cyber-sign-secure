@@ -12,10 +12,14 @@ export function SignerPdfViewer({
   fileUrl,
   coordinates,
   onRemovePin,
+  placedIndices,
+  onPinClick,
 }: {
   fileUrl: string;
   coordinates: SigCoord[];
   onRemovePin?: (index: number) => void;
+  placedIndices?: Set<number>;
+  onPinClick?: (index: number) => void;
 }) {
   const [numPages, setNumPages] = useState<number>(0);
   const [width, setWidth] = useState<number>(0);
@@ -68,6 +72,7 @@ export function SignerPdfViewer({
               {pinsForPage.map(({ c, idx }) => (
                 <div
                   key={idx}
+                  data-pin-index={idx}
                   role={onRemovePin ? "button" : undefined}
                   title={onRemovePin ? "לחץ להסרת סיכה" : undefined}
                   onClick={
@@ -76,28 +81,53 @@ export function SignerPdfViewer({
                           e.stopPropagation();
                           onRemovePin(idx);
                         }
+                      : onPinClick
+                      ? (e) => {
+                          e.stopPropagation();
+                          onPinClick(idx);
+                        }
                       : undefined
                   }
                   className={
                     "absolute z-10 -translate-x-1/2 -translate-y-full " +
                     (onRemovePin
                       ? "cursor-pointer transition hover:scale-110"
+                      : onPinClick
+                      ? "cursor-pointer transition hover:scale-110"
                       : "pointer-events-none")
                   }
                   style={{ left: `${c.x * 100}%`, top: `${c.y * 100}%` }}
                 >
                   <div className="relative">
-                    <MapPin
-                      className="h-8 w-8 text-primary animate-pulse"
-                      style={{
-                        filter:
-                          "drop-shadow(0 0 6px hsl(var(--primary))) drop-shadow(0 0 12px hsl(var(--primary)))",
-                      }}
-                      fill="hsl(var(--primary) / 0.4)"
-                    />
-                    <span className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md border border-primary/60 bg-background/90 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
-                      חתום כאן
-                    </span>
+                    {placedIndices?.has(idx) ? (
+                      <>
+                        <MapPin
+                          className="h-8 w-8"
+                          style={{
+                            color: "#003399",
+                            filter: "drop-shadow(0 0 4px rgba(0,51,153,0.6))",
+                          }}
+                          fill="#003399"
+                        />
+                        <span className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md border border-[#003399]/60 bg-background/90 px-1.5 py-0.5 text-[10px] font-semibold text-[#003399]">
+                          נחתם ✓
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <MapPin
+                          className="h-8 w-8 text-primary animate-pulse"
+                          style={{
+                            filter:
+                              "drop-shadow(0 0 6px hsl(var(--primary))) drop-shadow(0 0 12px hsl(var(--primary)))",
+                          }}
+                          fill="hsl(var(--primary) / 0.4)"
+                        />
+                        <span className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md border border-primary/60 bg-background/90 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
+                          חתום כאן
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
               ))}
