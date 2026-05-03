@@ -7,11 +7,13 @@ export function Step3Settings({ api }: { api: SignatureRequestApi }) {
       <div className="flex flex-col gap-4">
         <div>
           <div className="mb-1 flex items-center justify-between">
-            <label className="text-xs font-medium text-muted-foreground">נושא</label>
+            <label className="text-xs font-medium text-muted-foreground">
+              נושא <span className="asterisk-glow">*</span>
+            </label>
             <AiRefineButton field="subject" value={api.subject} onApply={api.setSubject} />
           </div>
           <input value={api.subject} onChange={(e) => api.setSubject(e.target.value)} placeholder="חתימה על הסכם שירותים"
-            className="w-full rounded-md border border-primary/20 bg-background/50 px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+            className={`w-full rounded-md border bg-background/50 px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary ${!api.subject.trim() ? "field-required-empty" : "border-primary/20"}`} />
         </div>
         <div>
           <div className="mb-1 flex items-center justify-between">

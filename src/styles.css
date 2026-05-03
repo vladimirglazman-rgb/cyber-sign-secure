@@ -197,6 +197,28 @@
 
 .animate-pulse-glow { animation: pulse-glow 2.4s ease-in-out infinite; }
 
+@keyframes pulse-required {
+  0%, 100% {
+    border-color: rgba(255, 80, 90, 0.6);
+    box-shadow: 0 0 0 1px rgba(255, 80, 90, 0.4), 0 0 10px rgba(255, 80, 90, 0.25);
+  }
+  50% {
+    border-color: rgba(48, 255, 247, 0.9);
+    box-shadow: 0 0 0 1px rgba(48, 255, 247, 0.7), 0 0 14px rgba(48, 255, 247, 0.5);
+  }
+}
+
+.field-required-empty {
+  animation: pulse-required 1.8s ease-in-out infinite;
+}
+
+.asterisk-glow {
+  color: rgb(48, 255, 247);
+  text-shadow: 0 0 8px rgba(48, 255, 247, 0.9), 0 0 14px rgba(48, 255, 247, 0.6);
+  font-weight: 700;
+  margin-inline-start: 2px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cyber-grid, .cyber-grid::after, .animate-pulse-glow {
     animation: none !important;

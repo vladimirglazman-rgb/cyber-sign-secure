@@ -23,6 +23,11 @@ export function Step2Recipients({ api }: { api: SignatureRequestApi }) {
       <div className="flex flex-col gap-3">
         {api.recipients.map((r, idx) => {
           const color = getRecipientColor(idx);
+          const nameMissing = !r.name.trim();
+          const emailMissing = r.deliveryMethod === "email" && !r.email.trim();
+          const phoneMissing = r.deliveryMethod === "sms" && r.phone.trim().length < 7;
+          const verifMissing = !(r.verificationType === "phone" && r.deliveryMethod === "sms")
+            && r.verificationValue.trim().length < 4;
           return (
           <div
             key={r.id}
@@ -44,19 +49,27 @@ export function Step2Recipients({ api }: { api: SignatureRequestApi }) {
                 נמען {idx + 1}
               </span>
             </div>
+            <div className="mb-1 grid grid-cols-1 gap-2 text-[11px] text-muted-foreground md:grid-cols-[1fr_1fr_auto_auto]">
+              <span>שם מלא <span className="asterisk-glow">*</span></span>
+              <span>
+                אימייל {r.deliveryMethod === "email" && <span className="asterisk-glow">*</span>}
+              </span>
+              <span>תפקיד</span>
+              <span className="sr-only">פעולות</span>
+            </div>
             <div className="grid grid-cols-1 gap-2 md:grid-cols-[1fr_1fr_auto_auto]">
               <div className="relative">
                 <User className="absolute end-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <input value={r.name} onChange={(e) => api.updateRecipient(r.id, { name: e.target.value })} placeholder={`שם נמען ${idx + 1}`}
-                  className="w-full rounded-md border border-primary/20 bg-background/50 pe-8 ps-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+                <input value={r.name} onChange={(e) => api.updateRecipient(r.id, { name: e.target.value })} placeholder={`שם מלא * נמען ${idx + 1}`}
+                  className={`w-full rounded-md border bg-background/50 pe-8 ps-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary ${nameMissing ? "field-required-empty" : "border-primary/20"}`} />
               </div>
               <input
                 type="email"
                 dir="ltr"
                 value={r.email}
                 onChange={(e) => api.updateRecipient(r.id, { email: e.target.value })}
-                placeholder="email@example.com"
-                className={`w-full rounded-md border bg-background/50 px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary ${r.deliveryMethod === "email" ? "border-primary/20" : "border-primary/10 opacity-70"}`}
+                placeholder={r.deliveryMethod === "email" ? "* email@example.com" : "email@example.com"}
+                className={`w-full rounded-md border bg-background/50 px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary ${emailMissing ? "field-required-empty" : r.deliveryMethod === "email" ? "border-primary/20" : "border-primary/10 opacity-70"}`}
               />
               <select value={r.role} onChange={(e) => api.updateRecipient(r.id, { role: e.target.value as "signer" | "cc" })}
                 className="rounded-md border border-primary/20 bg-background/50 px-3 py-2 text-sm text-foreground outline-none focus:border-primary">
@@ -96,10 +109,12 @@ export function Step2Recipients({ api }: { api: SignatureRequestApi }) {
                   dir="ltr"
                   value={r.phone}
                   onChange={(e) => api.updateRecipient(r.id, { phone: e.target.value })}
-                  placeholder="מספר טלפון 05X-XXXXXXX"
+                  placeholder={r.deliveryMethod === "sms" ? "* מספר טלפון 05X-XXXXXXX" : "מספר טלפון 05X-XXXXXXX"}
                   required={r.deliveryMethod === "sms"}
                   className={`w-full rounded-md border bg-background/50 pe-8 ps-3 py-1.5 text-sm text-foreground outline-none focus:ring-1 focus:ring-primary ${
-                    r.deliveryMethod === "sms"
+                    phoneMissing
+                      ? "field-required-empty"
+                      : r.deliveryMethod === "sms"
                       ? "border-primary focus:border-primary glow-aqua"
                       : "border-primary/20 focus:border-primary"
                   }`}
@@ -123,8 +138,8 @@ export function Step2Recipients({ api }: { api: SignatureRequestApi }) {
                 dir="ltr"
                 value={r.verificationValue}
                 onChange={(e) => api.updateRecipient(r.id, { verificationValue: e.target.value })}
-                placeholder={r.verificationType === "id_number" ? "מספר תעודת זהות" : "מספר טלפון"}
-                className="w-full rounded-md border border-primary/20 bg-background/50 px-3 py-1.5 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                placeholder={r.verificationType === "id_number" ? "* מספר תעודת זהות" : "* מספר טלפון"}
+                className={`w-full rounded-md border bg-background/50 px-3 py-1.5 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary ${verifMissing ? "field-required-empty" : "border-primary/20"}`}
               />
             </div>
           </div>
