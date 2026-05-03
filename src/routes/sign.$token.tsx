@@ -436,7 +436,7 @@ function ViewerCard({
           type="button"
           onClick={submit}
           disabled={busy || !allPlaced}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 font-display text-sm font-bold tracking-wider text-primary-foreground glow-aqua hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 font-display text-sm font-bold tracking-wider text-primary-foreground glow-aqua hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 disabled:pointer-events-none"
         >
           {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           {allPlaced ? "סיום ושלח" : `סיום ושלח (${placed.size}/${totalPins})`}
