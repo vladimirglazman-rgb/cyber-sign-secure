@@ -49,7 +49,8 @@ function SignPage() {
   const [stage, setStage] = useState<Stage>("verify");
   const [peek, setPeek] = useState<Peek | null>(null);
   const [peekErr, setPeekErr] = useState<string | null>(null);
-  const [verification, setVerification] = useState("");
+  const [idNumber, setIdNumber] = useState("");
+  const [phone, setPhone] = useState("");
   const [busy, setBusy] = useState(false);
   const [ctx, setCtx] = useState<Ctx | null>(null);
 
@@ -68,17 +69,23 @@ function SignPage() {
   }, [token]);
 
   const verify = async () => {
-    if (verification.trim().length < 4) {
-      toast.error("יש להזין ערך אימות תקין");
+    if (idNumber.trim().length < 4 || phone.trim().length < 4) {
+      toast.error("יש להזין ת.ז. וטלפון תקינים");
       return;
     }
     try {
       setBusy(true);
-      const c = await verifySigner({ data: { token, verification: verification.trim() } });
+      const c = await verifySigner({
+        data: { token, idNumber: idNumber.trim(), phone: phone.trim() },
+      });
       setCtx(c as Ctx);
       setStage(c.alreadySigned ? "done" : "view");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "פרטי אימות שגויים");
+      toast.error(
+        e instanceof Error
+          ? e.message
+          : "פרטי הזיהוי (ת.ז. או טלפון) אינם תואמים את רישומי המערכת.",
+      );
     } finally {
       setBusy(false);
     }
@@ -105,8 +112,10 @@ function SignPage() {
         ) : stage === "verify" ? (
           <VerifyCard
             peek={peek}
-            value={verification}
-            onChange={setVerification}
+            idValue={idNumber}
+            phoneValue={phone}
+            onIdChange={setIdNumber}
+            onPhoneChange={setPhone}
             onSubmit={verify}
             busy={busy}
           />
@@ -114,7 +123,8 @@ function SignPage() {
           <ViewerCard
             ctx={ctx}
             token={token}
-            verification={verification.trim()}
+            idNumber={idNumber.trim()}
+            phone={phone.trim()}
             onSigned={() => setStage("done")}
           />
         ) : (
@@ -127,42 +137,65 @@ function SignPage() {
 
 function VerifyCard({
   peek,
-  value,
-  onChange,
+  idValue,
+  phoneValue,
+  onIdChange,
+  onPhoneChange,
   onSubmit,
   busy,
 }: {
   peek: Peek;
-  value: string;
-  onChange: (v: string) => void;
+  idValue: string;
+  phoneValue: string;
+  onIdChange: (v: string) => void;
+  onPhoneChange: (v: string) => void;
   onSubmit: () => void;
   busy: boolean;
 }) {
-  const isId = peek.verification_type === "id_number";
   return (
     <section className="glass-panel p-6">
       <div className="mb-4 flex items-center gap-2">
         <ShieldCheck className="h-5 w-5 text-primary icon-glow" />
-        <h1 className="font-display text-lg text-primary text-glow">אימות זהות</h1>
+        <h1 className="font-display text-lg text-primary text-glow">אימות זהות דו-שלבי</h1>
       </div>
       <p className="mb-4 text-sm text-muted-foreground">
-        שלום <span className="text-foreground">{peek.recipient_name}</span>, אנא הזן את{" "}
-        {isId ? "מספר תעודת הזהות" : "מספר הטלפון"} שלך כדי לצפות במסמך:
+        שלום <span className="text-foreground">{peek.recipient_name}</span>, לאימות זהותך הזן הן את מספר ת.ז. והן את מספר הטלפון הנייד שלך:
       </p>
       <p className="mb-4 text-xs text-muted-foreground">
         נושא הפנייה: <span className="text-foreground">{peek.document_subject}</span>
       </p>
-      <input
-        dir="ltr"
-        autoFocus
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") onSubmit();
-        }}
-        placeholder={isId ? "ת.ז." : "טלפון"}
-        className="mb-4 w-full rounded-md border border-primary/30 bg-background/50 px-3 py-2.5 text-base text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary"
-      />
+      <div className="mb-4 flex flex-col gap-3">
+        <label className="flex flex-col gap-1.5">
+          <span className="font-display text-[11px] uppercase tracking-[0.18em] text-primary text-glow">
+            מספר תעודת זהות
+          </span>
+          <input
+            dir="ltr"
+            autoFocus
+            inputMode="numeric"
+            value={idValue}
+            onChange={(e) => onIdChange(e.target.value)}
+            placeholder="000000000"
+            className="w-full rounded-md border border-primary/40 bg-background/50 px-3 py-2.5 text-base text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary focus:shadow-[0_0_12px_rgba(48,255,247,0.5)]"
+          />
+        </label>
+        <label className="flex flex-col gap-1.5">
+          <span className="font-display text-[11px] uppercase tracking-[0.18em] text-primary text-glow">
+            מספר טלפון נייד
+          </span>
+          <input
+            dir="ltr"
+            inputMode="tel"
+            value={phoneValue}
+            onChange={(e) => onPhoneChange(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") onSubmit();
+            }}
+            placeholder="05X-XXXXXXX"
+            className="w-full rounded-md border border-primary/40 bg-background/50 px-3 py-2.5 text-base text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary focus:shadow-[0_0_12px_rgba(48,255,247,0.5)]"
+          />
+        </label>
+      </div>
       <button
         type="button"
         onClick={onSubmit}
@@ -179,12 +212,14 @@ function VerifyCard({
 function ViewerCard({
   ctx,
   token,
-  verification,
+  idNumber,
+  phone,
   onSigned,
 }: {
   ctx: Ctx;
   token: string;
-  verification: string;
+  idNumber: string;
+  phone: string;
   onSigned: () => void;
 }) {
   const canvasRef = useRef<SignatureCanvasHandle>(null);
@@ -199,7 +234,7 @@ function ViewerCard({
     if (!dataUrl) return;
     try {
       setBusy(true);
-      await submitSignature({ data: { token, verification, signature: dataUrl } });
+      await submitSignature({ data: { token, idNumber, phone, signature: dataUrl } });
       toast.success("המסמך נחתם בהצלחה");
       onSigned();
     } catch (e) {
