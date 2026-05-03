@@ -25,7 +25,7 @@ export function Step2Recipients({ api }: { api: SignatureRequestApi }) {
           const color = getRecipientColor(idx);
           const nameMissing = !r.name.trim();
           const emailMissing = r.deliveryMethod === "email" && !r.email.trim();
-          const phoneMissing = r.deliveryMethod === "sms" && r.phone.trim().length < 7;
+          const phoneMissing = r.phone.trim().length < 7;
           const verifMissing = !(r.verificationType === "phone" && r.deliveryMethod === "sms")
             && r.verificationValue.trim().length < 4;
           return (
@@ -109,8 +109,8 @@ export function Step2Recipients({ api }: { api: SignatureRequestApi }) {
                   dir="ltr"
                   value={r.phone}
                   onChange={(e) => api.updateRecipient(r.id, { phone: e.target.value })}
-                  placeholder={r.deliveryMethod === "sms" ? "* מספר טלפון 05X-XXXXXXX" : "מספר טלפון 05X-XXXXXXX"}
-                  required={r.deliveryMethod === "sms"}
+                  placeholder="* מספר טלפון נייד 05X-XXXXXXX"
+                  required
                   className={`w-full rounded-md border bg-background/50 pe-8 ps-3 py-1.5 text-sm text-foreground outline-none focus:ring-1 focus:ring-primary ${
                     phoneMissing
                       ? "field-required-empty"
