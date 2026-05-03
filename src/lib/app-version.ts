@@ -1,1 +1,1 @@
-export const APP_VERSION = "v1.3.0-LegalAuth";
+export const APP_VERSION = "v1.3.2-FullFlow";
