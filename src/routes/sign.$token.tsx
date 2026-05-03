@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { peekToken, verifySigner, submitSignature } from "@/server/signing.functions";
 import { SignatureCanvas, type SignatureCanvasHandle } from "@/components/mnit/SignatureCanvas";
 import { SignerPdfViewer, type SigCoord } from "@/components/mnit/SignerPdfViewer";
+import { MNIT_LEGAL_TERMS } from "@/content/mnit-legal-terms";
 
 export const Route = createFileRoute("/sign/$token")({
   head: () => ({
@@ -53,6 +54,8 @@ function SignPage() {
   const [phone, setPhone] = useState("");
   const [busy, setBusy] = useState(false);
   const [ctx, setCtx] = useState<Ctx | null>(null);
+  const [agreedTerms, setAgreedTerms] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -71,6 +74,10 @@ function SignPage() {
   const verify = async () => {
     if (idNumber.trim().length < 4 || phone.trim().length < 4) {
       toast.error("יש להזין ת.ז. וטלפון תקינים");
+      return;
+    }
+    if (!agreedTerms) {
+      toast.error("יש לאשר את תנאי השימוש ואת הצהרת החתימה הדיגיטלית");
       return;
     }
     try {
@@ -118,6 +125,9 @@ function SignPage() {
             onPhoneChange={setPhone}
             onSubmit={verify}
             busy={busy}
+            agreedTerms={agreedTerms}
+            onAgreedChange={setAgreedTerms}
+            onShowTerms={() => setShowTerms(true)}
           />
         ) : stage === "view" && ctx ? (
           <ViewerCard
@@ -131,6 +141,32 @@ function SignPage() {
           <SuccessCard subject={peek.document_subject} />
         )}
       </div>
+      {showTerms && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 p-4 backdrop-blur-md"
+          onClick={() => setShowTerms(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="glass-panel relative max-h-[85vh] w-full max-w-2xl overflow-hidden border border-primary/40 shadow-[0_0_40px_rgba(48,255,247,0.35)]"
+          >
+            <div className="flex items-center justify-between border-b border-primary/20 px-6 py-4">
+              <h2 className="font-display text-lg font-bold text-primary text-glow">תנאי השימוש</h2>
+              <button
+                onClick={() => setShowTerms(false)}
+                className="rounded-md px-2 py-1 text-sm text-muted-foreground hover:text-foreground"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="max-h-[70vh] overflow-y-auto px-6 py-4">
+              <pre className="whitespace-pre-wrap text-right font-sans text-sm leading-relaxed text-foreground/90">
+                {MNIT_LEGAL_TERMS}
+              </pre>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -143,6 +179,9 @@ function VerifyCard({
   onPhoneChange,
   onSubmit,
   busy,
+  agreedTerms,
+  onAgreedChange,
+  onShowTerms,
 }: {
   peek: Peek;
   idValue: string;
@@ -151,6 +190,9 @@ function VerifyCard({
   onPhoneChange: (v: string) => void;
   onSubmit: () => void;
   busy: boolean;
+  agreedTerms: boolean;
+  onAgreedChange: (v: boolean) => void;
+  onShowTerms: () => void;
 }) {
   return (
     <section className="glass-panel p-6">
@@ -196,14 +238,33 @@ function VerifyCard({
           />
         </label>
       </div>
+      <label className="mb-4 flex cursor-pointer items-start gap-2 text-xs text-muted-foreground">
+        <input
+          type="checkbox"
+          checked={agreedTerms}
+          onChange={(e) => onAgreedChange(e.target.checked)}
+          className="mt-0.5 h-4 w-4 cursor-pointer appearance-none rounded border border-primary/40 bg-background/50 transition checked:border-primary checked:bg-primary checked:shadow-[0_0_12px_rgba(48,255,247,0.9)] focus:outline-none focus:ring-1 focus:ring-primary"
+        />
+        <span className="leading-relaxed">
+          אני מאשר כי קראתי ואני מסכים ל
+          <button
+            type="button"
+            onClick={onShowTerms}
+            className="mx-1 font-medium text-primary text-glow underline-offset-2 hover:underline"
+          >
+            תנאי השימוש
+          </button>
+          ולהצהרת החתימה הדיגיטלית.
+        </span>
+      </label>
       <button
         type="button"
         onClick={onSubmit}
-        disabled={busy}
+        disabled={busy || !agreedTerms}
         className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-2.5 font-display text-sm font-bold text-primary-foreground glow-aqua hover:brightness-110 disabled:opacity-60"
       >
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
-        אמת והמשך
+        המשך למסמך
       </button>
     </section>
   );
