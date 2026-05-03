@@ -25,7 +25,7 @@ export function Step2Recipients({ api }: { api: SignatureRequestApi }) {
           const color = getRecipientColor(idx);
           const nameMissing = !r.name.trim();
           const emailMissing = r.deliveryMethod === "email" && !r.email.trim();
-          const phoneMissing = r.deliveryMethod === "sms" && r.phone.trim().length < 7;
+          const phoneMissing = r.phone.trim().length < 7;
           const verifMissing = !(r.verificationType === "phone" && r.deliveryMethod === "sms")
             && r.verificationValue.trim().length < 4;
           return (
@@ -103,14 +103,18 @@ export function Step2Recipients({ api }: { api: SignatureRequestApi }) {
                   <option value="sms">SMS / וואטסאפ</option>
                 </select>
               </div>
-              <div className="relative">
-                <Phone className="absolute end-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <input
+              <div>
+                <div className="mb-1 text-[11px] text-muted-foreground">
+                  מספר טלפון נייד <span className="asterisk-glow">*</span>
+                </div>
+                <div className="relative">
+                  <Phone className="absolute end-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <input
                   dir="ltr"
                   value={r.phone}
                   onChange={(e) => api.updateRecipient(r.id, { phone: e.target.value })}
-                  placeholder={r.deliveryMethod === "sms" ? "* מספר טלפון 05X-XXXXXXX" : "מספר טלפון 05X-XXXXXXX"}
-                  required={r.deliveryMethod === "sms"}
+                  placeholder="* מספר טלפון נייד 05X-XXXXXXX"
+                  required
                   className={`w-full rounded-md border bg-background/50 pe-8 ps-3 py-1.5 text-sm text-foreground outline-none focus:ring-1 focus:ring-primary ${
                     phoneMissing
                       ? "field-required-empty"
@@ -118,7 +122,8 @@ export function Step2Recipients({ api }: { api: SignatureRequestApi }) {
                       ? "border-primary focus:border-primary glow-aqua"
                       : "border-primary/20 focus:border-primary"
                   }`}
-                />
+                  />
+                </div>
               </div>
             </div>
             <div className="mt-2 grid grid-cols-1 gap-2 md:grid-cols-[160px_1fr]">
