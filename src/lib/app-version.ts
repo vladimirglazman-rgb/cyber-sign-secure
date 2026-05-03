@@ -1,1 +1,1 @@
-export const APP_VERSION = "גרסת ייצור יציבה: v1.4.0-Stable";
+export const APP_VERSION = "MNIT Sign | גרסה יציבה v1.4.0-Stable";
