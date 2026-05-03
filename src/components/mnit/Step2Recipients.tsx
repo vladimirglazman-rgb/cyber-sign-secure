@@ -49,6 +49,14 @@ export function Step2Recipients({ api }: { api: SignatureRequestApi }) {
                 נמען {idx + 1}
               </span>
             </div>
+            <div className="mb-1 grid grid-cols-1 gap-2 text-[11px] text-muted-foreground md:grid-cols-[1fr_1fr_auto_auto]">
+              <span>שם מלא <span className="asterisk-glow">*</span></span>
+              <span>
+                אימייל {r.deliveryMethod === "email" && <span className="asterisk-glow">*</span>}
+              </span>
+              <span>תפקיד</span>
+              <span className="sr-only">פעולות</span>
+            </div>
             <div className="grid grid-cols-1 gap-2 md:grid-cols-[1fr_1fr_auto_auto]">
               <div className="relative">
                 <User className="absolute end-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
