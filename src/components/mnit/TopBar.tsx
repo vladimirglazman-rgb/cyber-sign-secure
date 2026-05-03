@@ -1,11 +1,14 @@
-import { Bell, ShieldCheck } from "lucide-react";
+import { Bell, LogOut, ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { useDashboard } from "@/hooks/use-dashboard";
 import { supabase } from "@/integrations/supabase/client";
 
 export function TopBar() {
   const { data } = useDashboard();
   const [email, setEmail] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? null));
@@ -18,6 +21,16 @@ export function TopBar() {
   const fullName = data?.profile?.full_name?.trim();
   const displayName = fullName && fullName.length > 0 ? fullName : email ?? "משתמש";
   const initial = (displayName[0] ?? "?").toUpperCase();
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error("שגיאה בהתנתקות");
+      return;
+    }
+    toast.success("התנתקת מהמערכת בהצלחה.");
+    navigate({ to: "/auth" });
+  };
 
   return (
     <header className="glass-panel mx-4 mt-4 flex items-center justify-between px-5 py-3">
@@ -53,6 +66,15 @@ export function TopBar() {
             <span className="text-[10px] text-muted-foreground">Freelancer</span>
           </div>
         </div>
+        <button
+          type="button"
+          onClick={handleLogout}
+          aria-label="התנתק"
+          className="group inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-3 py-1.5 text-xs font-display tracking-wider text-secondary transition hover:border-primary/70 hover:text-primary hover:bg-primary/10 hover:shadow-[0_0_12px_rgba(48,255,247,0.6)]"
+        >
+          <LogOut className="h-4 w-4 transition group-hover:drop-shadow-[0_0_8px_rgba(48,255,247,0.9)]" />
+          <span>התנתק</span>
+        </button>
       </div>
     </header>
   );
