@@ -178,9 +178,25 @@ export function AuditModal({ open, onOpenChange, documentId }: Props) {
                 <div className="grid grid-cols-1 gap-1.5 text-[11px] text-muted-foreground sm:grid-cols-2">
                   <div className="flex items-center gap-1.5">
                     <Clock className="h-3 w-3 text-primary/70" />
-                    {r.signed_at
-                      ? new Date(r.signed_at).toLocaleString("he-IL")
-                      : "—"}
+                    {r.signed_at ? (
+                      <span>
+                        {new Date(r.signed_at).toLocaleDateString("he-IL", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                        })}
+                        <span className="mx-1 text-primary/50">|</span>
+                        <span className="text-[10px] text-primary/70">
+                          {new Date(r.signed_at).toLocaleTimeString("he-IL", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: false,
+                          })}
+                        </span>
+                      </span>
+                    ) : (
+                      "—"
+                    )}
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Globe className="h-3 w-3 text-primary/70" />
