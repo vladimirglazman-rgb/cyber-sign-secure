@@ -285,8 +285,41 @@ function ViewerCard({
 }) {
   const canvasRef = useRef<SignatureCanvasHandle>(null);
   const [busy, setBusy] = useState(false);
+  const [placed, setPlaced] = useState<Set<number>>(new Set());
+  const totalPins = ctx.coordinates?.length ?? 0;
+  const allPlaced = totalPins === 0 ? true : placed.size === totalPins;
+
+  const scrollToFirstMissing = () => {
+    const firstMissing = (ctx.coordinates ?? []).findIndex(
+      (_, i) => !placed.has(i),
+    );
+    if (firstMissing < 0) return;
+    const el = document.querySelector(
+      `[data-pin-index="${firstMissing}"]`,
+    ) as HTMLElement | null;
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
+
+  const handlePinClick = (idx: number) => {
+    if (canvasRef.current?.isEmpty()) {
+      toast.error("יש לצייר חתימה לפני סימון מיקום");
+      const pad = document.getElementById("signature-pad");
+      pad?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    setPlaced((prev) => {
+      const next = new Set(prev);
+      next.add(idx);
+      return next;
+    });
+  };
 
   const submit = async () => {
+    if (!allPlaced) {
+      toast.error("יש להשלים את כל מיקומי החתימה");
+      scrollToFirstMissing();
+      return;
+    }
     if (canvasRef.current?.isEmpty()) {
       toast.error("יש לחתום במסגרת");
       return;
@@ -296,7 +329,14 @@ function ViewerCard({
     try {
       setBusy(true);
       await submitSignature({ data: { token, idNumber, phone, signature: dataUrl } });
-      toast.success("המסמך נחתם בהצלחה");
+      toast.success("המסמך נחתם ונשלח בהצלחה!", {
+        style: {
+          background: "rgba(48,255,247,0.12)",
+          border: "1px solid rgba(48,255,247,0.6)",
+          color: "hsl(var(--primary))",
+          boxShadow: "0 0 24px rgba(48,255,247,0.5)",
+        },
+      });
       onSigned();
     } catch (e) {
       console.error(e);
@@ -343,7 +383,12 @@ function ViewerCard({
           )}
         </div>
         {ctx.fileUrl ? (
-          <SignerPdfViewer fileUrl={ctx.fileUrl} coordinates={ctx.coordinates ?? []} />
+          <SignerPdfViewer
+            fileUrl={ctx.fileUrl}
+            coordinates={ctx.coordinates ?? []}
+            placedIndices={placed}
+            onPinClick={handlePinClick}
+          />
         ) : (
           <div className="rounded-md border border-destructive/40 p-4 text-center text-xs text-destructive">
             לא ניתן לטעון את המסמך
@@ -353,11 +398,11 @@ function ViewerCard({
 
       {/* Instruction */}
       <p className="rounded-md border border-primary/15 bg-primary/5 p-3 text-center text-xs text-foreground sm:text-sm">
-        לאחר קריאת המסמך, צייר את חתימתך כאן:
+        צייר את חתימתך כאן, ולאחר מכן לחץ על כל סמן זוהר במסמך כדי לסמן אותו כהושלם ({placed.size}/{totalPins}):
       </p>
 
       {/* Signature pad */}
-      <div className="space-y-2">
+      <div id="signature-pad" className="space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <PenTool className="h-4 w-4 text-primary icon-glow" />
@@ -367,7 +412,10 @@ function ViewerCard({
           </div>
           <button
             type="button"
-            onClick={() => canvasRef.current?.clear()}
+            onClick={() => {
+              canvasRef.current?.clear();
+              setPlaced(new Set());
+            }}
             className="inline-flex items-center gap-1.5 rounded-md border border-primary/20 px-2.5 py-1 text-[11px] text-muted-foreground hover:bg-primary/5 hover:text-foreground"
           >
             <Eraser className="h-3 w-3" /> נקה
@@ -376,15 +424,24 @@ function ViewerCard({
         <SignatureCanvas ref={canvasRef} />
       </div>
 
-      <button
-        type="button"
-        onClick={submit}
-        disabled={busy}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 font-display text-sm font-bold tracking-wider text-primary-foreground glow-aqua hover:brightness-110 disabled:opacity-60"
+      <div
+        onClick={() => {
+          if (!allPlaced && !busy) {
+            toast.error("יש להשלים את כל מיקומי החתימה");
+            scrollToFirstMissing();
+          }
+        }}
       >
-        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-        חתום ושלח
-      </button>
+        <button
+          type="button"
+          onClick={submit}
+          disabled={busy || !allPlaced}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 font-display text-sm font-bold tracking-wider text-primary-foreground glow-aqua hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+          {allPlaced ? "סיום ושלח" : `סיום ושלח (${placed.size}/${totalPins})`}
+        </button>
+      </div>
     </section>
   );
 }
