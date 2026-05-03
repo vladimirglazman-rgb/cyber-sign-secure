@@ -1,1 +1,1 @@
-export const APP_VERSION = "v1.3.2-FullFlow";
+export const APP_VERSION = "v1.3.3-SecureEntry";
