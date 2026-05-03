@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Shield, Users, Crown, Clock, Sparkles, Loader2 } from "lucide-react";
+import { Shield, Users, Crown, Clock, Sparkles, Loader2, Undo2 } from "lucide-react";
 import { useIsAdmin } from "@/hooks/use-is-admin";
 import { useEffect, useState, useCallback } from "react";
 import { TopBar } from "@/components/mnit/TopBar";
@@ -39,6 +39,7 @@ function AdminPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [fetching, setFetching] = useState(true);
   const [upgradingId, setUpgradingId] = useState<string | null>(null);
+  const [revertingId, setRevertingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !isAdmin) navigate({ to: "/app" });
@@ -104,6 +105,26 @@ function AdminPage() {
       toast.error(`שדרוג נכשל: ${e instanceof Error ? e.message : "Unknown"}`);
     } finally {
       setUpgradingId(null);
+    }
+  };
+
+  const handleRevert = async (u: AdminUser) => {
+    setRevertingId(u.id);
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ subscription_tier: "free" })
+        .eq("id", u.id);
+      if (error) throw error;
+      toast.success("המשתמש הוחזר לחינמי");
+      setUsers((prev) =>
+        prev.map((x) => (x.id === u.id ? { ...x, subscription_tier: "free" } : x)),
+      );
+    } catch (e) {
+      console.error("[admin] revert failed", e);
+      toast.error(`החזרה נכשלה: ${e instanceof Error ? e.message : "Unknown"}`);
+    } finally {
+      setRevertingId(null);
     }
   };
 
@@ -199,7 +220,7 @@ function AdminPage() {
                           )}
                         </TableCell>
                         <TableCell>
-                          {!isPro && (
+                          {!isPro ? (
                             <Button
                               size="sm"
                               disabled={upgradingId === u.id}
@@ -212,6 +233,21 @@ function AdminPage() {
                                 <Sparkles className="h-3 w-3" />
                               )}
                               שדרג ל-Pro
+                            </Button>
+                          ) : (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              disabled={revertingId === u.id}
+                              onClick={() => handleRevert(u)}
+                              className="border-amber-400/50 bg-amber-400/10 text-amber-300 hover:bg-amber-400/20 font-display text-xs"
+                            >
+                              {revertingId === u.id ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <Undo2 className="h-3 w-3" />
+                              )}
+                              החזר לחינמי
                             </Button>
                           )}
                         </TableCell>
