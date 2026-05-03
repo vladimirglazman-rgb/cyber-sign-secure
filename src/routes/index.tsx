@@ -14,6 +14,7 @@ import {
   Scale,
   BrainCircuit,
   Headphones,
+  Sun,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { APP_VERSION } from "@/lib/app-version";
@@ -198,13 +199,14 @@ function LandingPage() {
               { icon: Scale, title: "חוקי משפטית", desc: "תואם לחוק החתימה האלקטרונית הישראלי וה-eIDAS." },
               { icon: BrainCircuit, title: "מבוסס AI", desc: "ניסוח חכם, אופטימיזציה ובדיקת מסמכים אוטומטית." },
               { icon: Headphones, title: "תמיכה טכנית 24/7", desc: "צוות אנושי זמין סביב השעון בצ'אט ובטלפון." },
+              { icon: Sun, title: "נראות מקסימלית בשטח", desc: "ממשק Cyber-Legal עוצמתי עם קונטרסט גבוה וזוהר בציאן, המאפשר עבודה נוחה וזיהוי שדות חתימה בקלות גם תחת אור שמש ישיר בסמארטפון." },
             ].map((b) => (
               <div
                 key={b.title}
                 className="glass-panel group relative p-5 text-right transition-all duration-300 hover:-translate-y-1 hover:border-primary/70 hover:shadow-[0_0_30px_rgba(48,255,247,0.35)]"
               >
                 <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/40 transition group-hover:bg-primary/25 group-hover:ring-primary/70">
-                  <b.icon className="h-5 w-5 text-primary icon-glow" />
+                  <b.icon className="h-5 w-5 text-primary icon-glow drop-shadow-[0_0_12px_rgba(48,255,247,0.9)]" />
                 </div>
                 <h3 className="mb-1.5 font-display text-sm font-bold tracking-wide text-foreground">
                   {b.title}
