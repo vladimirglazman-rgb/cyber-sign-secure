@@ -4,10 +4,10 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 const BANK_DETAILS = {
-  bank: "[שם הבנק שלך]",
-  branch: "[מספר סניף]",
-  account: "[מספר חשבון]",
-  beneficiary: "[שם המוטב - MNIT Sign או שמך המלא]",
+  bank: "מזרחי טפחות",
+  branch: "490",
+  account: "127153",
+  beneficiary: "ולדימיר גלזמן",
   amount: "₪99 / חודש",
 };
 
