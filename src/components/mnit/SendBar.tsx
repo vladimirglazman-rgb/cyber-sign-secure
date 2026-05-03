@@ -142,6 +142,11 @@ export function SendBar({
           {sending ? "שולח…" : "שלח לחתימה"}
         </button>
       </div>
+      {!api.canSend && (
+        <p className="text-center text-[11px] text-muted-foreground">
+          יש למלא את כל שדות החובה המסומנים ב-<span className="asterisk-glow">*</span> כדי להמשיך.
+        </p>
+      )}
       {shareLinks.length > 0 && (
         <div className="rounded-lg border border-primary/20 bg-primary/5 p-2">
           <p className="mb-2 text-[11px] text-muted-foreground">שליחה ידנית מיידית</p>
