@@ -104,6 +104,9 @@ export function Step2Recipients({ api }: { api: SignatureRequestApi }) {
                 </select>
               </div>
               <div className="relative">
+                <div className="mb-1 text-[11px] text-muted-foreground">
+                  מספר טלפון נייד <span className="asterisk-glow">*</span>
+                </div>
                 <Phone className="absolute end-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   dir="ltr"
