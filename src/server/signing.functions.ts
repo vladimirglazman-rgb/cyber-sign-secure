@@ -2,14 +2,19 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { getRequest } from "@tanstack/react-start/server";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { createHash } from "crypto";
 
 const tokenSchema = z.object({ token: z.string().min(20).max(200) });
-const verifySchema = tokenSchema.extend({
-  verification: z.string().min(4).max(40),
+const dualSchema = tokenSchema.extend({
+  idNumber: z.string().min(4).max(40),
+  phone: z.string().min(4).max(40),
 });
-const signSchema = verifySchema.extend({
+const signSchema = dualSchema.extend({
   signature: z.string().min(50).max(200000),
 });
+
+const normalizePhone = (s: string) => s.replace(/\D+/g, "");
+const MISMATCH_MSG = "פרטי הזיהוי (ת.ז. או טלפון) אינם תואמים את רישומי המערכת.";
 
 export const peekToken = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => tokenSchema.parse(d))
@@ -27,36 +32,61 @@ export const peekToken = createServerFn({ method: "POST" })
   });
 
 export const verifySigner = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => verifySchema.parse(d))
+  .inputValidator((d: unknown) => dualSchema.parse(d))
   .handler(async ({ data }) => {
-    const { data: rows, error } = await supabaseAdmin.rpc("get_signing_context", {
-      _token: data.token,
-      _verification: data.verification.trim(),
-    });
-    if (error) {
-      console.error(error);
+    const idTrim = data.idNumber.trim();
+    const phoneTrim = data.phone.trim();
+    const idHash = createHash("sha256").update(idTrim).digest("hex");
+    const phoneNorm = normalizePhone(phoneTrim);
+
+    const { data: rec, error: recErr } = await supabaseAdmin
+      .from("recipients")
+      .select(
+        "id, document_id, phone, verification_value_hash, status, signature_coordinates",
+      )
+      .eq("signing_token", data.token)
+      .maybeSingle();
+    if (recErr) {
+      console.error(recErr);
       throw new Error("שגיאה באימות");
     }
-    const row = rows?.[0];
-    if (!row) throw new Error("פרטי אימות שגויים");
+    if (!rec) throw new Error(MISMATCH_MSG);
 
-    await supabaseAdmin.rpc("mark_recipient_opened", {
-      _token: data.token,
-      _verification: data.verification.trim(),
-    });
+    const storedPhone = normalizePhone(String(rec.phone ?? ""));
+    const idMatch = rec.verification_value_hash === idHash;
+    const phoneMatch = !!storedPhone && storedPhone === phoneNorm;
+    if (!idMatch || !phoneMatch) {
+      throw new Error(MISMATCH_MSG);
+    }
+
+    const { data: doc, error: docErr } = await supabaseAdmin
+      .from("documents")
+      .select("id, file_name, file_path, subject, message")
+      .eq("id", rec.document_id)
+      .maybeSingle();
+    if (docErr || !doc) throw new Error("שגיאה בטעינת המסמך");
+
+    const row = {
+      recipient_id: rec.id,
+      file_name: doc.file_name,
+      file_path: doc.file_path,
+      subject: doc.subject,
+      message: doc.message,
+      already_signed: rec.status === "signed",
+    };
+
+    await supabaseAdmin
+      .from("recipients")
+      .update({ opened_at: new Date().toISOString() } as never)
+      .eq("id", rec.id)
+      .is("opened_at", null);
 
     const { data: signed } = await supabaseAdmin.storage
       .from("contracts")
       .createSignedUrl(row.file_path, 600);
 
-    // Fetch signature pin coordinates set by sender for this recipient
     let coordinates: { pageNumber: number; x: number; y: number }[] = [];
     try {
-      const { data: rec } = await supabaseAdmin
-        .from("recipients")
-        .select("signature_coordinates")
-        .eq("id", row.recipient_id)
-        .maybeSingle();
       const raw = rec?.signature_coordinates;
       if (Array.isArray(raw)) {
         coordinates = raw
@@ -94,9 +124,26 @@ export const submitSignature = createServerFn({ method: "POST" })
       "";
     const ua = req?.headers.get("user-agent") ?? "";
 
+    // Re-verify both factors before signing.
+    const idTrim = data.idNumber.trim();
+    const phoneNorm = normalizePhone(data.phone.trim());
+    const idHash = createHash("sha256").update(idTrim).digest("hex");
+    const { data: rec } = await supabaseAdmin
+      .from("recipients")
+      .select("id, phone, verification_value_hash")
+      .eq("signing_token", data.token)
+      .maybeSingle();
+    if (
+      !rec ||
+      rec.verification_value_hash !== idHash ||
+      normalizePhone(String(rec.phone ?? "")) !== phoneNorm
+    ) {
+      throw new Error(MISMATCH_MSG);
+    }
+
     const { data: rows, error } = await supabaseAdmin.rpc("sign_recipient", {
       _token: data.token,
-      _verification: data.verification.trim(),
+      _verification: idTrim,
       _signature: data.signature,
       _ip: ip,
       _ua: ua,
@@ -106,7 +153,7 @@ export const submitSignature = createServerFn({ method: "POST" })
       const msg = error.message?.includes("already_signed")
         ? "המסמך כבר נחתם"
         : error.message?.includes("verification_failed")
-          ? "פרטי אימות שגויים"
+          ? MISMATCH_MSG
           : "שגיאה בשליחת החתימה";
       throw new Error(msg);
     }
