@@ -14,9 +14,15 @@ const cls: Record<DocumentRow["status"], string> = {
   cancelled: "bg-rose-400/15 text-rose-200 ring-rose-300/40",
 };
 export function ActivityItem({ doc }: { doc: DocumentRow }) {
-  const date = new Date(doc.created_at).toLocaleDateString("he-IL", {
+  const created = new Date(doc.created_at);
+  const datePart = created.toLocaleDateString("he-IL", {
     day: "2-digit",
     month: "2-digit",
+  });
+  const timePart = created.toLocaleTimeString("he-IL", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
   });
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [auditOpen, setAuditOpen] = useState(false);
@@ -68,7 +74,11 @@ export function ActivityItem({ doc }: { doc: DocumentRow }) {
           >
             {label[doc.status]}
           </span>
-          <span className="text-[10px] text-muted-foreground">{date}</span>
+          <span className="text-[10px] text-muted-foreground">
+            {datePart}
+            <span className="mx-1 text-primary/50">|</span>
+            <span className="text-[9px] text-primary/70">{timePart}</span>
+          </span>
           {doc.version && (
             <span className="font-display text-[9px] tracking-wider text-primary/80 text-glow">
               גרסה {doc.version}
