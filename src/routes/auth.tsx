@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { ShieldCheck, Loader2, ShieldAlert, Rocket, Wallet, Star, CheckCircle2, Scale, BrainCircuit, Headphones } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { MNIT_LEGAL_TERMS } from "@/content/mnit-legal-terms";
 export const Route = createFileRoute("/auth")({ component: AuthPage });
 
 const BENEFITS = [
@@ -23,11 +24,14 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [agreedTerms, setAgreedTerms] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
   useEffect(() => { supabase.auth.getSession().then(({ data }) => { if (data.session) navigate({ to: "/app" }); }); }, [navigate]);
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
     try {
       if (mode === "signup") {
+        if (!agreedTerms) { toast.error("יש לאשר את תנאי השימוש"); setLoading(false); return; }
         const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/app`, data: { full_name: fullName } } });
         if (error) throw error;
         toast.success("נרשמת בהצלחה");
