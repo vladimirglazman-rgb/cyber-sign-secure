@@ -126,6 +126,7 @@ export function useSignatureRequest() {
     const hasValidRecipient = recipients.some(
       (r) =>
         r.name.trim().length > 0 &&
+        r.phone.trim().length >= 7 &&
         (r.deliveryMethod === "sms"
           ? r.phone.trim().length >= 7
           : emailRe.test(r.email.trim())) &&
