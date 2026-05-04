@@ -376,6 +376,10 @@ function FullscreenPinModal({
   const activeRecipient = recipients[activeIdx >= 0 ? activeIdx : 0];
   const activeCount =
     activeRecipient?.signatureCoordinates?.length ?? 0;
+  const totalCount = recipients.reduce(
+    (sum, r) => sum + (r.signatureCoordinates?.length ?? 0),
+    0,
+  );
 
   useEffect(() => {
     if (!wrapRef.current) return;
@@ -443,7 +447,7 @@ function FullscreenPinModal({
               })}
             </select>
             <span className="text-[11px] text-muted-foreground">
-              {activeCount} סיכות
+              {activeCount} סיכות · סה״כ {totalCount}
             </span>
           </div>
         </div>
