@@ -113,6 +113,10 @@ export function DocumentPreview({
     });
   };
   const coords = recipient?.signatureCoordinates ?? [];
+  const totalCoords = api.recipients.reduce(
+    (sum, r) => sum + (r.signatureCoordinates?.length ?? 0),
+    0,
+  );
 
   const handleRemovePin = (
     e: React.MouseEvent<HTMLDivElement>,
@@ -307,8 +311,8 @@ export function DocumentPreview({
       </div>
       {file && recipient && (
         <div className="mt-2 text-[11px] text-muted-foreground">
-          {coords.length > 0 ? (
-            <>{coords.length} מיקומי חתימה נבחרו</>
+          {totalCoords > 0 ? (
+            <>{totalCoords} מיקומי חתימה נבחרו (סה״כ לכל הנמענים)</>
           ) : (
             <>טרם נבחר מיקום חתימה — לחץ על המסמך כדי להוסיף</>
           )}
@@ -372,6 +376,10 @@ function FullscreenPinModal({
   const activeRecipient = recipients[activeIdx >= 0 ? activeIdx : 0];
   const activeCount =
     activeRecipient?.signatureCoordinates?.length ?? 0;
+  const totalCount = recipients.reduce(
+    (sum, r) => sum + (r.signatureCoordinates?.length ?? 0),
+    0,
+  );
 
   useEffect(() => {
     if (!wrapRef.current) return;
@@ -439,7 +447,7 @@ function FullscreenPinModal({
               })}
             </select>
             <span className="text-[11px] text-muted-foreground">
-              {activeCount} סיכות
+              {activeCount} סיכות · סה״כ {totalCount}
             </span>
           </div>
         </div>
