@@ -288,11 +288,14 @@ export const downloadSignedDocument = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data: doc, error: docErr } = await supabase
       .from("documents")
-      .select("id, owner_id, file_name, file_path")
+      .select("id, owner_id, file_name, file_path, status")
       .eq("id", data.documentId)
       .maybeSingle();
     if (docErr || !doc) throw new Error("המסמך לא נמצא");
     if (doc.owner_id !== userId) throw new Error("Forbidden");
+    if (doc.status !== "signed") {
+      throw new Error("המסמך טרם נחתם על ידי כל הנמענים");
+    }
 
     const { data: recipients, error: recErr } = await supabase
       .from("recipients")
