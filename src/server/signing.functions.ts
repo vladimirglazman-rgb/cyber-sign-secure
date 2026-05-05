@@ -160,3 +160,28 @@ export const submitSignature = createServerFn({ method: "POST" })
     const row = rows?.[0];
     return { allSigned: !!row?.all_signed };
   });
+
+export const findNextSignerForPhone = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) =>
+    z
+      .object({ token: z.string().min(20).max(200), phone: z.string().min(4).max(40) })
+      .parse(d),
+  )
+  .handler(async ({ data }) => {
+    const phoneNorm = normalizePhone(data.phone);
+    const { data: current } = await supabaseAdmin
+      .from("recipients")
+      .select("document_id")
+      .eq("signing_token", data.token)
+      .maybeSingle();
+    if (!current) return { token: null, name: null };
+    const { data: peers } = await supabaseAdmin
+      .from("recipients")
+      .select("name, phone, signing_token, status")
+      .eq("document_id", current.document_id)
+      .neq("status", "signed");
+    const next = (peers ?? []).find(
+      (r) => normalizePhone(String(r.phone ?? "")) === phoneNorm && r.signing_token,
+    );
+    return next ? { token: next.signing_token, name: next.name } : { token: null, name: null };
+  });

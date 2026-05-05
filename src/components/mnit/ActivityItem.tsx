@@ -29,6 +29,8 @@ export function ActivityItem({ doc }: { doc: DocumentRow }) {
   const pendingSigners = (doc.recipients ?? []).filter(
     (r) => r.signing_token && r.status !== "signed",
   );
+  const signers = (doc.recipients ?? []).filter((r) => r.signing_token);
+  const signedCount = signers.filter((r) => r.status === "signed").length;
   const copy = async (token: string, name: string) => {
     const url = `${window.location.origin}/sign/${token}`;
     try {
@@ -74,6 +76,11 @@ export function ActivityItem({ doc }: { doc: DocumentRow }) {
           >
             {label[doc.status]}
           </span>
+          {signers.length > 0 && (
+            <span className="text-[9px] text-primary/80">
+              {signedCount}/{signers.length} חתמו
+            </span>
+          )}
           <span className="text-[10px] text-muted-foreground">
             {datePart}
             <span className="mx-1 text-primary/50">|</span>
