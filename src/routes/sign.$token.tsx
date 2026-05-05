@@ -12,7 +12,12 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
-import { peekToken, verifySigner, submitSignature } from "@/server/signing.functions";
+import {
+  peekToken,
+  verifySigner,
+  submitSignature,
+  findNextSignerForPhone,
+} from "@/server/signing.functions";
 import { SignatureCanvas, type SignatureCanvasHandle } from "@/components/mnit/SignatureCanvas";
 import { SignerPdfViewer, type SigCoord } from "@/components/mnit/SignerPdfViewer";
 import { MNIT_LEGAL_TERMS } from "@/content/mnit-legal-terms";
@@ -46,7 +51,8 @@ type Ctx = {
 };
 
 function SignPage() {
-  const { token } = Route.useParams();
+  const params = Route.useParams();
+  const [token, setToken] = useState(params.token);
   const [stage, setStage] = useState<Stage>("verify");
   const [peek, setPeek] = useState<Peek | null>(null);
   const [peekErr, setPeekErr] = useState<string | null>(null);
@@ -56,6 +62,7 @@ function SignPage() {
   const [ctx, setCtx] = useState<Ctx | null>(null);
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
+  const [nextSigner, setNextSigner] = useState<{ token: string; name: string } | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -135,10 +142,39 @@ function SignPage() {
             token={token}
             idNumber={idNumber.trim()}
             phone={phone.trim()}
-            onSigned={() => setStage("done")}
+            onSigned={async () => {
+              try {
+                const res = await findNextSignerForPhone({
+                  data: { token, phone: phone.trim() },
+                });
+                if (res?.token) {
+                  setNextSigner({ token: res.token, name: res.name ?? "" });
+                }
+              } catch {
+                /* ignore */
+              }
+              setStage("done");
+            }}
           />
         ) : (
-          <SuccessCard subject={peek.document_subject} />
+          <SuccessCard
+            subject={peek.document_subject}
+            nextSigner={nextSigner}
+            onContinueNext={() => {
+              if (!nextSigner) return;
+              const nt = nextSigner.token;
+              setNextSigner(null);
+              setPeek(null);
+              setPeekErr(null);
+              setIdNumber("");
+              setPhone("");
+              setCtx(null);
+              setAgreedTerms(false);
+              setStage("verify");
+              setToken(nt);
+              window.history.replaceState(null, "", `/sign/${nt}`);
+            }}
+          />
         )}
       </div>
       {showTerms && (
@@ -446,7 +482,15 @@ function ViewerCard({
   );
 }
 
-function SuccessCard({ subject }: { subject: string }) {
+function SuccessCard({
+  subject,
+  nextSigner,
+  onContinueNext,
+}: {
+  subject: string;
+  nextSigner: { token: string; name: string } | null;
+  onContinueNext: () => void;
+}) {
   return (
     <section className="glass-panel flex flex-col items-center p-10 text-center">
       <CheckCircle2 className="mb-4 h-16 w-16 text-primary icon-glow" />
@@ -454,6 +498,20 @@ function SuccessCard({ subject }: { subject: string }) {
       <p className="mt-2 text-sm text-muted-foreground">
         תודה על חתימתך על "{subject}". ניתן לסגור חלון זה.
       </p>
+      {nextSigner && (
+        <div className="mt-6 flex flex-col items-center gap-3 rounded-lg border border-primary/40 bg-primary/5 p-4">
+          <p className="text-sm text-foreground">
+            נמען נוסף ({nextSigner.name}) ממתין לחתימה במכשיר זה.
+          </p>
+          <button
+            type="button"
+            onClick={onContinueNext}
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 font-display text-sm font-bold text-primary-foreground glow-aqua hover:brightness-110"
+          >
+            המשך לחתימה הבאה
+          </button>
+        </div>
+      )}
     </section>
   );
 }
