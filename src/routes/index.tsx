@@ -234,8 +234,39 @@ function LandingPage() {
         </section>
       </main>
 
-      <footer className="relative z-10 border-t border-primary/10 py-6 text-center text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
-        © {new Date().getFullYear()} MNIT Sign · {APP_VERSION}
+      <footer className="relative z-10 border-t border-primary/10 py-8">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-6 text-center">
+          <div className="flex flex-col items-center gap-3 text-sm text-muted-foreground md:flex-row md:gap-4">
+            <span>© 2026 MNIT Cyber AI Hub.</span>
+            <span className="hidden text-primary/30 md:inline">|</span>
+            <a
+              href="mailto:vladimirglazman@gmail.com"
+              className="transition-colors hover:text-primary hover:text-glow"
+            >
+              vladimirglazman@gmail.com
+            </a>
+            <span className="hidden text-primary/30 md:inline">|</span>
+            <a
+              href="tel:0526134890"
+              className="transition-colors hover:text-primary hover:text-glow"
+              dir="ltr"
+            >
+              052-613-4890
+            </a>
+            <span className="hidden text-primary/30 md:inline">|</span>
+            <a
+              href="https://www.linkedin.com/in/vladimirglazman"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-colors hover:text-primary hover:text-glow"
+            >
+              LinkedIn
+            </a>
+          </div>
+          <div className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground/60">
+            MNIT Sign · {APP_VERSION}
+          </div>
+        </div>
       </footer>
     </div>
   );
