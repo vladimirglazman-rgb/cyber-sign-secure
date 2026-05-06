@@ -124,6 +124,20 @@ function LandingPage() {
           מהמתקדמים בעולם — מותאמת לפרילנסרים, עורכי דין ועסקים בישראל.
         </p>
 
+        {/* Marketing video */}
+        <div
+          className="mx-auto mt-10 w-full max-w-3xl overflow-hidden rounded-xl border border-primary/30 glow-aqua"
+          style={{ position: "relative", paddingBottom: "56.25%", height: 0 }}
+        >
+          <iframe
+            src="https://www.loom.com/embed/53630878dbfb4570a47c95105b68a1f9"
+            title="MNIT Sign — סרטון הסבר"
+            frameBorder={0}
+            allowFullScreen
+            style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+          />
+        </div>
+
         <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
           <button
             onClick={handleStart}
