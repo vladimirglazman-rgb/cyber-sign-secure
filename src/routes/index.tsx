@@ -136,7 +136,7 @@ function HomePage() {
             tags={[{ label: "ACTIVE", tone: "green" }]}
             button={
               <a
-                href="https://sign.mnitcyberai.com"
+                href="https://www.mnitcyberai.com"
                 className="inline-flex w-full justify-center items-center py-2.5 px-4 bg-cyan-400 text-slate-950 rounded-lg hover:bg-cyan-300 font-bold transition-colors shadow-[0_0_15px_rgba(34,211,238,0.4)]"
               >
                 חתימה
