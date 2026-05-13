@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Activity, Edit3, Calculator, FileText, Smartphone, Handshake } from "lucide-react";
+import { Activity, Edit3, Calculator, FileText, Smartphone } from "lucide-react";
+import heroBg from "@/assets/hero-bg.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -17,10 +18,19 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   return (
     <div dir="rtl" className="min-h-screen bg-slate-950 text-white font-sans selection:bg-cyan-500/30 flex flex-col items-center">
-      <header className="relative w-full pt-20 pb-12 px-4 flex flex-col items-center text-center">
-        <div className="absolute inset-0 z-0 flex items-center justify-center opacity-10 pointer-events-none">
-          <Handshake className="text-cyan-500" size={300} />
-        </div>
+      <header className="relative w-full pt-20 pb-12 px-4 flex flex-col items-center text-center overflow-hidden">
+        <div
+          aria-hidden
+          className="absolute inset-0 z-0 pointer-events-none bg-center bg-no-repeat bg-contain opacity-25"
+          style={{
+            backgroundImage: `url(${heroBg})`,
+            maskImage:
+              "radial-gradient(ellipse at center, black 30%, transparent 75%)",
+            WebkitMaskImage:
+              "radial-gradient(ellipse at center, black 30%, transparent 75%)",
+          }}
+        />
+        <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-b from-slate-950/40 via-slate-950/60 to-slate-950" />
 
         <div className="relative z-10">
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-4">
