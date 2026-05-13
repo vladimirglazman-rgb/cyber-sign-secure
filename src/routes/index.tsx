@@ -15,6 +15,10 @@ import {
   BrainCircuit,
   Headphones,
   Sun,
+  Activity,
+  Edit3,
+  Smartphone,
+  Handshake,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { APP_VERSION } from "@/lib/app-version";
@@ -107,22 +111,76 @@ function LandingPage() {
 
       {/* Hero */}
       <main className="relative z-10 mx-auto flex max-w-7xl flex-col items-center px-6 pb-24 pt-16 text-center md:pt-28">
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.25em] text-primary text-glow animate-fade-in">
-          <Sparkles className="h-3.5 w-3.5" />
-          Next-Gen Digital Signatures
+        {/* MNIT CYBER AI Hero with handshake graphic */}
+        <div className="relative w-full">
+          <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-10">
+            <Handshake className="text-primary" size={300} />
+          </div>
+          <div className="relative z-10 flex flex-col items-center">
+            <h1 className="font-display text-5xl font-extrabold tracking-tight text-foreground md:text-6xl">
+              MNIT{" "}
+              <span className="text-primary text-glow drop-shadow-[0_0_15px_rgba(48,255,247,0.5)]">
+                CYBER AI
+              </span>
+            </h1>
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
+              ניהול חכם, מאובטח ומבוסס AI לכל היבטי העסק שלך.
+            </p>
+            <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm text-primary/90">
+              <Smartphone className="h-4 w-4" />
+              <span>מותאם באופן מלא למכשירים ניידים</span>
+            </div>
+          </div>
         </div>
 
-        <h1 className="max-w-4xl font-display text-4xl font-extrabold leading-tight text-foreground md:text-6xl">
-          <span className="text-primary text-glow">MNIT Sign</span>
-          <span className="block text-foreground/95">
-            חתימה דיגיטלית חכמה, פשוטה ומאובטחת
-          </span>
-        </h1>
+        {/* 2x2 product grid */}
+        <div className="mt-12 grid w-full max-w-4xl grid-cols-1 gap-6 md:grid-cols-2">
+          {/* MNIT Risk */}
+          <div className="glass-panel flex flex-col rounded-2xl p-6 text-right transition-all duration-300 hover:border-primary/60 hover:shadow-[0_0_30px_-5px_rgba(48,255,247,0.35)]">
+            <div className="mb-4 flex items-start justify-between">
+              <div className="rounded-xl bg-primary/10 p-3 text-primary ring-1 ring-primary/40">
+                <Activity className="h-6 w-6 icon-glow" />
+              </div>
+              <span className="rounded-full border border-purple-400/30 bg-purple-400/10 px-2.5 py-1 text-xs font-semibold tracking-wider text-purple-300">
+                DASHBOARD
+              </span>
+            </div>
+            <h3 className="mb-2 font-display text-xl font-bold text-foreground">MNIT Risk</h3>
+            <p className="mb-6 flex-grow text-sm leading-relaxed text-muted-foreground">
+              ניהול סיכוני השכרה וניתוח נתונים מתקדם למתווכים ובעלי נכסים.
+            </p>
+            <a
+              href="https://risk.mnitcyberai.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full rounded-lg border border-primary px-4 py-2.5 text-center font-display text-sm font-medium uppercase tracking-[0.18em] text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+            >
+              כניסה למערכת
+            </a>
+          </div>
 
-        <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
-          שלחו, חתמו ונהלו מסמכים משפטיים תוך שניות. פלטפורמה עתידנית עם תקני אבטחה
-          מהמתקדמים בעולם — מותאמת לפרילנסרים, עורכי דין ועסקים בישראל.
-        </p>
+          {/* MNIT Sign */}
+          <div className="glass-panel flex flex-col rounded-2xl p-6 text-right transition-all duration-300 hover:border-primary/60 hover:shadow-[0_0_30px_-5px_rgba(48,255,247,0.35)]">
+            <div className="mb-4 flex items-start justify-between">
+              <div className="rounded-xl bg-primary/10 p-3 text-primary ring-1 ring-primary/40">
+                <Edit3 className="h-6 w-6 icon-glow" />
+              </div>
+              <span className="rounded-full border border-green-400/30 bg-green-400/10 px-2.5 py-1 text-xs font-semibold tracking-wider text-green-300">
+                ACTIVE
+              </span>
+            </div>
+            <h3 className="mb-2 font-display text-xl font-bold text-foreground">MNIT Sign</h3>
+            <p className="mb-6 flex-grow text-sm leading-relaxed text-muted-foreground">
+              מערכת חתימה דיגיטלית חכמה ומאובטחת לניהול חוזים והסכמים מכל מכשיר.
+            </p>
+            <button
+              onClick={handleStart}
+              className="w-full rounded-lg bg-primary px-4 py-2.5 text-center font-display text-sm font-bold uppercase tracking-[0.18em] text-primary-foreground glow-aqua transition hover:brightness-110"
+            >
+              חתימה
+            </button>
+          </div>
+        </div>
 
         {/* Marketing video */}
         <div
