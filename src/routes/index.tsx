@@ -1,10 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Smartphone } from "lucide-react";
+import { Activity, Edit3, Calculator, FileText, Smartphone } from "lucide-react";
 import heroBg from "@/assets/hero-bg.png";
-import cardRisk from "@/assets/card-risk.png";
-import cardSign from "@/assets/card-sign.png";
-import cardAccountant from "@/assets/card-accountant.png";
-import cardCv from "@/assets/card-cv.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -52,14 +48,15 @@ function HomePage() {
 
       <main className="relative z-10 w-full max-w-5xl px-4 pb-20">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-slate-900 border border-slate-800 hover:border-cyan-500/50 rounded-2xl overflow-hidden flex flex-col transition-colors">
-            <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-950">
-              <img src={cardRisk} alt="MNIT Risk" className="absolute inset-0 w-full h-full object-cover" />
-              <span className="absolute top-3 left-3 text-xs font-semibold px-2.5 py-1 bg-purple-500/20 text-purple-300 rounded-full border border-purple-500/30 backdrop-blur-sm">
+          <div className="bg-slate-900 border border-slate-800 hover:border-cyan-500/50 rounded-2xl p-6 flex flex-col transition-colors">
+            <div className="flex justify-between items-start mb-4">
+              <div className="p-3 bg-slate-800 rounded-xl text-cyan-400">
+                <Activity size={24} />
+              </div>
+              <span className="text-xs font-semibold px-2.5 py-1 bg-purple-500/10 text-purple-400 rounded-full border border-purple-500/20">
                 DASHBOARD
               </span>
             </div>
-            <div className="p-6 flex flex-col flex-grow">
             <h3 className="text-xl font-bold mb-2">MNIT Risk</h3>
             <p className="text-slate-400 text-sm mb-6 flex-grow">
               ניהול סיכוני השכרה וניתוח נתונים מתקדם למתווכים ובעלי נכסים.
@@ -70,17 +67,17 @@ function HomePage() {
             >
               כניסה למערכת
             </a>
-            </div>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 hover:border-cyan-500/50 rounded-2xl overflow-hidden flex flex-col transition-colors">
-            <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-950">
-              <img src={cardSign} alt="MNIT Sign" className="absolute inset-0 w-full h-full object-cover" />
-              <span className="absolute top-3 left-3 text-xs font-semibold px-2.5 py-1 bg-green-500/20 text-green-300 rounded-full border border-green-500/30 backdrop-blur-sm">
+          <div className="bg-slate-900 border border-slate-800 hover:border-cyan-500/50 rounded-2xl p-6 flex flex-col transition-colors">
+            <div className="flex justify-between items-start mb-4">
+              <div className="p-3 bg-slate-800 rounded-xl text-cyan-400">
+                <Edit3 size={24} />
+              </div>
+              <span className="text-xs font-semibold px-2.5 py-1 bg-green-500/10 text-green-400 rounded-full border border-green-500/20">
                 ACTIVE
               </span>
             </div>
-            <div className="p-6 flex flex-col flex-grow">
             <h3 className="text-xl font-bold mb-2">MNIT Sign</h3>
             <p className="text-slate-400 text-sm mb-6 flex-grow">
               מערכת חתימה דיגיטלית חכמה ומאובטחת לניהול חוזים והסכמים מכל מכשיר.
@@ -91,17 +88,17 @@ function HomePage() {
             >
               חתימה
             </a>
-            </div>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden flex flex-col opacity-80">
-            <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-950">
-              <img src={cardAccountant} alt="רואה חשבון דיגיטלי" className="absolute inset-0 w-full h-full object-cover" />
-              <span className="absolute top-3 left-3 text-xs font-semibold px-2.5 py-1 bg-amber-500/20 text-amber-300 rounded-full border border-amber-500/30 backdrop-blur-sm">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col opacity-80">
+            <div className="flex justify-between items-start mb-4">
+              <div className="p-3 bg-slate-800 rounded-xl text-slate-500">
+                <Calculator size={24} />
+              </div>
+              <span className="text-xs font-semibold px-2.5 py-1 bg-amber-500/10 text-amber-400 rounded-full border border-amber-500/20">
                 בקרוב
               </span>
             </div>
-            <div className="p-6 flex flex-col flex-grow">
             <h3 className="text-xl font-bold mb-2">רואה חשבון דיגיטלי</h3>
             <p className="text-slate-400 text-sm mb-6 flex-grow">
               ניהול פיננסי חכם, מעקב הוצאות והפקת דוחות מבוססי AI.
@@ -109,17 +106,17 @@ function HomePage() {
             <button className="w-full py-2.5 px-4 bg-slate-800 text-slate-500 rounded-lg cursor-not-allowed border border-slate-700">
               Coming Soon
             </button>
-            </div>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 hover:border-cyan-500/50 rounded-2xl overflow-hidden flex flex-col transition-colors">
-            <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-950">
-              <img src={cardCv} alt="MNIT CV" className="absolute inset-0 w-full h-full object-cover" />
-              <span className="absolute top-3 left-3 text-xs font-semibold px-2.5 py-1 bg-blue-500/20 text-blue-300 rounded-full border border-blue-500/30 backdrop-blur-sm">
+          <div className="bg-slate-900 border border-slate-800 hover:border-cyan-500/50 rounded-2xl p-6 flex flex-col transition-colors">
+            <div className="flex justify-between items-start mb-4">
+              <div className="p-3 bg-slate-800 rounded-xl text-cyan-400">
+                <FileText size={24} />
+              </div>
+              <span className="text-xs font-semibold px-2.5 py-1 bg-blue-500/10 text-blue-400 rounded-full border border-blue-500/20">
                 DEVELOPMENT
               </span>
             </div>
-            <div className="p-6 flex flex-col flex-grow">
             <h3 className="text-xl font-bold mb-2">MNIT CV</h3>
             <p className="text-slate-400 text-sm mb-6 flex-grow">
               מערכת ליצירה ואופטימיזציה של קורות חיים בעברית מבוססת בינה מלאכותית.
@@ -127,7 +124,6 @@ function HomePage() {
             <button className="w-full py-2.5 px-4 border border-slate-600 text-slate-300 rounded-lg hover:bg-slate-800 transition-colors">
               יצירת קורות חיים
             </button>
-            </div>
           </div>
         </div>
       </main>
