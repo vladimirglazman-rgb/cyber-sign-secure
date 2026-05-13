@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Smartphone } from "lucide-react";
-import heroBg from "@/assets/hero-bg.png";
 import cardRisk from "@/assets/card-risk.png";
 import cardSign from "@/assets/card-sign.png";
 import cardAccountant from "@/assets/card-accountant.png";
@@ -22,20 +21,7 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   return (
     <div dir="rtl" className="min-h-screen bg-slate-950 text-white font-sans selection:bg-cyan-500/30 flex flex-col items-center">
-      <header className="relative w-full pt-20 pb-12 px-4 flex flex-col items-center text-center overflow-hidden">
-        <div
-          aria-hidden
-          className="absolute inset-0 z-0 pointer-events-none bg-center bg-no-repeat bg-contain opacity-25"
-          style={{
-            backgroundImage: `url(${heroBg})`,
-            maskImage:
-              "radial-gradient(ellipse at center, black 30%, transparent 75%)",
-            WebkitMaskImage:
-              "radial-gradient(ellipse at center, black 30%, transparent 75%)",
-          }}
-        />
-        <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-b from-slate-950/40 via-slate-950/60 to-slate-950" />
-
+      <header className="relative w-full pt-20 pb-12 px-4 flex flex-col items-center text-center overflow-hidden bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950">
         <div className="relative z-10">
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-4">
             MNIT <span className="text-cyan-400 drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]">CYBER AI</span>
@@ -50,16 +36,16 @@ function HomePage() {
         </div>
       </header>
 
-      <main className="relative z-10 w-full max-w-5xl px-4 pb-20">
+      <main className="relative z-10 w-full max-w-7xl px-4 pb-20">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-slate-900 border border-slate-800 hover:border-cyan-500/50 rounded-2xl overflow-hidden flex flex-col transition-colors">
-            <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-950">
+          <div className="bg-slate-900 border border-slate-800 hover:border-cyan-500/50 rounded-2xl overflow-hidden flex flex-row transition-colors min-h-[220px]">
+            <div className="relative w-2/5 shrink-0 overflow-hidden bg-slate-950">
               <img src={cardRisk} alt="MNIT Risk" className="absolute inset-0 w-full h-full object-cover" />
               <span className="absolute top-3 left-3 text-xs font-semibold px-2.5 py-1 bg-purple-500/20 text-purple-300 rounded-full border border-purple-500/30 backdrop-blur-sm">
                 DASHBOARD
               </span>
             </div>
-            <div className="p-6 flex flex-col flex-grow">
+            <div className="p-6 flex flex-col flex-grow w-3/5">
             <h3 className="text-xl font-bold mb-2">MNIT Risk</h3>
             <p className="text-slate-400 text-sm mb-6 flex-grow">
               ניהול סיכוני השכרה וניתוח נתונים מתקדם למתווכים ובעלי נכסים.
@@ -73,14 +59,14 @@ function HomePage() {
             </div>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 hover:border-cyan-500/50 rounded-2xl overflow-hidden flex flex-col transition-colors">
-            <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-950">
+          <div className="bg-slate-900 border border-slate-800 hover:border-cyan-500/50 rounded-2xl overflow-hidden flex flex-row transition-colors min-h-[220px]">
+            <div className="relative w-2/5 shrink-0 overflow-hidden bg-slate-950">
               <img src={cardSign} alt="MNIT Sign" className="absolute inset-0 w-full h-full object-cover" />
               <span className="absolute top-3 left-3 text-xs font-semibold px-2.5 py-1 bg-green-500/20 text-green-300 rounded-full border border-green-500/30 backdrop-blur-sm">
                 ACTIVE
               </span>
             </div>
-            <div className="p-6 flex flex-col flex-grow">
+            <div className="p-6 flex flex-col flex-grow w-3/5">
             <h3 className="text-xl font-bold mb-2">MNIT Sign</h3>
             <p className="text-slate-400 text-sm mb-6 flex-grow">
               מערכת חתימה דיגיטלית חכמה ומאובטחת לניהול חוזים והסכמים מכל מכשיר.
@@ -94,14 +80,14 @@ function HomePage() {
             </div>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden flex flex-col opacity-80">
-            <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-950">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden flex flex-row opacity-80 min-h-[220px]">
+            <div className="relative w-2/5 shrink-0 overflow-hidden bg-slate-950">
               <img src={cardAccountant} alt="רואה חשבון דיגיטלי" className="absolute inset-0 w-full h-full object-cover" />
               <span className="absolute top-3 left-3 text-xs font-semibold px-2.5 py-1 bg-amber-500/20 text-amber-300 rounded-full border border-amber-500/30 backdrop-blur-sm">
                 בקרוב
               </span>
             </div>
-            <div className="p-6 flex flex-col flex-grow">
+            <div className="p-6 flex flex-col flex-grow w-3/5">
             <h3 className="text-xl font-bold mb-2">רואה חשבון דיגיטלי</h3>
             <p className="text-slate-400 text-sm mb-6 flex-grow">
               ניהול פיננסי חכם, מעקב הוצאות והפקת דוחות מבוססי AI.
@@ -112,14 +98,14 @@ function HomePage() {
             </div>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 hover:border-cyan-500/50 rounded-2xl overflow-hidden flex flex-col transition-colors">
-            <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-950">
+          <div className="bg-slate-900 border border-slate-800 hover:border-cyan-500/50 rounded-2xl overflow-hidden flex flex-row transition-colors min-h-[220px]">
+            <div className="relative w-2/5 shrink-0 overflow-hidden bg-slate-950">
               <img src={cardCv} alt="MNIT CV" className="absolute inset-0 w-full h-full object-cover" />
               <span className="absolute top-3 left-3 text-xs font-semibold px-2.5 py-1 bg-blue-500/20 text-blue-300 rounded-full border border-blue-500/30 backdrop-blur-sm">
                 DEVELOPMENT
               </span>
             </div>
-            <div className="p-6 flex flex-col flex-grow">
+            <div className="p-6 flex flex-col flex-grow w-3/5">
             <h3 className="text-xl font-bold mb-2">MNIT CV</h3>
             <p className="text-slate-400 text-sm mb-6 flex-grow">
               מערכת ליצירה ואופטימיזציה של קורות חיים בעברית מבוססת בינה מלאכותית.
