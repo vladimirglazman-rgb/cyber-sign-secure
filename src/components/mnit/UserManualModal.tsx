@@ -223,7 +223,7 @@ export function UserManualModal({ open, onOpenChange }: UserManualModalProps) {
                 לאחר החתימה, הלקוח לוחץ על 'אשר וסיים'.
               </li>
             </ul>
-            <Screenshot src={step2Img} alt="חוויית החותם בנייד" />
+            <Step2Mockup />
           </TabsContent>
 
           <TabsContent value="step3" dir="rtl" className={tabContentClass}>
