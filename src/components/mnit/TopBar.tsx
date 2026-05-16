@@ -1,11 +1,10 @@
-import { Bell, BookOpen, LogOut, ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Bell, BookOpen, LogOut, ShieldCheck } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useDashboard } from "@/hooks/use-dashboard";
 import { supabase } from "@/integrations/supabase/client";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { UserManualModal } from "@/components/mnit/UserManualModal";
 
 export function TopBar() {
   const { data } = useDashboard();
