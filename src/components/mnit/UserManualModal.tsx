@@ -1,4 +1,13 @@
-import { Image as ImageIcon, Upload, FileText, Check } from "lucide-react";
+import {
+  Image as ImageIcon,
+  Upload,
+  FileText,
+  Check,
+  Link2,
+  MessageCircle,
+  Clock,
+  CheckCircle2,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +18,6 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import step3Img from "@/assets/manual/step3-dashboard.png";
 
 interface UserManualModalProps {
   open: boolean;
@@ -18,18 +26,6 @@ interface UserManualModalProps {
 
 const tabContentClass =
   "min-h-[420px] rounded-lg border border-primary/15 bg-background/40 p-6 text-right text-sm leading-relaxed text-foreground/90 space-y-5";
-
-function Screenshot({ src, alt }: { src: string; alt: string }) {
-  return (
-    <div className="mx-auto max-w-2xl rounded-xl border border-primary/40 bg-background/60 p-3 shadow-[0_0_24px_-6px_rgba(48,255,247,0.6)]">
-      <img
-        src={src}
-        alt={alt}
-        className="mx-auto w-auto max-h-[480px] rounded-lg"
-      />
-    </div>
-  );
-}
 
 function Step1Mockup() {
   return (
