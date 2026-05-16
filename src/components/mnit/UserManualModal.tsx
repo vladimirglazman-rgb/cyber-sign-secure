@@ -1,4 +1,4 @@
-import { Image as ImageIcon, Upload, FileText } from "lucide-react";
+import { Image as ImageIcon, Upload, FileText, Check } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,6 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import step2Img from "@/assets/manual/step2-signer.png";
 import step3Img from "@/assets/manual/step3-dashboard.png";
 
 interface UserManualModalProps {
