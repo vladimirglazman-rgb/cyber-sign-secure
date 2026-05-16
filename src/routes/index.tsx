@@ -131,55 +131,6 @@ function LandingPage() {
           </div>
         </div>
 
-        {/* 2x2 product grid */}
-        <div className="mt-12 grid w-full max-w-4xl grid-cols-1 gap-6 md:grid-cols-2">
-          {/* MNIT Risk */}
-          <div className="glass-panel flex flex-col rounded-2xl p-6 text-right transition-all duration-300 hover:border-primary/60 hover:shadow-[0_0_30px_-5px_rgba(48,255,247,0.35)]">
-            <div className="mb-4 flex items-start justify-between">
-              <div className="rounded-xl bg-primary/10 p-3 text-primary ring-1 ring-primary/40">
-                <Activity className="h-6 w-6 icon-glow" />
-              </div>
-              <span className="rounded-full border border-purple-400/30 bg-purple-400/10 px-2.5 py-1 text-xs font-semibold tracking-wider text-purple-300">
-                DASHBOARD
-              </span>
-            </div>
-            <h3 className="mb-2 font-display text-xl font-bold text-foreground">MNIT Risk</h3>
-            <p className="mb-6 flex-grow text-sm leading-relaxed text-muted-foreground">
-              ניהול סיכוני השכרה וניתוח נתונים מתקדם למתווכים ובעלי נכסים.
-            </p>
-            <a
-              href="https://risk.mnitcyberai.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full rounded-lg border border-primary px-4 py-2.5 text-center font-display text-sm font-medium uppercase tracking-[0.18em] text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
-            >
-              כניסה למערכת
-            </a>
-          </div>
-
-          {/* MNIT Sign */}
-          <div className="glass-panel flex flex-col rounded-2xl p-6 text-right transition-all duration-300 hover:border-primary/60 hover:shadow-[0_0_30px_-5px_rgba(48,255,247,0.35)]">
-            <div className="mb-4 flex items-start justify-between">
-              <div className="rounded-xl bg-primary/10 p-3 text-primary ring-1 ring-primary/40">
-                <Edit3 className="h-6 w-6 icon-glow" />
-              </div>
-              <span className="rounded-full border border-green-400/30 bg-green-400/10 px-2.5 py-1 text-xs font-semibold tracking-wider text-green-300">
-                ACTIVE
-              </span>
-            </div>
-            <h3 className="mb-2 font-display text-xl font-bold text-foreground">MNIT Sign</h3>
-            <p className="mb-6 flex-grow text-sm leading-relaxed text-muted-foreground">
-              מערכת חתימה דיגיטלית חכמה ומאובטחת לניהול חוזים והסכמים מכל מכשיר.
-            </p>
-            <button
-              onClick={handleStart}
-              className="w-full rounded-lg bg-primary px-4 py-2.5 text-center font-display text-sm font-bold uppercase tracking-[0.18em] text-primary-foreground glow-aqua transition hover:brightness-110"
-            >
-              חתימה
-            </button>
-          </div>
-        </div>
-
         {/* Marketing video */}
         <div
           className="mx-auto mt-10 w-full max-w-3xl overflow-hidden rounded-xl border border-primary/30 glow-aqua"
