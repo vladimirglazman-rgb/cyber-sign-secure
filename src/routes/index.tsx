@@ -9,20 +9,10 @@ import {
   Smartphone,
   Handshake,
   BookOpen,
-  Image as ImageIcon,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { APP_VERSION } from "@/lib/app-version";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  DialogClose,
-} from "@/components/ui/dialog";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { UserManualModal } from "@/components/mnit/UserManualModal";
 
 export const Route = createFileRoute("/")({
   head: () => ({
