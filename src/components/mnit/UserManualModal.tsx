@@ -1,5 +1,4 @@
 import {
-  Image as ImageIcon,
   Upload,
   FileText,
   Check,
@@ -7,6 +6,9 @@ import {
   MessageCircle,
   Clock,
   CheckCircle2,
+  ShieldCheck,
+  Lock,
+  Sparkles,
 } from "lucide-react";
 import {
   Dialog,
@@ -200,6 +202,50 @@ function Step3Mockup() {
   );
 }
 
+function Step4Certificate() {
+  return (
+    <div className="relative mx-auto max-w-2xl rounded-2xl border-2 border-primary/40 bg-gradient-to-br from-background/80 via-background/60 to-background/80 p-8 shadow-[0_0_40px_-8px_rgba(48,255,247,0.5)]">
+      <Sparkles className="absolute left-3 top-3 h-4 w-4 text-primary/60" />
+      <Sparkles className="absolute right-3 top-3 h-4 w-4 text-primary/60" />
+      <Sparkles className="absolute bottom-3 left-3 h-4 w-4 text-primary/60" />
+      <Sparkles className="absolute bottom-3 right-3 h-4 w-4 text-primary/60" />
+
+      <div
+        dir="rtl"
+        className="rounded-xl border border-primary/20 p-6 text-center sm:p-8"
+      >
+        {/* Seal */}
+        <div className="mx-auto flex h-28 w-28 animate-pulse items-center justify-center rounded-full border border-primary/30 bg-primary/5">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full border border-primary/50 bg-gradient-to-br from-primary/30 to-primary/10 shadow-[0_0_24px_-2px_rgba(48,255,247,0.8)]">
+            <ShieldCheck
+              className="h-10 w-10 text-primary"
+              style={{ filter: "drop-shadow(0 0 8px rgba(48,255,247,0.9))" }}
+            />
+          </div>
+        </div>
+
+        {/* Title */}
+        <h4 className="mt-5 font-display text-xl tracking-wider text-primary text-glow">
+          MNIT — חתימה מאובטחת
+        </h4>
+        <p className="mt-1 inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-primary/80">
+          <Lock className="h-3.5 w-3.5" />
+          Secured &amp; Verified
+        </p>
+
+        {/* Footer chips */}
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
+          <span>מסמך נעול</span>
+          <span className="text-primary/40">·</span>
+          <span>PDF Flattened</span>
+          <span className="text-primary/40">·</span>
+          <span>ארכיון ענן</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function UserManualModal({ open, onOpenChange }: UserManualModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -333,12 +379,7 @@ export function UserManualModal({ open, onOpenChange }: UserManualModalProps) {
                 ויישמר בארכיון הענן המאובטח שלכם במערכת.
               </li>
             </ul>
-            <div className="mx-auto flex h-64 max-w-2xl flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-primary/30 bg-primary/5">
-              <ImageIcon className="h-10 w-10 text-primary/60" />
-              <span className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
-                מקום שמור לצילום מסך
-              </span>
-            </div>
+            <Step4Certificate />
           </TabsContent>
         </Tabs>
 
