@@ -8,9 +8,20 @@ import {
   Zap,
   Smartphone,
   Handshake,
+  BookOpen,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { APP_VERSION } from "@/lib/app-version";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -34,6 +45,7 @@ export const Route = createFileRoute("/")({
 function LandingPage() {
   const navigate = useNavigate();
   const [authed, setAuthed] = useState(false);
+  const [manualOpen, setManualOpen] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setAuthed(!!data.session));
@@ -82,6 +94,14 @@ function LandingPage() {
           </div>
         </div>
         <nav className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setManualOpen(true)}
+            className="group inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-3 py-1.5 text-xs font-display tracking-wider text-secondary transition hover:border-primary/70 hover:text-primary hover:bg-primary/10 hover:shadow-[0_0_12px_rgba(48,255,247,0.6)]"
+          >
+            <BookOpen className="h-4 w-4 transition group-hover:drop-shadow-[0_0_8px_rgba(48,255,247,0.9)]" />
+            <span>מדריך למשתמש 📘</span>
+          </button>
           <Link
             to="/auth"
             className="rounded-md px-3 py-2 text-sm text-muted-foreground transition hover:text-foreground"
@@ -222,6 +242,58 @@ function LandingPage() {
           </div>
         </div>
       </footer>
+
+      <Dialog open={manualOpen} onOpenChange={setManualOpen}>
+        <DialogContent
+          dir="rtl"
+          className="max-w-2xl border border-primary/30 bg-background/80 backdrop-blur-xl shadow-[0_0_40px_-10px_rgba(48,255,247,0.4)]"
+        >
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl tracking-wider text-primary text-glow text-right">
+              מדריך למשתמש 📘
+            </DialogTitle>
+            <DialogDescription className="text-right text-muted-foreground">
+              מדריך מהיר לשימוש במערכת MNIT Sign
+            </DialogDescription>
+          </DialogHeader>
+
+          <Tabs defaultValue="intro" className="w-full" dir="rtl">
+            <TabsList className="grid w-full grid-cols-4 bg-primary/5 border border-primary/20">
+              <TabsTrigger value="intro">מבוא ושלב 1</TabsTrigger>
+              <TabsTrigger value="step2">שלב 2</TabsTrigger>
+              <TabsTrigger value="step3">שלב 3</TabsTrigger>
+              <TabsTrigger value="step4">שלב 4</TabsTrigger>
+            </TabsList>
+            <TabsContent value="intro" className="min-h-[220px] rounded-lg border border-primary/15 bg-background/40 p-5 text-sm leading-relaxed text-foreground/90">
+              <h3 className="mb-2 font-display text-primary text-glow">מבוא ושלב 1 – העלאת מסמך</h3>
+              <p>ברוכים הבאים ל-MNIT Sign. בשלב הראשון, גררו או בחרו את קובץ ה-PDF שברצונכם להחתים. המערכת תזהה את המסמך ותכין אותו לעריכה.</p>
+            </TabsContent>
+            <TabsContent value="step2" className="min-h-[220px] rounded-lg border border-primary/15 bg-background/40 p-5 text-sm leading-relaxed text-foreground/90">
+              <h3 className="mb-2 font-display text-primary text-glow">שלב 2 – הוספת נמענים</h3>
+              <p>הוסיפו את פרטי הנמענים: שם מלא, כתובת אימייל ומספר טלפון. ניתן להוסיף מספר חותמים ולקבוע את סדר החתימה.</p>
+            </TabsContent>
+            <TabsContent value="step3" className="min-h-[220px] rounded-lg border border-primary/15 bg-background/40 p-5 text-sm leading-relaxed text-foreground/90">
+              <h3 className="mb-2 font-display text-primary text-glow">שלב 3 – הגדרות ושליחה</h3>
+              <p>הגדירו את תוקף החתימה, הוסיפו הודעה אישית ושלחו את הבקשה. הנמענים יקבלו קישור מאובטח לחתימה.</p>
+            </TabsContent>
+            <TabsContent value="step4" className="min-h-[220px] rounded-lg border border-primary/15 bg-background/40 p-5 text-sm leading-relaxed text-foreground/90">
+              <h3 className="mb-2 font-display text-primary text-glow">שלב 4 – מעקב והשלמה</h3>
+              <p>עקבו אחר סטטוס החתימות מהדשבורד. לאחר השלמת כל החתימות, תקבלו מסמך חתום עם חותמת זמן וביקורת מלאה.</p>
+            </TabsContent>
+          </Tabs>
+
+          <DialogFooter className="sm:justify-start">
+            <DialogClose asChild>
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-4 py-2 text-xs font-display tracking-wider text-primary transition hover:bg-primary/20 hover:shadow-[0_0_12px_rgba(48,255,247,0.6)]"
+              >
+                סגור
+              </button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
