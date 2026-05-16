@@ -9,6 +9,7 @@ import {
   Smartphone,
   Handshake,
   BookOpen,
+  Image as ImageIcon,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { APP_VERSION } from "@/lib/app-version";
@@ -246,7 +247,7 @@ function LandingPage() {
       <Dialog open={manualOpen} onOpenChange={setManualOpen}>
         <DialogContent
           dir="rtl"
-          className="max-w-2xl border border-primary/30 bg-background/80 backdrop-blur-xl shadow-[0_0_40px_-10px_rgba(48,255,247,0.4)]"
+          className="max-w-5xl max-h-[90vh] overflow-y-auto border border-primary/30 bg-background/80 backdrop-blur-xl shadow-[0_0_40px_-10px_rgba(48,255,247,0.4)]"
         >
           <DialogHeader>
             <DialogTitle className="font-display text-xl tracking-wider text-primary text-glow text-right">
@@ -264,9 +265,52 @@ function LandingPage() {
               <TabsTrigger value="step3">שלב 3</TabsTrigger>
               <TabsTrigger value="step4">שלב 4</TabsTrigger>
             </TabsList>
-            <TabsContent value="intro" className="min-h-[220px] rounded-lg border border-primary/15 bg-background/40 p-5 text-sm leading-relaxed text-foreground/90">
-              <h3 className="mb-2 font-display text-primary text-glow">מבוא ושלב 1 – העלאת מסמך</h3>
-              <p>ברוכים הבאים ל-MNIT Sign. בשלב הראשון, גררו או בחרו את קובץ ה-PDF שברצונכם להחתים. המערכת תזהה את המסמך ותכין אותו לעריכה.</p>
+            <TabsContent
+              value="intro"
+              dir="rtl"
+              className="min-h-[420px] rounded-lg border border-primary/15 bg-background/40 p-6 text-right text-sm leading-relaxed text-foreground/90 space-y-5"
+            >
+              <h2 className="font-display text-2xl text-primary text-glow">
+                📘 MNIT Sign – חתימה דיגיטלית חכמה
+              </h2>
+              <p className="leading-7">
+                ברוכים הבאים ל-MNIT Sign, הפלטפורמה המאובטחת לניהול והחתמת מסמכים דיגיטליים.
+                המערכת נועדה לחסוך לכם זמן, ניירת וכאב ראש משפטי. הנה כל מה שאתם צריכים לדעת
+                כדי לצאת לדרך:
+              </p>
+              <h3 className="font-display text-lg text-primary/90">
+                1. 📤 יצירת בקשת חתימה (לשולח המסמך)
+              </h3>
+              <ul className="space-y-3 list-none pr-0">
+                <li className="leading-7">
+                  <span className="text-primary">•</span>{" "}
+                  <span className="font-semibold text-foreground">העלאת קובץ:</span>{" "}
+                  במסך הראשי, לחצו על כפתור 'העלה מסמך' ובחרו את קובץ ה-PDF שלכם (לדוגמה: חוזה שכירות).
+                </li>
+                <li className="leading-7">
+                  <span className="text-primary">•</span>{" "}
+                  <span className="font-semibold text-foreground">הוספת נמענים:</span>{" "}
+                  הזינו את שמות החותמים (שוכר, ערב 1 וכו') ואת מספרי הטלפון שלהם לקבלת הקישור בווטסאפ.
+                  הערה: ניתן לשלוח גם למספר טלפון זהה אם החותמים יושבים יחד.
+                </li>
+                <li className="leading-7">
+                  <span className="text-primary">•</span>{" "}
+                  <span className="font-semibold text-foreground">הנחת סיכות (Pins):</span>{" "}
+                  לחצו על האזורים במסמך שבהם נדרשת חתימה. שייכו כל 'סיכה' לנמען המתאים כדי שהמערכת
+                  תדע מי צריך לחתום ואיפה.
+                </li>
+                <li className="leading-7">
+                  <span className="text-primary">•</span>{" "}
+                  <span className="font-semibold text-foreground">שיגור:</span>{" "}
+                  לחצו על 'שלח לחתימה'. המערכת תייצר קישור מאובטח ותפיץ אותו לנמענים.
+                </li>
+              </ul>
+              <div className="flex h-64 w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-primary/30 bg-primary/5">
+                <ImageIcon className="h-10 w-10 text-primary/60" />
+                <span className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
+                  מקום שמור לצילום מסך
+                </span>
+              </div>
             </TabsContent>
             <TabsContent value="step2" className="min-h-[220px] rounded-lg border border-primary/15 bg-background/40 p-5 text-sm leading-relaxed text-foreground/90">
               <h3 className="mb-2 font-display text-primary text-glow">שלב 2 – הוספת נמענים</h3>

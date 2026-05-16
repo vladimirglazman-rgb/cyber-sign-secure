@@ -1,26 +1,27 @@
-## Goal
-Make the "מדריך למשתמש 📘" button + modal visible on the public homepage (`/`), which is what you're currently previewing. Today it only exists in `TopBar.tsx`, which renders inside the authenticated `/app` layout — that's why nothing shows up on `/`.
+## Optimize User Manual Modal
 
-## Changes
-Single file: `src/routes/index.tsx`
+Edit `src/routes/index.tsx` only — no other files touched.
 
-1. **Header nav** (next to "התחברות" / "מתחילים עכשיו"):
-   - Add a button styled to match the existing nav (rounded, primary/30 border, cyan glow on hover) with `BookOpen` icon + label `מדריך למשתמש 📘`.
-   - Wire it to a local `useState` `manualOpen` / `setManualOpen`.
+### 1. Enlarge the modal
+On the `<DialogContent>` for `manualOpen`, change `max-w-2xl` → `max-w-5xl` and add `max-h-[90vh] overflow-y-auto` so the taller content scrolls cleanly on smaller viewports.
 
-2. **Modal** (rendered at the bottom of `LandingPage`, outside `<main>`):
-   - Reuse the exact same `Dialog` + `Tabs` markup already in `TopBar.tsx` (4 tabs: `מבוא ושלב 1`, `שלב 2`, `שלב 3`, `שלב 4`, with the same Hebrew content and "סגור" close button).
-   - Same dark glass styling: `bg-background/80 backdrop-blur-xl`, `border-primary/30`, cyan shadow.
+### 2. Rewrite Tab 1 content (`value="intro"`)
+Replace the current intro `<TabsContent>` body with the exact RTL Hebrew copy provided, structured as:
+- H2 title: `📘 MNIT Sign – חתימה דיגיטלית חכמה` (using `font-display text-primary text-glow`, larger size)
+- Intro paragraph (welcome text)
+- Section heading: `1. 📤 יצירת בקשת חתימה (לשולח המסמך)`
+- A `<ul>` of 4 bullet items (`העלאת קובץ`, `הוספת נמענים`, `הנחת סיכות`, `שיגור`), each with the bold lead phrase + description, using bullet markers consistent with `•`
+- Spacing tuned with `space-y-4`, comfortable line-height, `text-right` and `dir="rtl"` enforced on the tab content
 
-3. **Imports to add** to `src/routes/index.tsx`:
-   - `BookOpen` from `lucide-react`
-   - `Dialog`, `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogDescription`, `DialogFooter`, `DialogClose` from `@/components/ui/dialog`
-   - `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` from `@/components/ui/tabs`
+### 3. Image placeholder box
+Below the bullet list (replacing `[IMAGE_PLACEHOLDER_1]`), add a centered placeholder:
+- Full-width, ~`h-64`, `rounded-xl`
+- `border border-dashed border-primary/30 bg-primary/5`
+- Centered icon (`ImageIcon` from `lucide-react`) + caption text `מקום שמור לצילום מסך` in muted color
+- New import: add `ImageIcon` to the existing `lucide-react` import
 
-## Out of scope
-- No changes to `TopBar.tsx` (the authenticated dashboard keeps its own copy).
-- No extraction into a shared component yet — can do that later if you want to dedupe. Say the word and I'll refactor both call sites to use a single `<UserManualButton />`.
-- No routing, auth, or backend changes.
+### Out of scope
+Tabs 2–4 content, modal styling beyond size, the TopBar copy of the modal, any backend or routing change.
 
-## Verification
-After the edit, the button appears in the top-right of the landing page header at `/`, clicking it opens the dark modal with 4 working tabs, and "סגור" closes it.
+### Verification
+After the edit, open `/`, click `מדריך למשתמש 📘`: modal is noticeably wider/taller, Tab 1 shows the new RTL structured content with the dashed placeholder box, other tabs unchanged, `סגור` still closes it.
