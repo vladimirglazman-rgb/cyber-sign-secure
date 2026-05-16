@@ -1,5 +1,4 @@
 import {
-  Image as ImageIcon,
   Upload,
   FileText,
   Check,
@@ -7,6 +6,9 @@ import {
   MessageCircle,
   Clock,
   CheckCircle2,
+  ShieldCheck,
+  Lock,
+  Sparkles,
 } from "lucide-react";
 import {
   Dialog,

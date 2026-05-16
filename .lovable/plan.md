@@ -1,54 +1,56 @@
-## Tab 3 Visual Upgrade — Coded dashboard mockup for "לוח בקרה"
+## Tab 4 Visual Upgrade — Coded "Secured Digital Certificate" mockup
 
 ### Scope
-Only Tab 3 inside `src/components/mnit/UserManualModal.tsx`. Tabs 1, 2, 4 untouched. No text changes.
+Only Tab 4 inside `src/components/mnit/UserManualModal.tsx`. Tabs 1, 2, 3 untouched. No text changes.
 
 ### Changes
 
-1. **Remove image for Tab 3**
-   - Delete `import step3Img from "@/assets/manual/step3-dashboard.png"`.
-   - Remove `<Screenshot src={step3Img} alt="לוח בקרה ופעילות אחרונה" />`.
-   - Leave PNG on disk; `Screenshot` helper stays (unused now — also remove to keep file clean).
+1. **Remove the dashed placeholder**
+   - Delete the `<div className="mx-auto flex h-64 max-w-2xl ... border-dashed ...">` block containing the `ImageIcon` and "מקום שמור לצילום מסך" label.
+   - Remove the now-unused `Image as ImageIcon` from the lucide-react import.
 
-2. **Add icons** from lucide-react alongside existing imports: `Link2`, `MessageCircle`, `Clock`, `CheckCircle2`.
+2. **Add icons** from lucide-react: `ShieldCheck`, `Lock`, `Sparkles`.
 
-3. **Add `Step3Mockup` component** rendered in place of the removed screenshot, inside the same glowing cyan card wrapper used in Tabs 1/2 (`mx-auto max-w-2xl rounded-xl border border-primary/40 bg-background/60 p-4 shadow-[0_0_24px_-6px_rgba(48,255,247,0.6)]`).
+3. **Add `Step4Certificate` component** rendered in place of the removed placeholder.
 
-   **Structure (RTL, dark):**
+   **Structure (RTL, dark, centered):**
 
    ```text
-   ┌─ Card (cyan glow) ─────────────────────────────────────┐
-   │  פעילות אחרונה                                  📊      │
-   │  ──────────────────────────────────────────────────    │
-   │  [⏳ ממתין]  חוזה שכירות — ולדימיר   [🔗 העתק] [💬 וואטסאפ] │
-   │  [✓ נחתם]   הסכם NDA — סופיה        [🔗 העתק] [💬 וואטסאפ] │
-   │  [⏳ ממתין]  ייפוי כוח — דניאל        [🔗 העתק] [💬 וואטסאפ] │
-   └────────────────────────────────────────────────────────┘
+   ┌═══════════════════════════════════════════════════════┐
+   ║  ✦                                                 ✦  ║
+   ║         ┌─ outer ring (cyan glow) ─┐                  ║
+   ║         │   ┌─ inner seal ─┐       │                  ║
+   ║         │   │   🛡  (glow)   │      │                  ║
+   ║         │   └───────────────┘       │                  ║
+   ║         └────────────────────────────┘                 ║
+   ║                                                       ║
+   ║          MNIT — חתימה מאובטחת                          ║
+   ║         🔒 Secured & Verified                          ║
+   ║                                                       ║
+   ║   ── מסמך נעול · PDF Flattened · ארכיון ענן ──        ║
+   ║  ✦                                                 ✦  ║
+   └═══════════════════════════════════════════════════════┘
    ```
 
    **Implementation details (Tailwind):**
-   - Header row: `flex items-center justify-between border-b border-primary/15 pb-2 mb-3` with `text-sm font-display text-primary tracking-wider` title "פעילות אחרונה" on the right (RTL).
-   - Three rows in a `space-y-2` list. Each row: `flex items-center justify-between gap-3 rounded-lg border border-primary/15 bg-background/60 p-3 hover:border-primary/30 transition-colors`.
-   - **Right side (document + status):** `flex items-center gap-2.5`
-     - Status badge:
-       - Pending: `inline-flex items-center gap-1 rounded-md bg-amber-500/15 px-2 py-0.5 text-[11px] font-semibold text-amber-400` + `Clock` icon (h-3 w-3) + "ממתין לחתימה"
-       - Signed: `inline-flex items-center gap-1 rounded-md bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-400` + `CheckCircle2` icon + "נחתם"
-     - Document name: `text-sm font-semibold text-foreground` + small `text-xs text-muted-foreground` for recipient ("· ולדימיר").
-   - **Left side (actions):** `flex items-center gap-2`
-     - "העתק קישור" button: `inline-flex items-center gap-1.5 rounded-md border border-primary/30 bg-primary/10 px-2.5 py-1 text-[11px] font-semibold text-primary hover:bg-primary/20` + `Link2` icon h-3 w-3.
-     - "וואטסאפ" button: `inline-flex items-center gap-1.5 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-400 hover:bg-emerald-500/20` + `MessageCircle` icon h-3 w-3.
-   - All inner content `dir="rtl"` and `text-right`.
+   - Outer certificate frame: `mx-auto max-w-2xl relative rounded-2xl border-2 border-primary/40 bg-gradient-to-br from-background/80 via-background/60 to-background/80 p-8 shadow-[0_0_40px_-8px_rgba(48,255,247,0.5)]`.
+   - Add a second inner border ring for the "official document" look: nested `<div className="rounded-xl border border-primary/20 p-6 sm:p-8">`.
+   - Four corner ornaments: absolutely-positioned `Sparkles` icons (h-4 w-4 text-primary/60) at top-left, top-right, bottom-left, bottom-right of the outer frame.
+   - **Seal stack (centered):**
+     - Outer pulsing ring: `mx-auto h-28 w-28 rounded-full border border-primary/30 bg-primary/5 flex items-center justify-center animate-pulse`.
+     - Inner solid disc: `h-20 w-20 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 border border-primary/50 flex items-center justify-center shadow-[0_0_24px_-2px_rgba(48,255,247,0.8)]`.
+     - Icon: `<ShieldCheck className="h-10 w-10 text-primary drop-shadow-[0_0_8px_rgba(48,255,247,0.9)]" />`.
+   - **Title block (below seal, centered, RTL):**
+     - `<h4 className="mt-5 font-display text-xl tracking-wider text-primary text-glow">MNIT — חתימה מאובטחת</h4>`
+     - Sub-line: `<p className="mt-1 inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-primary/80"><Lock className="h-3.5 w-3.5" /> Secured & Verified</p>`
+   - **Footer divider line:** `mt-6 flex items-center justify-center gap-3 text-[11px] uppercase tracking-[0.25em] text-muted-foreground` with three small chips separated by `·`: "מסמך נעול", "PDF Flattened", "ארכיון ענן".
+   - Wrapping container `dir="rtl"` and `text-center` for the title/footer area.
 
-   **Sample data (3 rows):**
-   - `{ doc: "חוזה שכירות", recipient: "ולדימיר", status: "pending" }`
-   - `{ doc: "הסכם NDA", recipient: "סופיה", status: "signed" }`
-   - `{ doc: "ייפוי כוח", recipient: "דניאל", status: "pending" }`
-
-4. **Keep all Tab 3 Hebrew copy unchanged** — `h3` + paragraph + 2-bullet list stay exactly as they are, `text-right` RTL.
+4. **Keep all Tab 4 Hebrew copy unchanged** — `h3` + 2-bullet list stay exactly as they are, `text-right` RTL.
 
 ### Out of scope
-- Tabs 1, 2, 4 (no changes).
-- Tab 3 text content.
-- Deleting the PNG file from `src/assets/manual/`.
+- Tabs 1, 2, 3 (no changes).
+- Tab 4 text content.
+- New asset files.
 
 Approve and I'll implement.
