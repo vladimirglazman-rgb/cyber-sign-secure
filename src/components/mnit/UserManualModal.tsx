@@ -335,12 +335,7 @@ export function UserManualModal({ open, onOpenChange }: UserManualModalProps) {
                 ויישמר בארכיון הענן המאובטח שלכם במערכת.
               </li>
             </ul>
-            <div className="mx-auto flex h-64 max-w-2xl flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-primary/30 bg-primary/5">
-              <ImageIcon className="h-10 w-10 text-primary/60" />
-              <span className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
-                מקום שמור לצילום מסך
-              </span>
-            </div>
+            <Step4Certificate />
           </TabsContent>
         </Tabs>
 
