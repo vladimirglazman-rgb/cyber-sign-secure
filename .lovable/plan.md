@@ -1,56 +1,46 @@
-## Tab 4 Visual Upgrade — Coded "Secured Digital Certificate" mockup
+## Technology Stack Section — Landing Page
 
-### Scope
-Only Tab 4 inside `src/components/mnit/UserManualModal.tsx`. Tabs 1, 2, 3 untouched. No text changes.
+### Goal
+Add a premium "Technology Stack" section to the public landing page (`/`) just above the Footer, showcasing the 7 technologies behind MNIT Sign with a high-end dark-mode cyber aesthetic aligned to the existing design system.
 
-### Changes
+### Design
+- **Position**: Inside `<main>` or as a sibling section between the Feature tiles and the `<footer>`.
+- **Container**: `max-w-5xl mx-auto px-6` (matches existing feature tiles width).
+- **Header**: Hebrew title `הטכנולוגיה שמאחורי המערכת` in `font-display`, centered, with a subtle `text-glow` or `text-primary` accent and a short decorative divider line.
+- **Grid**: Responsive grid of 7 cards:
+  - Mobile: 1 column
+  - Tablet (`sm`): 2 columns
+  - Desktop (`md`+): 3 columns with the last row centered (4+3 layout) OR a 4+3 natural wrap.
+- **Card style**: Reuse the existing `glass-panel` utility with `text-right` RTL alignment. Each card contains:
+  - A Lucide icon inside a `rounded-lg bg-primary/15 ring-1 ring-primary/40` container (`h-10 w-10`)
+  - Technology name in `font-display` bold
+  - Hebrew description in `text-muted-foreground` (`text-sm`)
+- **Hover**: Cards lift subtly via `hover:border-primary/50` transition (same as feature tiles).
+- **Icons** (one per card, chosen from `lucide-react`):
+  1. Lovable — `Wand2` or `Sparkles`
+  2. React & Vite — `Code2` or `Monitor`
+  3. Tailwind CSS — `Paintbrush` or `Layers`
+  4. Supabase — `Database` or `Cloud`
+  5. GitHub — `Github` (Lucide icon)
+  6. AI Engine — `Brain` or `Cpu`
+  7. Cloudflare — `Shield` or `Globe`
 
-1. **Remove the dashed placeholder**
-   - Delete the `<div className="mx-auto flex h-64 max-w-2xl ... border-dashed ...">` block containing the `ImageIcon` and "מקום שמור לצילום מסך" label.
-   - Remove the now-unused `Image as ImageIcon` from the lucide-react import.
+### Content (RTL)
+| Tech | Hebrew Description |
+|------|-------------------|
+| Lovable | פיתוח מבוסס AI לבנייה מהירה, פריסה חכמה ועדכוני קוד בזמן אמת. |
+| React & Vite | חוויית משתמש מהירה במיוחד, יציבה ומודרנית. |
+| Tailwind CSS | עיצוב רספונסיבי, נקי וחדשני המותאם לכל מכשיר. |
+| Supabase | מסד נתונים מאובטח בענן, ניהול משתמשים ותשתית Backend חזקה. |
+| GitHub | ניהול קוד מקצועי, בקרת גרסאות ואבטחה ברמה ארגונית (Enterprise). |
+| AI Engine | מנוע בינה מלאכותית מתקדם לעיבוד, ניתוח ושכלול מסמכים אוטומטי. |
+| Cloudflare | הגנת DDoS, אבטחת DNS ותעודות SSL להגנה מקסימלית על המידע. |
 
-2. **Add icons** from lucide-react: `ShieldCheck`, `Lock`, `Sparkles`.
+### Scope & Out of Scope
+- **In scope**: New section markup + CSS classes in `src/routes/index.tsx` only. Import any additional Lucide icons needed.
+- **Out of scope**: No new components, no style system changes, no backend logic, no route changes. Reuse existing `glass-panel` and typography tokens.
 
-3. **Add `Step4Certificate` component** rendered in place of the removed placeholder.
-
-   **Structure (RTL, dark, centered):**
-
-   ```text
-   ┌═══════════════════════════════════════════════════════┐
-   ║  ✦                                                 ✦  ║
-   ║         ┌─ outer ring (cyan glow) ─┐                  ║
-   ║         │   ┌─ inner seal ─┐       │                  ║
-   ║         │   │   🛡  (glow)   │      │                  ║
-   ║         │   └───────────────┘       │                  ║
-   ║         └────────────────────────────┘                 ║
-   ║                                                       ║
-   ║          MNIT — חתימה מאובטחת                          ║
-   ║         🔒 Secured & Verified                          ║
-   ║                                                       ║
-   ║   ── מסמך נעול · PDF Flattened · ארכיון ענן ──        ║
-   ║  ✦                                                 ✦  ║
-   └═══════════════════════════════════════════════════════┘
-   ```
-
-   **Implementation details (Tailwind):**
-   - Outer certificate frame: `mx-auto max-w-2xl relative rounded-2xl border-2 border-primary/40 bg-gradient-to-br from-background/80 via-background/60 to-background/80 p-8 shadow-[0_0_40px_-8px_rgba(48,255,247,0.5)]`.
-   - Add a second inner border ring for the "official document" look: nested `<div className="rounded-xl border border-primary/20 p-6 sm:p-8">`.
-   - Four corner ornaments: absolutely-positioned `Sparkles` icons (h-4 w-4 text-primary/60) at top-left, top-right, bottom-left, bottom-right of the outer frame.
-   - **Seal stack (centered):**
-     - Outer pulsing ring: `mx-auto h-28 w-28 rounded-full border border-primary/30 bg-primary/5 flex items-center justify-center animate-pulse`.
-     - Inner solid disc: `h-20 w-20 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 border border-primary/50 flex items-center justify-center shadow-[0_0_24px_-2px_rgba(48,255,247,0.8)]`.
-     - Icon: `<ShieldCheck className="h-10 w-10 text-primary drop-shadow-[0_0_8px_rgba(48,255,247,0.9)]" />`.
-   - **Title block (below seal, centered, RTL):**
-     - `<h4 className="mt-5 font-display text-xl tracking-wider text-primary text-glow">MNIT — חתימה מאובטחת</h4>`
-     - Sub-line: `<p className="mt-1 inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-primary/80"><Lock className="h-3.5 w-3.5" /> Secured & Verified</p>`
-   - **Footer divider line:** `mt-6 flex items-center justify-center gap-3 text-[11px] uppercase tracking-[0.25em] text-muted-foreground` with three small chips separated by `·`: "מסמך נעול", "PDF Flattened", "ארכיון ענן".
-   - Wrapping container `dir="rtl"` and `text-center` for the title/footer area.
-
-4. **Keep all Tab 4 Hebrew copy unchanged** — `h3` + 2-bullet list stay exactly as they are, `text-right` RTL.
-
-### Out of scope
-- Tabs 1, 2, 3 (no changes).
-- Tab 4 text content.
-- New asset files.
-
-Approve and I'll implement.
+### Implementation Notes
+- The page already has `dir="rtl"` on `<html>`, so `text-right` on cards will align correctly.
+- The existing 3 feature tiles use an identical card pattern — the new section will follow that markup structure exactly for visual consistency.
+- Add `mt-20` (or `mt-24`) spacing above the new section to separate it from the feature tiles, and `pb-24` on `<main>` may need adjustment or the section can live just before the footer with its own `py-16` padding.

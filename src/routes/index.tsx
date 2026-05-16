@@ -9,6 +9,13 @@ import {
   Smartphone,
   Handshake,
   BookOpen,
+  Wand2,
+  Code2,
+  Paintbrush,
+  Database,
+  Github,
+  Brain,
+  Cloud,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { APP_VERSION } from "@/lib/app-version";
@@ -196,6 +203,44 @@ function LandingPage() {
             </div>
           ))}
         </div>
+
+        {/* Technology Stack */}
+        <section className="mt-24 w-full max-w-5xl" dir="rtl">
+          <div className="mb-10 text-center">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-[10px] font-display uppercase tracking-[0.3em] text-primary/90">
+              <Sparkles className="h-3.5 w-3.5" />
+              <span>Tech Stack</span>
+            </div>
+            <h2 className="font-display text-3xl font-extrabold tracking-tight text-foreground md:text-4xl">
+              <span className="text-primary text-glow">הטכנולוגיה</span> שמאחורי המערכת
+            </h2>
+            <div className="mx-auto mt-4 h-px w-24 bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {[
+              { icon: Wand2, name: "Lovable", desc: "פיתוח מבוסס AI לבנייה מהירה, פריסה חכמה ועדכוני קוד בזמן אמת." },
+              { icon: Code2, name: "React & Vite", desc: "חוויית משתמש מהירה במיוחד, יציבה ומודרנית." },
+              { icon: Paintbrush, name: "Tailwind CSS", desc: "עיצוב רספונסיבי, נקי וחדשני המותאם לכל מכשיר." },
+              { icon: Database, name: "Supabase", desc: "מסד נתונים מאובטח בענן, ניהול משתמשים ותשתית Backend חזקה." },
+              { icon: Github, name: "GitHub", desc: "ניהול קוד מקצועי, בקרת גרסאות ואבטחה ברמה ארגונית (Enterprise)." },
+              { icon: Brain, name: "AI Engine", desc: "מנוע בינה מלאכותית מתקדם לעיבוד, ניתוח ושכלול מסמכים אוטומטי." },
+              { icon: Cloud, name: "Cloudflare", desc: "הגנת DDoS, אבטחת DNS ותעודות SSL להגנה מקסימלית על המידע." },
+            ].map((t) => (
+              <div
+                key={t.name}
+                className="glass-panel group p-5 text-right transition hover:border-primary/60 hover:shadow-[0_0_24px_-6px_rgba(48,255,247,0.55)]"
+              >
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/40 transition group-hover:bg-primary/25">
+                  <t.icon className="h-5 w-5 text-primary icon-glow" />
+                </div>
+                <h3 className="mb-1 font-display text-sm font-bold tracking-wide text-foreground">
+                  {t.name}
+                </h3>
+                <p className="text-xs leading-relaxed text-muted-foreground">{t.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
       </main>
 
