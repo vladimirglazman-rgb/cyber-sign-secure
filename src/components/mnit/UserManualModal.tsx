@@ -73,6 +73,65 @@ function Step1Mockup() {
   );
 }
 
+function Step2Mockup() {
+  return (
+    <div className="mx-auto w-[300px] rounded-[2.5rem] border border-primary/40 bg-background/80 p-2 shadow-[0_0_32px_-6px_rgba(48,255,247,0.6)]">
+      <div className="mx-auto mb-1 h-1.5 w-16 rounded-full bg-primary/30" />
+      <div dir="rtl" className="space-y-3 rounded-[2rem] bg-[#0a1525] p-3">
+        {/* Status bar */}
+        <div className="flex justify-between text-[10px] text-muted-foreground">
+          <span>9:41</span>
+          <span>●●●● 100%</span>
+        </div>
+
+        {/* Document preview */}
+        <div className="space-y-1.5 rounded-lg border border-primary/15 bg-background/60 p-3">
+          <div className="h-1.5 w-full rounded bg-muted-foreground/25" />
+          <div className="h-1.5 w-5/6 rounded bg-muted-foreground/25" />
+          <div className="h-1.5 w-11/12 rounded bg-muted-foreground/25" />
+          <div className="h-1.5 w-3/4 rounded bg-muted-foreground/25" />
+          <div className="pt-2 text-left">
+            <span className="inline-flex animate-pulse items-center rounded-md bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary">
+              סיכת חתימה ←
+            </span>
+          </div>
+        </div>
+
+        {/* Signature pad */}
+        <div className="relative h-24 rounded-lg border-2 border-dashed border-primary/40 bg-primary/5 p-3">
+          <span className="absolute right-3 top-1.5 text-[10px] text-muted-foreground">
+            צייר חתימה
+          </span>
+          <svg
+            viewBox="0 0 200 60"
+            className="h-full w-full"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ filter: "drop-shadow(0 0 4px rgba(48,255,247,0.7))" }}
+          >
+            <path
+              d="M10 40 C 30 10, 50 60, 70 30 S 110 10, 130 35 S 170 55, 195 25"
+              className="text-primary"
+            />
+          </svg>
+        </div>
+
+        {/* Confirm button */}
+        <button
+          type="button"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_0_16px_-2px_rgba(48,255,247,0.7)]"
+        >
+          <Check className="h-4 w-4" />
+          אשר וסיים
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function UserManualModal({ open, onOpenChange }: UserManualModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
