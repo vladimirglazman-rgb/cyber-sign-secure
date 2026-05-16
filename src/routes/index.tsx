@@ -382,9 +382,32 @@ function LandingPage() {
                 </span>
               </div>
             </TabsContent>
-            <TabsContent value="step4" className="min-h-[220px] rounded-lg border border-primary/15 bg-background/40 p-5 text-sm leading-relaxed text-foreground/90">
-              <h3 className="mb-2 font-display text-primary text-glow">שלב 4 – מעקב והשלמה</h3>
-              <p>עקבו אחר סטטוס החתימות מהדשבורד. לאחר השלמת כל החתימות, תקבלו מסמך חתום עם חותמת זמן וביקורת מלאה.</p>
+            <TabsContent
+              value="step4"
+              dir="rtl"
+              className="min-h-[420px] rounded-lg border border-primary/15 bg-background/40 p-6 text-right text-sm leading-relaxed text-foreground/90 space-y-5"
+            >
+              <h3 className="font-display text-lg text-primary/90">
+                4. 🔒 סיום התהליך וקבלת עותק סופי
+              </h3>
+              <ul className="space-y-3 list-none pr-0">
+                <li className="leading-7">
+                  <span className="text-primary">•</span>{" "}
+                  ברגע שהחותם האחרון (למשל, הערב השני) מסיים את חלקו, המערכת נועלת את
+                  המסמך (PDF Flattening) כדי למנוע שינויים עתידיים.
+                </li>
+                <li className="leading-7">
+                  <span className="text-primary">•</span>{" "}
+                  עותק סופי, חתום ומהימן משפטית, יישלח אוטומטית בחזרה לכל הצדדים המעורבים
+                  ויישמר בארכיון הענן המאובטח שלכם במערכת.
+                </li>
+              </ul>
+              <div className="flex h-64 w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-primary/30 bg-primary/5">
+                <ImageIcon className="h-10 w-10 text-primary/60" />
+                <span className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
+                  מקום שמור לצילום מסך
+                </span>
+              </div>
             </TabsContent>
           </Tabs>
 
