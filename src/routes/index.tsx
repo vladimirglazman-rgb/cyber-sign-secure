@@ -312,13 +312,75 @@ function LandingPage() {
                 </span>
               </div>
             </TabsContent>
-            <TabsContent value="step2" className="min-h-[220px] rounded-lg border border-primary/15 bg-background/40 p-5 text-sm leading-relaxed text-foreground/90">
-              <h3 className="mb-2 font-display text-primary text-glow">שלב 2 – הוספת נמענים</h3>
-              <p>הוסיפו את פרטי הנמענים: שם מלא, כתובת אימייל ומספר טלפון. ניתן להוסיף מספר חותמים ולקבוע את סדר החתימה.</p>
+            <TabsContent
+              value="step2"
+              dir="rtl"
+              className="min-h-[420px] rounded-lg border border-primary/15 bg-background/40 p-6 text-right text-sm leading-relaxed text-foreground/90 space-y-5"
+            >
+              <h3 className="font-display text-lg text-primary/90">
+                2. 📱 חוויית החותם (ללקוח הקצה)
+              </h3>
+              <ul className="space-y-3 list-none pr-0">
+                <li className="leading-7">
+                  <span className="text-primary">•</span>{" "}
+                  <span className="font-semibold text-foreground">קבלת התראה:</span>{" "}
+                  לקוח הקצה יקבל הודעת ווטסאפ (או מייל) ידידותית עם קישור ייחודי ומוצפן.
+                  אין צורך בהורדת אפליקציה או בהרשמה.
+                </li>
+                <li className="leading-7">
+                  <span className="text-primary">•</span>{" "}
+                  <span className="font-semibold text-foreground">אימות וצפייה:</span>{" "}
+                  לחיצה על הקישור תפתח את המסמך בדפדפן הנייד בצורה מאובטחת.
+                </li>
+                <li className="leading-7">
+                  <span className="text-primary">•</span>{" "}
+                  <span className="font-semibold text-foreground">פעולת החתימה:</span>{" "}
+                  הלקוח יופנה אוטומטית ל'סיכה' המיועדת לו. לחיצה עליה תפתח מסך שבו ניתן
+                  לצייר את החתימה עם האצבע או להקליד שם.
+                </li>
+                <li className="leading-7">
+                  <span className="text-primary">•</span>{" "}
+                  <span className="font-semibold text-foreground">אישור:</span>{" "}
+                  לאחר החתימה, הלקוח לוחץ על 'אשר וסיים'.
+                </li>
+              </ul>
+              <div className="flex h-64 w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-primary/30 bg-primary/5">
+                <ImageIcon className="h-10 w-10 text-primary/60" />
+                <span className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
+                  מקום שמור לצילום מסך
+                </span>
+              </div>
             </TabsContent>
-            <TabsContent value="step3" className="min-h-[220px] rounded-lg border border-primary/15 bg-background/40 p-5 text-sm leading-relaxed text-foreground/90">
-              <h3 className="mb-2 font-display text-primary text-glow">שלב 3 – הגדרות ושליחה</h3>
-              <p>הגדירו את תוקף החתימה, הוסיפו הודעה אישית ושלחו את הבקשה. הנמענים יקבלו קישור מאובטח לחתימה.</p>
+            <TabsContent
+              value="step3"
+              dir="rtl"
+              className="min-h-[420px] rounded-lg border border-primary/15 bg-background/40 p-6 text-right text-sm leading-relaxed text-foreground/90 space-y-5"
+            >
+              <h3 className="font-display text-lg text-primary/90">
+                3. 📊 לוח בקרה ומעקב (Dashboard)
+              </h3>
+              <p className="leading-7">
+                כמי ששלח את המסמך, יש לכם שליטה מלאה בזמן אמת:
+              </p>
+              <ul className="space-y-3 list-none pr-0">
+                <li className="leading-7">
+                  <span className="text-primary">•</span>{" "}
+                  <span className="font-semibold text-foreground">סטטוס חי:</span>{" "}
+                  בלוח הבקרה תוכלו לראות איזה מסמך נמצא בסטטוס 'ממתין לחתימה', מי כבר חתם,
+                  ומי מעכב את התהליך.
+                </li>
+                <li className="leading-7">
+                  <span className="text-primary">•</span>{" "}
+                  <span className="font-semibold text-foreground">שליחת תזכורות:</span>{" "}
+                  בלחיצת כפתור תוכלו לשלוח תזכורת אוטומטית לנמען שטרם חתם.
+                </li>
+              </ul>
+              <div className="flex h-64 w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-primary/30 bg-primary/5">
+                <ImageIcon className="h-10 w-10 text-primary/60" />
+                <span className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
+                  מקום שמור לצילום מסך
+                </span>
+              </div>
             </TabsContent>
             <TabsContent value="step4" className="min-h-[220px] rounded-lg border border-primary/15 bg-background/40 p-5 text-sm leading-relaxed text-foreground/90">
               <h3 className="mb-2 font-display text-primary text-glow">שלב 4 – מעקב והשלמה</h3>
