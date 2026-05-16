@@ -1,4 +1,4 @@
-import { Image as ImageIcon } from "lucide-react";
+import { Image as ImageIcon, Upload, FileText } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,6 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import step1Img from "@/assets/manual/step1-recipients.png";
 import step2Img from "@/assets/manual/step2-signer.png";
 import step3Img from "@/assets/manual/step3-dashboard.png";
 
@@ -29,6 +28,48 @@ function Screenshot({ src, alt }: { src: string; alt: string }) {
         alt={alt}
         className="mx-auto w-auto max-h-[480px] rounded-lg"
       />
+    </div>
+  );
+}
+
+function Step1Mockup() {
+  return (
+    <div
+      dir="rtl"
+      className="mx-auto max-w-2xl space-y-4 rounded-xl border border-primary/40 bg-background/60 p-4 shadow-[0_0_24px_-6px_rgba(48,255,247,0.6)]"
+    >
+      {/* Dropzone */}
+      <div className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-primary/40 bg-primary/5 p-6 text-center">
+        <Upload className="h-7 w-7 text-primary" />
+        <span className="text-sm font-semibold text-foreground">
+          גרור קובץ PDF או לחץ להעלאה
+        </span>
+        <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+          <FileText className="h-3.5 w-3.5" />
+          contract.pdf · 2.4 MB
+        </span>
+      </div>
+
+      {/* Recipient rows */}
+      {[
+        { idx: 1, name: "ולדימיר", phone: "050-123-4567" },
+        { idx: 2, name: "סופיה", phone: "050-987-6543" },
+      ].map((r) => (
+        <div
+          key={r.idx}
+          className="flex items-center justify-between gap-3 rounded-lg border border-primary/20 bg-background/60 p-3"
+        >
+          <div className="flex items-center gap-2.5">
+            <span className="rounded-md bg-primary/15 px-2 py-0.5 text-[11px] font-semibold text-primary">
+              נמען {r.idx}
+            </span>
+            <span className="text-sm font-semibold text-foreground">{r.name}</span>
+          </div>
+          <span className="font-mono text-xs text-muted-foreground" dir="ltr">
+            {r.phone}
+          </span>
+        </div>
+      ))}
     </div>
   );
 }
@@ -93,7 +134,7 @@ export function UserManualModal({ open, onOpenChange }: UserManualModalProps) {
                 לחצו על 'שלח לחתימה'. המערכת תייצר קישור מאובטח ותפיץ אותו לנמענים.
               </li>
             </ul>
-            <Screenshot src={step1Img} alt="טופס הוספת נמענים" />
+            <Step1Mockup />
           </TabsContent>
 
           <TabsContent value="step2" dir="rtl" className={tabContentClass}>
