@@ -1,4 +1,13 @@
-import { Image as ImageIcon, Upload, FileText, Check } from "lucide-react";
+import {
+  Image as ImageIcon,
+  Upload,
+  FileText,
+  Check,
+  Link2,
+  MessageCircle,
+  Clock,
+  CheckCircle2,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +18,6 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import step3Img from "@/assets/manual/step3-dashboard.png";
 
 interface UserManualModalProps {
   open: boolean;
@@ -18,18 +26,6 @@ interface UserManualModalProps {
 
 const tabContentClass =
   "min-h-[420px] rounded-lg border border-primary/15 bg-background/40 p-6 text-right text-sm leading-relaxed text-foreground/90 space-y-5";
-
-function Screenshot({ src, alt }: { src: string; alt: string }) {
-  return (
-    <div className="mx-auto max-w-2xl rounded-xl border border-primary/40 bg-background/60 p-3 shadow-[0_0_24px_-6px_rgba(48,255,247,0.6)]">
-      <img
-        src={src}
-        alt={alt}
-        className="mx-auto w-auto max-h-[480px] rounded-lg"
-      />
-    </div>
-  );
-}
 
 function Step1Mockup() {
   return (
@@ -127,6 +123,78 @@ function Step2Mockup() {
           <Check className="h-4 w-4" />
           אשר וסיים
         </button>
+      </div>
+    </div>
+  );
+}
+
+function Step3Mockup() {
+  const rows: Array<{
+    doc: string;
+    recipient: string;
+    status: "pending" | "signed";
+  }> = [
+    { doc: "חוזה שכירות", recipient: "ולדימיר", status: "pending" },
+    { doc: "הסכם NDA", recipient: "סופיה", status: "signed" },
+    { doc: "ייפוי כוח", recipient: "דניאל", status: "pending" },
+  ];
+
+  return (
+    <div
+      dir="rtl"
+      className="mx-auto max-w-2xl rounded-xl border border-primary/40 bg-background/60 p-4 text-right shadow-[0_0_24px_-6px_rgba(48,255,247,0.6)]"
+    >
+      <div className="mb-3 flex items-center justify-between border-b border-primary/15 pb-2">
+        <span className="font-display text-sm tracking-wider text-primary">
+          פעילות אחרונה
+        </span>
+        <span className="text-xs text-muted-foreground">Dashboard</span>
+      </div>
+
+      <div className="space-y-2">
+        {rows.map((r) => (
+          <div
+            key={r.doc}
+            className="flex items-center justify-between gap-3 rounded-lg border border-primary/15 bg-background/60 p-3 transition-colors hover:border-primary/30"
+          >
+            <div className="flex items-center gap-2.5">
+              {r.status === "pending" ? (
+                <span className="inline-flex items-center gap-1 rounded-md bg-amber-500/15 px-2 py-0.5 text-[11px] font-semibold text-amber-400">
+                  <Clock className="h-3 w-3" />
+                  ממתין לחתימה
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-400">
+                  <CheckCircle2 className="h-3 w-3" />
+                  נחתם
+                </span>
+              )}
+              <span className="text-sm font-semibold text-foreground">
+                {r.doc}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                · {r.recipient}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 rounded-md border border-primary/30 bg-primary/10 px-2.5 py-1 text-[11px] font-semibold text-primary transition-colors hover:bg-primary/20"
+              >
+                <Link2 className="h-3 w-3" />
+                העתק קישור
+              </button>
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-400 transition-colors hover:bg-emerald-500/20"
+              >
+                <MessageCircle className="h-3 w-3" />
+                וואטסאפ
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -246,7 +314,7 @@ export function UserManualModal({ open, onOpenChange }: UserManualModalProps) {
                 בלחיצת כפתור תוכלו לשלוח תזכורת אוטומטית לנמען שטרם חתם.
               </li>
             </ul>
-            <Screenshot src={step3Img} alt="לוח בקרה ופעילות אחרונה" />
+            <Step3Mockup />
           </TabsContent>
 
           <TabsContent value="step4" dir="rtl" className={tabContentClass}>
