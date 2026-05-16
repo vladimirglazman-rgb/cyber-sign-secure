@@ -15,8 +15,6 @@ import {
   BrainCircuit,
   Headphones,
   Sun,
-  Activity,
-  Edit3,
   Smartphone,
   Handshake,
 } from "lucide-react";
