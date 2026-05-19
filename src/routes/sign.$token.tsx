@@ -425,7 +425,6 @@ function ViewerCard({
             coordinates={ctx.coordinates ?? []}
             placedIndices={placed}
             onPinClick={handlePinClick}
-            pinLabel={ctx.signerName}
           />
         ) : (
           <div className="rounded-md border border-destructive/40 p-4 text-center text-xs text-destructive">

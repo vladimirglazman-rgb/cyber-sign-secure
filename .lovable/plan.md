@@ -1,37 +1,21 @@
-## Fix: Per-signer named pins on the signing page
+## Plan: restore all-pins signing view with original names
 
-### Findings
+1. **Return all document pins from verification**
+   - In `verifySigner`, keep the existing 2FA/token validation unchanged.
+   - After verifying the active recipient, fetch all recipients for the same document with `id`, `name`, `status`, and `signature_coordinates`.
+   - Build the signing-view coordinates by flattening every recipient’s `signature_coordinates`, preserving every pin and attaching that recipient’s `name` as the pin label.
+   - Do not change database schema, auth, token checks, or signing submission workflow.
 
-- **Pin filtering is already correct.** `verifySigner` (`src/server/signing.functions.ts`) loads `signature_coordinates` from the recipient row matched by the signing token, so each signer already receives only their own pins.
-- **DB confirms multiple pins per recipient are stored properly** (e.g. one row has 4 pins). The full array reaches the client via the `coordinates` field returned by `verifySigner`.
-- **The hardcoded badge text "חתום כאן"** on every pin lives in `src/components/mnit/SignerPdfViewer.tsx`. There is no per-pin label in the data model — the natural label is the active signer's name (returned by `peek_signing_token` as `recipient_name`).
-- The "only one pin appears" symptom most likely reflects sessions where only one pin was placed per recipient during setup; the rendering loop in `SignerPdfViewer` already maps over every coordinate. We will still add a defensive review to make sure nothing slices/caps the array.
+2. **Carry per-pin labels through the signing page state**
+   - Extend the signing coordinate type used by the client to include an optional `label`/`recipientName` field.
+   - Keep the existing click-to-place completion logic based on the flattened array index, so all visible pins must be clicked before submit.
 
-### Changes
+3. **Render each pin’s own label in `SignerPdfViewer`**
+   - Remove the single shared `pinLabel={ctx.signerName}` behavior from the signing route.
+   - In the PDF viewer, render every coordinate in the array as it already does, but show `coordinate.label` for each pin badge.
+   - Keep the fallback text only for legacy/missing labels.
+   - Preserve the existing signed badge, buttons, layout, responsiveness, and all click behavior.
 
-1. **`src/server/signing.functions.ts` — `verifySigner`**
-   - Also fetch `recipients.name` and return it as `signerName` in the response.
-   - Leave the coordinate-mapping loop untouched (it already preserves every entry); just confirm no `.slice` / index access is added.
-
-2. **`src/routes/sign.$token.tsx`**
-   - Extend the `Ctx` type with `signerName: string`.
-   - Pass `signerName` from `ctx` down into `<SignerPdfViewer />` as a new prop (e.g. `pinLabel={ctx.signerName}`).
-   - No changes to the 2FA flow, routing, or submit logic.
-
-3. **`src/components/mnit/SignerPdfViewer.tsx`**
-   - Add an optional `pinLabel?: string` prop.
-   - Replace the hardcoded `חתום כאן` badge text with `pinLabel ?? "חתום כאן"` (fallback keeps existing behavior if the prop is missing).
-   - Keep the existing `נחתם ✓` badge for already-placed pins unchanged.
-   - Keep the render loop as-is so **all** coordinates for the active signer render.
-   - Preserve responsive layout (no class changes beyond the badge text).
-
-### Out of scope (per the strict constraint)
-
-- No DB schema changes (no per-pin label field is added).
-- No changes to the 2FA verification flow, RPCs, or signing submission.
-- No changes to the sender-side configuration UI in `DocumentPreview.tsx`.
-
-### Technical notes
-
-- `peek_signing_token` already exposes `recipient_name`, but the signing page only stores it in the `peek` state before verification. Returning `signerName` from `verifySigner` keeps the viewer's data source consistent with the rest of the verified context.
-- Fallback to `"חתום כאן"` ensures backward safety if `signerName` is ever missing.
+4. **Verify the regression target**
+   - Confirm there is no `.slice`, single-recipient filtering, or single shared label left in the signing view rendering path.
+   - Check that the viewer count and completion count use the full flattened all-pins array.
