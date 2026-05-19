@@ -27,7 +27,7 @@ interface UserManualModalProps {
 }
 
 const tabContentClass =
-  "min-h-[420px] rounded-lg border border-primary/15 bg-background/40 p-6 text-right text-sm leading-relaxed text-foreground/90 space-y-5";
+  "min-h-[420px] overflow-hidden rounded-lg border border-primary/15 bg-background/40 p-4 sm:p-6 text-right text-sm leading-relaxed text-foreground/90 space-y-5";
 
 function Step1Mockup() {
   return (
@@ -54,7 +54,7 @@ function Step1Mockup() {
       ].map((r) => (
         <div
           key={r.idx}
-          className="flex items-center justify-between gap-3 rounded-lg border border-primary/20 bg-background/60 p-3"
+          className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-primary/20 bg-background/60 p-3"
         >
           <div className="flex items-center gap-2.5">
             <span className="rounded-md bg-primary/15 px-2 py-0.5 text-[11px] font-semibold text-primary">
@@ -73,7 +73,7 @@ function Step1Mockup() {
 
 function Step2Mockup() {
   return (
-    <div className="mx-auto w-[300px] rounded-[2.5rem] border border-primary/40 bg-background/80 p-2 shadow-[0_0_32px_-6px_rgba(48,255,247,0.6)]">
+    <div className="mx-auto w-full max-w-[300px] rounded-[2.5rem] border border-primary/40 bg-background/80 p-2 shadow-[0_0_32px_-6px_rgba(48,255,247,0.6)]">
       <div className="mx-auto mb-1 h-1.5 w-16 rounded-full bg-primary/30" />
       <div dir="rtl" className="space-y-3 rounded-[2rem] bg-[#0a1525] p-3">
         {/* Status bar */}
@@ -157,9 +157,9 @@ function Step3Mockup() {
         {rows.map((r) => (
           <div
             key={r.doc}
-            className="flex items-center justify-between gap-3 rounded-lg border border-primary/15 bg-background/60 p-3 transition-colors hover:border-primary/30"
+            className="flex flex-col gap-2 rounded-lg border border-primary/15 bg-background/60 p-3 transition-colors hover:border-primary/30 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
           >
-            <div className="flex items-center gap-2.5">
+            <div className="flex flex-wrap items-center gap-2">
               {r.status === "pending" ? (
                 <span className="inline-flex items-center gap-1 rounded-md bg-amber-500/15 px-2 py-0.5 text-[11px] font-semibold text-amber-400">
                   <Clock className="h-3 w-3" />
@@ -179,17 +179,17 @@ function Step3Mockup() {
               </span>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
-                className="inline-flex items-center gap-1.5 rounded-md border border-primary/30 bg-primary/10 px-2.5 py-1 text-[11px] font-semibold text-primary transition-colors hover:bg-primary/20"
+                className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-md border border-primary/30 bg-primary/10 px-2.5 py-1 text-[11px] font-semibold text-primary transition-colors hover:bg-primary/20 sm:flex-none"
               >
                 <Link2 className="h-3 w-3" />
                 העתק קישור
               </button>
               <button
                 type="button"
-                className="inline-flex items-center gap-1.5 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-400 transition-colors hover:bg-emerald-500/20"
+                className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-400 transition-colors hover:bg-emerald-500/20 sm:flex-none"
               >
                 <MessageCircle className="h-3 w-3" />
                 וואטסאפ
