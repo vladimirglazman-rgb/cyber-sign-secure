@@ -6,7 +6,12 @@ import "react-pdf/dist/Page/TextLayer.css";
 
 pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
-export type SigCoord = { pageNumber: number; x: number; y: number };
+export type SigCoord = {
+  pageNumber: number;
+  x: number;
+  y: number;
+  label?: string;
+};
 
 export function SignerPdfViewer({
   fileUrl,
@@ -14,14 +19,12 @@ export function SignerPdfViewer({
   onRemovePin,
   placedIndices,
   onPinClick,
-  pinLabel,
 }: {
   fileUrl: string;
   coordinates: SigCoord[];
   onRemovePin?: (index: number) => void;
   placedIndices?: Set<number>;
   onPinClick?: (index: number) => void;
-  pinLabel?: string;
 }) {
   const [numPages, setNumPages] = useState<number>(0);
   const [width, setWidth] = useState<number>(0);
@@ -126,7 +129,7 @@ export function SignerPdfViewer({
                           fill="hsl(var(--primary) / 0.4)"
                         />
                         <span className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md border border-primary/60 bg-background/90 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
-                          {pinLabel ? pinLabel : "חתום כאן"}
+                          {c.label ? c.label : "חתום כאן"}
                         </span>
                       </>
                     )}

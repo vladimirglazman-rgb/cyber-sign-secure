@@ -42,7 +42,7 @@ export const verifySigner = createServerFn({ method: "POST" })
     const { data: rec, error: recErr } = await supabaseAdmin
       .from("recipients")
       .select(
-        "id, name, document_id, phone, verification_value_hash, status, signature_coordinates",
+        "id, name, document_id, phone, verification_value_hash, status",
       )
       .eq("signing_token", data.token)
       .maybeSingle();
@@ -86,20 +86,34 @@ export const verifySigner = createServerFn({ method: "POST" })
       .from("contracts")
       .createSignedUrl(row.file_path, 600);
 
-    let coordinates: { pageNumber: number; x: number; y: number }[] = [];
+    let coordinates: {
+      pageNumber: number;
+      x: number;
+      y: number;
+      label: string;
+    }[] = [];
     try {
-      const raw = rec?.signature_coordinates;
-      if (Array.isArray(raw)) {
-        coordinates = raw
-          .map((c) => {
-            const obj = (c && typeof c === "object" ? c : {}) as Record<string, unknown>;
-            return {
-              pageNumber: Number(obj.pageNumber ?? 1) || 1,
-              x: Number(obj.x ?? 0),
-              y: Number(obj.y ?? 0),
-            };
-          })
-          .filter((c) => Number.isFinite(c.x) && Number.isFinite(c.y));
+      const { data: allRecs, error: allErr } = await supabaseAdmin
+        .from("recipients")
+        .select("name, signature_coordinates")
+        .eq("document_id", rec.document_id);
+      if (allErr) console.error("FETCH_ALL_COORDS_FAILED", allErr);
+      for (const r of allRecs ?? []) {
+        const raw = (r as { signature_coordinates: unknown }).signature_coordinates;
+        const label = String((r as { name: string | null }).name ?? "");
+        if (!Array.isArray(raw)) continue;
+        for (const c of raw) {
+          const obj = (c && typeof c === "object" ? c : {}) as Record<string, unknown>;
+          const pin = {
+            pageNumber: Number(obj.pageNumber ?? 1) || 1,
+            x: Number(obj.x ?? 0),
+            y: Number(obj.y ?? 0),
+            label,
+          };
+          if (Number.isFinite(pin.x) && Number.isFinite(pin.y)) {
+            coordinates.push(pin);
+          }
+        }
       }
     } catch (e) {
       console.error("FETCH_COORDS_FAILED", e);
