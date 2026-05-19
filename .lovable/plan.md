@@ -1,21 +1,19 @@
-## Plan: restore all-pins signing view with original names
+### Pure UI Cosmetic Fix: Color the Pins by Index
 
-1. **Return all document pins from verification**
-   - In `verifySigner`, keep the existing 2FA/token validation unchanged.
-   - After verifying the active recipient, fetch all recipients for the same document with `id`, `name`, `status`, and `signature_coordinates`.
-   - Build the signing-view coordinates by flattening every recipient’s `signature_coordinates`, preserving every pin and attaching that recipient’s `name` as the pin label.
-   - Do not change database schema, auth, token checks, or signing submission workflow.
+**What:** Inside `src/components/mnit/SignerPdfViewer.tsx`, color each pin badge based on its array index within the existing `.map()` loop.
 
-2. **Carry per-pin labels through the signing page state**
-   - Extend the signing coordinate type used by the client to include an optional `label`/`recipientName` field.
-   - Keep the existing click-to-place completion logic based on the flattened array index, so all visible pins must be clicked before submit.
+**How:**
+1. In the `pinsForPage.map(({ c, idx }) => ...)` block, derive a color class string from `idx`:
+   - `idx === 0` → teal (`bg-teal-500`, `border-teal-600`, `text-teal-700`)
+   - `idx === 1` → purple (`bg-purple-500`, `border-purple-600`, `text-purple-700`)
+   - `idx === 2` → green (`bg-green-500`, `border-green-600`, `text-green-700`)
+   - `idx >= 3` → orange (`bg-orange-500`, `border-orange-600`, `text-orange-700`)
 
-3. **Render each pin’s own label in `SignerPdfViewer`**
-   - Remove the single shared `pinLabel={ctx.signerName}` behavior from the signing route.
-   - In the PDF viewer, render every coordinate in the array as it already does, but show `coordinate.label` for each pin badge.
-   - Keep the fallback text only for legacy/missing labels.
-   - Preserve the existing signed badge, buttons, layout, responsiveness, and all click behavior.
+2. Apply the chosen color classes to:
+   - The `MapPin` icon fill/text color
+   - The pin label box background, border, and text
 
-4. **Verify the regression target**
-   - Confirm there is no `.slice`, single-recipient filtering, or single shared label left in the signing view rendering path.
-   - Check that the viewer count and completion count use the full flattened all-pins array.
+**Constraints respected:**
+- No data fetching logic is touched.
+- No pin filtering or array manipulation is changed.
+- Only Tailwind classNames inside the existing map render path are modified.

@@ -74,7 +74,15 @@ export function SignerPdfViewer({
                 renderAnnotationLayer={false}
                 renderTextLayer={false}
               />
-              {pinsForPage.map(({ c, idx }) => (
+              {pinsForPage.map(({ c, idx }) => {
+                const palette = [
+                  { hex: "#14b8a6", border: "border-teal-600", bg: "bg-teal-50", text: "text-teal-700" },
+                  { hex: "#a855f7", border: "border-purple-600", bg: "bg-purple-50", text: "text-purple-700" },
+                  { hex: "#22c55e", border: "border-green-600", bg: "bg-green-50", text: "text-green-700" },
+                  { hex: "#f97316", border: "border-orange-600", bg: "bg-orange-50", text: "text-orange-700" },
+                ];
+                const color = palette[idx % palette.length];
+                return (
                 <div
                   key={idx}
                   data-pin-index={idx}
@@ -121,21 +129,22 @@ export function SignerPdfViewer({
                     ) : (
                       <>
                         <MapPin
-                          className="h-8 w-8 text-primary animate-pulse"
+                          className="h-8 w-8 animate-pulse"
                           style={{
-                            filter:
-                              "drop-shadow(0 0 6px hsl(var(--primary))) drop-shadow(0 0 12px hsl(var(--primary)))",
+                            color: color.hex,
+                            filter: `drop-shadow(0 0 6px ${color.hex}) drop-shadow(0 0 12px ${color.hex})`,
                           }}
-                          fill="hsl(var(--primary) / 0.4)"
+                          fill={color.hex}
                         />
-                        <span className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md border border-primary/60 bg-background/90 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
+                        <span className={`absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md border ${color.border} ${color.bg} px-1.5 py-0.5 text-[10px] font-semibold ${color.text}`}>
                           {c.label ? c.label : "חתום כאן"}
                         </span>
                       </>
                     )}
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           );
         })}
