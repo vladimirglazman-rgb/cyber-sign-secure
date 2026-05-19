@@ -9,11 +9,9 @@ import {
   Smartphone,
   Handshake,
   BookOpen,
-  Wand2,
   Code2,
   Paintbrush,
   Database,
-  Github,
   Brain,
   Cloud,
 } from "lucide-react";
@@ -216,13 +214,11 @@ function LandingPage() {
             </h2>
             <div className="mx-auto mt-4 h-px w-24 bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <div className="mx-auto grid max-w-4xl gap-4 sm:grid-cols-2 md:grid-cols-3">
             {[
-              { icon: Wand2, name: "Lovable", desc: "פיתוח מבוסס AI לבנייה מהירה, פריסה חכמה ועדכוני קוד בזמן אמת." },
               { icon: Code2, name: "React & Vite", desc: "חוויית משתמש מהירה במיוחד, יציבה ומודרנית." },
               { icon: Paintbrush, name: "Tailwind CSS", desc: "עיצוב רספונסיבי, נקי וחדשני המותאם לכל מכשיר." },
               { icon: Database, name: "Supabase", desc: "מסד נתונים מאובטח בענן, ניהול משתמשים ותשתית Backend חזקה." },
-              { icon: Github, name: "GitHub", desc: "ניהול קוד מקצועי, בקרת גרסאות ואבטחה ברמה ארגונית (Enterprise)." },
               { icon: Brain, name: "AI Engine", desc: "מנוע בינה מלאכותית מתקדם לעיבוד, ניתוח ושכלול מסמכים אוטומטי." },
               { icon: Cloud, name: "Cloudflare", desc: "הגנת DDoS, אבטחת DNS ותעודות SSL להגנה מקסימלית על המידע." },
             ].map((t) => (

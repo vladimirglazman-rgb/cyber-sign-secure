@@ -1,46 +1,31 @@
-## Technology Stack Section — Landing Page
+## Tech Stack — White-label Cleanup (2×3 Grid)
 
-### Goal
-Add a premium "Technology Stack" section to the public landing page (`/`) just above the Footer, showcasing the 7 technologies behind MNIT Sign with a high-end dark-mode cyber aesthetic aligned to the existing design system.
+### Scope
+Cosmetic edit to the "הטכנולוגיה שמאחורי המערכת" section in `src/routes/index.tsx`. No routes, schema, auth, or signing logic touched.
 
-### Design
-- **Position**: Inside `<main>` or as a sibling section between the Feature tiles and the `<footer>`.
-- **Container**: `max-w-5xl mx-auto px-6` (matches existing feature tiles width).
-- **Header**: Hebrew title `הטכנולוגיה שמאחורי המערכת` in `font-display`, centered, with a subtle `text-glow` or `text-primary` accent and a short decorative divider line.
-- **Grid**: Responsive grid of 7 cards:
-  - Mobile: 1 column
-  - Tablet (`sm`): 2 columns
-  - Desktop (`md`+): 3 columns with the last row centered (4+3 layout) OR a 4+3 natural wrap.
-- **Card style**: Reuse the existing `glass-panel` utility with `text-right` RTL alignment. Each card contains:
-  - A Lucide icon inside a `rounded-lg bg-primary/15 ring-1 ring-primary/40` container (`h-10 w-10`)
-  - Technology name in `font-display` bold
-  - Hebrew description in `text-muted-foreground` (`text-sm`)
-- **Hover**: Cards lift subtly via `hover:border-primary/50` transition (same as feature tiles).
-- **Icons** (one per card, chosen from `lucide-react`):
-  1. Lovable — `Wand2` or `Sparkles`
-  2. React & Vite — `Code2` or `Monitor`
-  3. Tailwind CSS — `Paintbrush` or `Layers`
-  4. Supabase — `Database` or `Cloud`
-  5. GitHub — `Github` (Lucide icon)
-  6. AI Engine — `Brain` or `Cpu`
-  7. Cloudflare — `Shield` or `Globe`
+### Changes
+1. **Remove tiles**: delete the `Lovable` (Wand2) and `GitHub` (Github) entries from the tech array.
+2. **Drop unused imports**: remove `Wand2` and `Github` from the `lucide-react` import block.
+3. **Remaining 6 tiles** (order preserved from current code):
+   - Row 1: `React & Vite` · `Tailwind CSS` · `Supabase`
+   - Row 2: `AI Engine` · `Cloudflare` · *(third slot)*
 
-### Content (RTL)
-| Tech | Hebrew Description |
-|------|-------------------|
-| Lovable | פיתוח מבוסס AI לבנייה מהירה, פריסה חכמה ועדכוני קוד בזמן אמת. |
-| React & Vite | חוויית משתמש מהירה במיוחד, יציבה ומודרנית. |
-| Tailwind CSS | עיצוב רספונסיבי, נקי וחדשני המותאם לכל מכשיר. |
-| Supabase | מסד נתונים מאובטח בענן, ניהול משתמשים ותשתית Backend חזקה. |
-| GitHub | ניהול קוד מקצועי, בקרת גרסאות ואבטחה ברמה ארגונית (Enterprise). |
-| AI Engine | מנוע בינה מלאכותית מתקדם לעיבוד, ניתוח ושכלול מסמכים אוטומטי. |
-| Cloudflare | הגנת DDoS, אבטחת DNS ותעודות SSL להגנה מקסימלית על המידע. |
+   To get a clean symmetrical 2×3, the order will be:
+   ```
+   Row 1:  React & Vite  |  Tailwind CSS  |  Supabase
+   Row 2:  AI Engine     |  Cloudflare    |  (needs 6th)
+   ```
+   Since removing Lovable + GitHub leaves only 5, a true 2×3 needs 6. **Clarification below.**
 
-### Scope & Out of Scope
-- **In scope**: New section markup + CSS classes in `src/routes/index.tsx` only. Import any additional Lucide icons needed.
-- **Out of scope**: No new components, no style system changes, no backend logic, no route changes. Reuse existing `glass-panel` and typography tokens.
+### Clarification needed
+Image_19.png is not visible to me in this turn. Removing both Lovable and GitHub from the current 7-tile list leaves **5 tiles**, which cannot form a symmetrical 2×3 grid.
 
-### Implementation Notes
-- The page already has `dir="rtl"` on `<html>`, so `text-right` on cards will align correctly.
-- The existing 3 feature tiles use an identical card pattern — the new section will follow that markup structure exactly for visual consistency.
-- Add `mt-20` (or `mt-24`) spacing above the new section to separate it from the feature tiles, and `pb-24` on `<main>` may need adjustment or the section can live just before the footer with its own `py-16` padding.
+Options:
+- **A.** Keep only 5 tiles and use a centered layout (`grid-cols-3` row of 3 + centered row of 2). Clean, fully white-label.
+- **B.** Re-add one tile to reach 6 (e.g. a "Security / TLS" or "Edge Runtime" card) — please specify name + Hebrew description.
+- **C.** Drop only one of Lovable/GitHub to keep 6 tiles in 2×3.
+
+### Styling (unchanged)
+Keep existing `glass-panel`, cyan `text-glow` header, "TECH STACK" pill badge, gradient divider, hover glow, and RTL alignment. Grid becomes `sm:grid-cols-2 md:grid-cols-3` (drop the `lg:grid-cols-4` so the layout stays a true 2×3 on desktop).
+
+Please confirm A / B / C before I implement.
