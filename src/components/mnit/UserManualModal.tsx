@@ -204,7 +204,7 @@ function Step3Mockup() {
 
 function Step4Certificate() {
   return (
-    <div className="relative mx-auto max-w-2xl rounded-2xl border-2 border-primary/40 bg-gradient-to-br from-background/80 via-background/60 to-background/80 p-8 shadow-[0_0_40px_-8px_rgba(48,255,247,0.5)]">
+    <div className="relative mx-auto max-w-2xl rounded-2xl border-2 border-primary/40 bg-gradient-to-br from-background/80 via-background/60 to-background/80 p-4 sm:p-8 shadow-[0_0_40px_-8px_rgba(48,255,247,0.5)]">
       <Sparkles className="absolute left-3 top-3 h-4 w-4 text-primary/60" />
       <Sparkles className="absolute right-3 top-3 h-4 w-4 text-primary/60" />
       <Sparkles className="absolute bottom-3 left-3 h-4 w-4 text-primary/60" />
@@ -212,10 +212,10 @@ function Step4Certificate() {
 
       <div
         dir="rtl"
-        className="rounded-xl border border-primary/20 p-6 text-center sm:p-8"
+        className="rounded-xl border border-primary/20 p-4 text-center sm:p-8"
       >
         {/* Seal */}
-        <div className="mx-auto flex h-28 w-28 animate-pulse items-center justify-center rounded-full border border-primary/30 bg-primary/5">
+        <div className="mx-auto flex h-24 w-24 animate-pulse items-center justify-center rounded-full border border-primary/30 bg-primary/5 sm:h-28 sm:w-28">
           <div className="flex h-20 w-20 items-center justify-center rounded-full border border-primary/50 bg-gradient-to-br from-primary/30 to-primary/10 shadow-[0_0_24px_-2px_rgba(48,255,247,0.8)]">
             <ShieldCheck
               className="h-10 w-10 text-primary"
@@ -225,7 +225,7 @@ function Step4Certificate() {
         </div>
 
         {/* Title */}
-        <h4 className="mt-5 font-display text-xl tracking-wider text-primary text-glow">
+        <h4 className="mt-5 font-display text-lg sm:text-xl tracking-wider text-primary text-glow">
           MNIT — חתימה מאובטחת
         </h4>
         <p className="mt-1 inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-primary/80">
@@ -251,10 +251,10 @@ export function UserManualModal({ open, onOpenChange }: UserManualModalProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         dir="rtl"
-        className="max-w-4xl max-h-[90vh] overflow-y-auto border border-primary/30 bg-background/80 backdrop-blur-xl shadow-[0_0_40px_-10px_rgba(48,255,247,0.4)]"
+        className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto border border-primary/30 bg-background/80 p-4 sm:p-6 backdrop-blur-xl shadow-[0_0_40px_-10px_rgba(48,255,247,0.4)]"
       >
         <DialogHeader>
-          <DialogTitle className="font-display text-xl tracking-wider text-primary text-glow text-right">
+          <DialogTitle className="font-display text-xl sm:text-2xl tracking-wider text-primary text-glow text-right">
             מדריך למשתמש 📘
           </DialogTitle>
           <DialogDescription className="text-right text-muted-foreground">
@@ -263,26 +263,26 @@ export function UserManualModal({ open, onOpenChange }: UserManualModalProps) {
         </DialogHeader>
 
         <Tabs defaultValue="intro" className="w-full" dir="rtl">
-          <TabsList className="grid w-full grid-cols-4 bg-primary/5 border border-primary/20">
-            <TabsTrigger value="intro">מבוא ושלב 1</TabsTrigger>
-            <TabsTrigger value="step2">שלב 2: חוויית החותם</TabsTrigger>
-            <TabsTrigger value="step3">שלב 3: לוח בקרה</TabsTrigger>
-            <TabsTrigger value="step4">שלב 4: אבטחה וסיום</TabsTrigger>
+          <TabsList className="grid h-auto w-full grid-cols-2 gap-1 bg-primary/5 border border-primary/20 sm:grid-cols-4">
+            <TabsTrigger value="intro" className="whitespace-normal py-2 text-xs sm:text-sm">מבוא ושלב 1</TabsTrigger>
+            <TabsTrigger value="step2" className="whitespace-normal py-2 text-xs sm:text-sm">שלב 2: חוויית החותם</TabsTrigger>
+            <TabsTrigger value="step3" className="whitespace-normal py-2 text-xs sm:text-sm">שלב 3: לוח בקרה</TabsTrigger>
+            <TabsTrigger value="step4" className="whitespace-normal py-2 text-xs sm:text-sm">שלב 4: אבטחה וסיום</TabsTrigger>
           </TabsList>
 
           <TabsContent value="intro" dir="rtl" className={tabContentClass}>
-            <h2 className="font-display text-2xl text-primary text-glow">
+            <h2 className="font-display text-xl sm:text-2xl text-primary text-glow break-words">
               📘 MNIT Sign – חתימה דיגיטלית חכמה
             </h2>
-            <p className="leading-7">
+            <p className="text-sm sm:text-base leading-7 break-words">
               ברוכים הבאים ל-MNIT Sign, הפלטפורמה המאובטחת לניהול והחתמת מסמכים דיגיטליים.
               המערכת נועדה לחסוך לכם זמן, ניירת וכאב ראש משפטי. הנה כל מה שאתם צריכים לדעת
               כדי לצאת לדרך:
             </p>
-            <h3 className="font-display text-lg text-primary/90">
+            <h3 className="font-display text-base sm:text-lg text-primary/90">
               1. 📤 יצירת בקשת חתימה (לשולח המסמך)
             </h3>
-            <ul className="space-y-3 list-none pr-0">
+            <ul className="space-y-3 list-none pr-0 text-sm sm:text-base">
               <li className="leading-7">
                 <span className="text-primary">•</span>{" "}
                 <span className="font-semibold text-foreground">העלאת קובץ:</span>{" "}
@@ -310,10 +310,10 @@ export function UserManualModal({ open, onOpenChange }: UserManualModalProps) {
           </TabsContent>
 
           <TabsContent value="step2" dir="rtl" className={tabContentClass}>
-            <h3 className="font-display text-lg text-primary/90">
+            <h3 className="font-display text-base sm:text-lg text-primary/90">
               2. 📱 חוויית החותם (ללקוח הקצה)
             </h3>
-            <ul className="space-y-3 list-none pr-0">
+            <ul className="space-y-3 list-none pr-0 text-sm sm:text-base">
               <li className="leading-7">
                 <span className="text-primary">•</span>{" "}
                 <span className="font-semibold text-foreground">קבלת התראה:</span>{" "}
@@ -341,13 +341,13 @@ export function UserManualModal({ open, onOpenChange }: UserManualModalProps) {
           </TabsContent>
 
           <TabsContent value="step3" dir="rtl" className={tabContentClass}>
-            <h3 className="font-display text-lg text-primary/90">
+            <h3 className="font-display text-base sm:text-lg text-primary/90">
               3. 📊 לוח בקרה ומעקב (Dashboard)
             </h3>
-            <p className="leading-7">
+            <p className="text-sm sm:text-base leading-7 break-words">
               כמי ששלח את המסמך, יש לכם שליטה מלאה בזמן אמת:
             </p>
-            <ul className="space-y-3 list-none pr-0">
+            <ul className="space-y-3 list-none pr-0 text-sm sm:text-base">
               <li className="leading-7">
                 <span className="text-primary">•</span>{" "}
                 <span className="font-semibold text-foreground">סטטוס חי:</span>{" "}
@@ -364,10 +364,10 @@ export function UserManualModal({ open, onOpenChange }: UserManualModalProps) {
           </TabsContent>
 
           <TabsContent value="step4" dir="rtl" className={tabContentClass}>
-            <h3 className="font-display text-lg text-primary/90">
+            <h3 className="font-display text-base sm:text-lg text-primary/90">
               4. 🔒 סיום התהליך וקבלת עותק סופי
             </h3>
-            <ul className="space-y-3 list-none pr-0">
+            <ul className="space-y-3 list-none pr-0 text-sm sm:text-base">
               <li className="leading-7">
                 <span className="text-primary">•</span>{" "}
                 ברגע שהחותם האחרון (למשל, הערב השני) מסיים את חלקו, המערכת נועלת את
