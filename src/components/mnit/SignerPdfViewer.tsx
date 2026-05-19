@@ -122,7 +122,6 @@ export function SignerPdfViewer({
                       </>
                     ) : (
                       <>
-                        {(() => null)()}
                         <MapPin
                           className="h-8 w-8 text-primary animate-pulse"
                           style={{
