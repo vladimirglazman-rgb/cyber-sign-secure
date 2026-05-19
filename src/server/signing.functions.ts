@@ -42,7 +42,7 @@ export const verifySigner = createServerFn({ method: "POST" })
     const { data: rec, error: recErr } = await supabaseAdmin
       .from("recipients")
       .select(
-        "id, document_id, phone, verification_value_hash, status, signature_coordinates",
+        "id, name, document_id, phone, verification_value_hash, status, signature_coordinates",
       )
       .eq("signing_token", data.token)
       .maybeSingle();
@@ -68,6 +68,7 @@ export const verifySigner = createServerFn({ method: "POST" })
 
     const row = {
       recipient_id: rec.id,
+      recipient_name: rec.name,
       file_name: doc.file_name,
       file_path: doc.file_path,
       subject: doc.subject,
@@ -111,6 +112,7 @@ export const verifySigner = createServerFn({ method: "POST" })
       alreadySigned: row.already_signed,
       fileUrl: signed?.signedUrl ?? null,
       coordinates,
+      signerName: row.recipient_name ?? "",
     };
   });
 
