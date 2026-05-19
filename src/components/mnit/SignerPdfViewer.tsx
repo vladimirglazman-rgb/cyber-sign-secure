@@ -14,12 +14,14 @@ export function SignerPdfViewer({
   onRemovePin,
   placedIndices,
   onPinClick,
+  pinLabel,
 }: {
   fileUrl: string;
   coordinates: SigCoord[];
   onRemovePin?: (index: number) => void;
   placedIndices?: Set<number>;
   onPinClick?: (index: number) => void;
+  pinLabel?: string;
 }) {
   const [numPages, setNumPages] = useState<number>(0);
   const [width, setWidth] = useState<number>(0);
@@ -124,7 +126,7 @@ export function SignerPdfViewer({
                           fill="hsl(var(--primary) / 0.4)"
                         />
                         <span className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md border border-primary/60 bg-background/90 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
-                          חתום כאן
+                          {pinLabel ? pinLabel : "חתום כאן"}
                         </span>
                       </>
                     )}
