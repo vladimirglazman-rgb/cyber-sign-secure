@@ -91,18 +91,14 @@ export const verifySigner = createServerFn({ method: "POST" })
       x: number;
       y: number;
       label: string;
-      colorIndex: number;
     }[] = [];
     try {
       const { data: allRecs, error: allErr } = await supabaseAdmin
         .from("recipients")
         .select("name, signature_coordinates")
-        .eq("document_id", rec.document_id)
-        .order("created_at", { ascending: true });
+        .eq("document_id", rec.document_id);
       if (allErr) console.error("FETCH_ALL_COORDS_FAILED", allErr);
-      const recs = allRecs ?? [];
-      for (let i = 0; i < recs.length; i++) {
-        const r = recs[i];
+      for (const r of allRecs ?? []) {
         const raw = (r as { signature_coordinates: unknown }).signature_coordinates;
         const label = String((r as { name: string | null }).name ?? "");
         if (!Array.isArray(raw)) continue;
@@ -113,7 +109,6 @@ export const verifySigner = createServerFn({ method: "POST" })
             x: Number(obj.x ?? 0),
             y: Number(obj.y ?? 0),
             label,
-            colorIndex: i,
           };
           if (Number.isFinite(pin.x) && Number.isFinite(pin.y)) {
             coordinates.push(pin);

@@ -3,7 +3,6 @@ import { Document, Page, pdfjs } from "react-pdf";
 import { Loader2, MapPin } from "lucide-react";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
-import { getRecipientColor } from "@/lib/recipient-colors";
 
 pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
@@ -12,7 +11,6 @@ export type SigCoord = {
   x: number;
   y: number;
   label?: string;
-  colorIndex?: number;
 };
 
 export function SignerPdfViewer({
@@ -125,19 +123,12 @@ export function SignerPdfViewer({
                         <MapPin
                           className="h-8 w-8 text-primary animate-pulse"
                           style={{
-                            color: getRecipientColor(c.colorIndex ?? 0).hex,
-                            filter: getRecipientColor(c.colorIndex ?? 0).glow,
+                            filter:
+                              "drop-shadow(0 0 6px hsl(var(--primary))) drop-shadow(0 0 12px hsl(var(--primary)))",
                           }}
-                          fill={getRecipientColor(c.colorIndex ?? 0).fill}
+                          fill="hsl(var(--primary) / 0.4)"
                         />
-                        <span
-                          className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md border px-1.5 py-0.5 text-[10px] font-semibold"
-                          style={{
-                            borderColor: getRecipientColor(c.colorIndex ?? 0).border,
-                            backgroundColor: getRecipientColor(c.colorIndex ?? 0).bg,
-                            color: getRecipientColor(c.colorIndex ?? 0).text,
-                          }}
-                        >
+                        <span className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md border border-primary/60 bg-background/90 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
                           {c.label ? c.label : "חתום כאן"}
                         </span>
                       </>

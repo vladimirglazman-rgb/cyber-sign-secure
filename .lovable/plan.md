@@ -1,33 +1,21 @@
-## Goal
+## Plan: restore all-pins signing view with original names
 
-On the client-facing signing page (`/sign/$token`), each pin should use the same vibrant per-recipient color (cyan, purple, orange, pink, lime, amber) as the Document Setup page, instead of the single dark blue. Pin marker, glow, label border, label background, and label text all adopt that color. Pin count, filtering, and signature logic stay unchanged.
+1. **Return all document pins from verification**
+   - In `verifySigner`, keep the existing 2FA/token validation unchanged.
+   - After verifying the active recipient, fetch all recipients for the same document with `id`, `name`, `status`, and `signature_coordinates`.
+   - Build the signing-view coordinates by flattening every recipient’s `signature_coordinates`, preserving every pin and attaching that recipient’s `name` as the pin label.
+   - Do not change database schema, auth, token checks, or signing submission workflow.
 
-## Changes
+2. **Carry per-pin labels through the signing page state**
+   - Extend the signing coordinate type used by the client to include an optional `label`/`recipientName` field.
+   - Keep the existing click-to-place completion logic based on the flattened array index, so all visible pins must be clicked before submit.
 
-### 1. `src/server/signing.functions.ts` — attach a stable color index per pin
+3. **Render each pin’s own label in `SignerPdfViewer`**
+   - Remove the single shared `pinLabel={ctx.signerName}` behavior from the signing route.
+   - In the PDF viewer, render every coordinate in the array as it already does, but show `coordinate.label` for each pin badge.
+   - Keep the fallback text only for legacy/missing labels.
+   - Preserve the existing signed badge, buttons, layout, responsiveness, and all click behavior.
 
-In `verifySigner`, when building `coordinates`:
-- Order the "all recipients" query with `.order("created_at", { ascending: true })` so each recipient gets the same index as in setup (recipients are inserted in array order).
-- For each recipient at index `i`, attach `colorIndex: i` to every pin alongside the existing `label`.
-- Extend the local coord type to `{ pageNumber, x, y, label, colorIndex }`.
-
-No other server logic changes.
-
-### 2. `src/components/mnit/SignerPdfViewer.tsx` — render pins in recipient color
-
-- Extend `SigCoord` with `colorIndex?: number`.
-- Import `getRecipientColor` from `@/lib/recipient-colors`.
-- For each unsigned pin, resolve `const color = getRecipientColor(c.colorIndex ?? 0)` and apply:
-  - `MapPin` → `style={{ color: color.hex, filter: color.glow }}` and `fill={color.fill}`.
-  - Label badge → inline `borderColor: color.border`, `backgroundColor: color.bg`, `color: color.text` (replacing the `border-primary/60 bg-background/90 text-primary` classes for this badge only).
-- Signed-state badge (the "נחתם ✓" dark blue marker) stays exactly as-is — it's a completion indicator, not a per-recipient identifier.
-
-### 3. No other files touched
-
-`sign.$token.tsx`, recipients query elsewhere, click/submission logic, and signed-state rendering all remain untouched. Pure cosmetic change scoped to the unsigned pin marker + its label.
-
-## Verification
-
-- Open a signing link for a 3-recipient document → see 3 differently colored pin sets matching the setup page colors.
-- Pin count and click-to-sign flow unchanged.
-- Already-signed pins still render the dark blue "נחתם ✓" badge.
+4. **Verify the regression target**
+   - Confirm there is no `.slice`, single-recipient filtering, or single shared label left in the signing view rendering path.
+   - Check that the viewer count and completion count use the full flattened all-pins array.
