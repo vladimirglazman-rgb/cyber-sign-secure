@@ -287,6 +287,10 @@ export function UserManualModal({ open, onOpenChange }: UserManualModalProps) {
                 <span className="text-primary">•</span>{" "}
                 <span className="font-semibold text-foreground">העלאת קובץ:</span>{" "}
                 במסך הראשי, לחצו על כפתור 'העלה מסמך' ובחרו את קובץ ה-PDF שלכם (לדוגמה: חוזה שכירות).
+                {" "}
+                <em className="text-primary/90">
+                  (שימו לב: המערכת תומכת בקבצי PDF ותמונות בלבד. אין להעלות קבצי Word).
+                </em>
               </li>
               <li className="leading-7">
                 <span className="text-primary">•</span>{" "}
