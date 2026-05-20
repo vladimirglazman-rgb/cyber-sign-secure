@@ -14,20 +14,10 @@ import {
   Database,
   Brain,
   Cloud,
-  FileWarning,
-  Files,
-  Users,
-  LayoutDashboard,
-  MessageCircle,
-  Activity,
-  Repeat,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { APP_VERSION } from "@/lib/app-version";
 import { UserManualModal } from "@/components/mnit/UserManualModal";
-import robotHandshakeImg from "@/assets/mnit-robot-handshake.png";
-import senderUxImg from "@/assets/mnit-sender-ux.png";
-import mobileUxImg from "@/assets/mnit-mobile-ux.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -161,151 +151,6 @@ function LandingPage() {
             style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
           />
         </div>
-
-        {/* Infographic — UX solution overview */}
-        <section className="mt-20 w-full max-w-6xl" dir="rtl">
-          <div className="mb-10 text-center">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-[10px] font-display uppercase tracking-[0.3em] text-primary/90">
-              <Sparkles className="h-3.5 w-3.5" />
-              <span>Infographic</span>
-            </div>
-            <h2 className="font-display text-2xl font-extrabold tracking-tight text-foreground md:text-4xl">
-              <span className="text-primary text-glow">MNIT Sign</span> — פתרון UX לחתימה דיגיטלית חכמה על חוזי שכירות
-            </h2>
-            <div className="mx-auto mt-4 h-px w-24 bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
-          </div>
-
-          {/* Problem vs Solution */}
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="glass-panel p-6 text-right">
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-destructive/15 ring-1 ring-destructive/40">
-                  <FileWarning className="h-5 w-5 text-destructive" />
-                </div>
-                <h3 className="font-display text-lg font-bold text-foreground">הבעיה — בירוקרטיה מסורבלת</h3>
-              </div>
-              <div className="mb-4 flex aspect-video items-center justify-center rounded-xl border border-destructive/20 bg-gradient-to-br from-destructive/10 to-transparent">
-                <Files className="h-16 w-16 text-destructive/70" />
-              </div>
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                החתמה על חוזי שכירות עם מספר נמענים (שוכר, ערבים) היא תהליך איטי, מבולבל ומועד לטעויות —
-                ניירת מפוזרת, חתימות חסרות והמתנה אינסופית בין הצדדים.
-              </p>
-            </div>
-
-            <div className="glass-panel p-6 text-right">
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/40">
-                  <Sparkles className="h-5 w-5 text-primary icon-glow" />
-                </div>
-                <h3 className="font-display text-lg font-bold text-foreground">הפתרון — תהליך דיגיטלי חלק</h3>
-              </div>
-              <div className="mb-4 flex aspect-video items-center justify-center rounded-xl border border-primary/30 bg-gradient-to-br from-primary/10 to-transparent glow-aqua">
-                <img
-                  src={robotHandshakeImg}
-                  alt="MNIT robot handshake"
-                  loading="lazy"
-                  className="h-full w-full rounded-xl object-cover"
-                />
-              </div>
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                אדם ובינה מלאכותית נפגשים — תהליך חתימה ברור, מאובטח ומובן לכולם.
-                העלאה, הגדרת חותמים, סימון מקומות חתימה ושליחה — הכל בלחיצה אחת.
-              </p>
-            </div>
-          </div>
-
-          {/* UX columns */}
-          <div className="mt-12">
-            <div className="mb-6 text-center">
-              <h3 className="font-display text-xl font-bold text-foreground md:text-2xl">
-                חוויית המשתמש (<span className="text-primary text-glow">UX</span>) ב-MNIT Sign
-              </h3>
-              <p className="mt-2 text-sm text-muted-foreground">הטכנולוגיה והדרך המהירה והבטוחה לחתימה</p>
-            </div>
-            <div className="grid gap-4 md:grid-cols-3">
-              {[
-                {
-                  icon: Users,
-                  visual: LayoutDashboard,
-                  image: senderUxImg,
-                  fit: "cover" as const,
-                  title: "שלב השולח (Sender UX)",
-                  desc: "הגדרת החוזה והחותמים: העלאת PDF, הוספת נמענים וסימון מקומות החתימה בממשק נקי וחכם.",
-                },
-                {
-                  icon: Smartphone,
-                  visual: Smartphone,
-                  image: mobileUxImg,
-                  fit: "contain" as const,
-                  title: "תצוגת מובייל",
-                  desc: "תהליך חתימה ברור ומובן לכולם — פינים צבעוניים, תמיכת מגע מלאה והבנה מיידית של מה לחתום.",
-                },
-                {
-                  icon: ShieldCheck,
-                  visual: Code2,
-                  image: undefined as string | undefined,
-                  fit: "cover" as const,
-                  title: "טכנולוגיה ואבטחה",
-                  desc: "נבנה ב-React, Tailwind ו-Supabase — תשתית מודרנית עם הצפנה מקצה לקצה ואימות דו-שלבי.",
-                },
-              ].map((c) => (
-                <div key={c.title} className="glass-panel p-6 text-right">
-                  <div className="mb-3 flex items-center justify-between gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/40">
-                      <c.icon className="h-5 w-5 text-primary icon-glow" />
-                    </div>
-                    <h4 className="font-display text-base font-bold text-foreground">{c.title}</h4>
-                  </div>
-                  <div className="mb-4 flex aspect-[4/3] items-center justify-center overflow-hidden rounded-xl border border-primary/20 bg-gradient-to-br from-primary/10 to-transparent">
-                    {c.image ? (
-                      <img
-                        src={c.image}
-                        alt={c.title}
-                        loading="lazy"
-                        className={`h-full w-full rounded-xl ${c.fit === "contain" ? "object-contain" : "object-cover"}`}
-                      />
-                    ) : (
-                      <c.visual className="h-14 w-14 text-primary/80 icon-glow" />
-                    )}
-                  </div>
-                  <p className="text-sm leading-relaxed text-muted-foreground">{c.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Roadmap strip */}
-          <div className="mt-12 glass-panel p-6" dir="rtl">
-            <div className="mb-5 text-center">
-              <h3 className="font-display text-xl font-bold text-foreground md:text-2xl">
-                <span className="text-primary text-glow">העתיד</span> — מפת דרכים
-              </h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                אינטגרציה עם WhatsApp, תמיכה במספר חותמים נוסף, והצגת סטטוס בזמן אמת.
-              </p>
-            </div>
-            <div className="grid gap-4 md:grid-cols-3">
-              {[
-                { icon: MessageCircle, label: "WhatsApp Integration" },
-                { icon: Activity, label: "Real-time Status" },
-                { icon: Repeat, label: "Automated Follow-ups" },
-              ].map((r) => (
-                <div
-                  key={r.label}
-                  className="flex flex-col items-center gap-2 rounded-xl border border-primary/20 bg-primary/5 px-4 py-5 text-center transition hover:border-primary/60"
-                >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/15 ring-1 ring-primary/40">
-                    <r.icon className="h-6 w-6 text-primary icon-glow" />
-                  </div>
-                  <div className="font-display text-sm font-semibold tracking-wide text-foreground">
-                    {r.label}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
 
         <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
           <button
