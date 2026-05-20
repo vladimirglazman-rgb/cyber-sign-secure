@@ -1,4 +1,33 @@
-# Infographic-inspired sections on landing page
+# Replace placeholder icons with uploaded images
+
+## Scope
+Frontend-only edit to `src/routes/index.tsx` (project has no `src/pages/Index.tsx`). Also copy 3 uploaded images into `src/assets/`. No other files touched.
+
+## Steps
+
+1. **Copy uploads into the repo** (so they bundle via Vite):
+   - `user-uploads://image-24.png` → `src/assets/mnit-robot-handshake.png` (robot + human handshake hero)
+   - `user-uploads://image-27.png` → `src/assets/mnit-sender-ux.png` (sender UI screenshot)
+   - `user-uploads://image-25.png` → `src/assets/mnit-mobile-ux.png` (mobile UI screenshot)
+
+2. **`src/routes/index.tsx` — add 3 ES6 image imports** alongside existing imports:
+   ```ts
+   import robotHandshakeImg from "@/assets/mnit-robot-handshake.png";
+   import senderUxImg from "@/assets/mnit-sender-ux.png";
+   import mobileUxImg from "@/assets/mnit-mobile-ux.png";
+   ```
+
+3. **Replace 3 icon placeholders inside the infographic section** (keep all wrappers, glass tiles, borders, glow, and aspect ratios identical — only swap the inner `<Icon />` for an `<img>`):
+   - **"הפתרון — תהליך דיגיטלי חלק"** card: replace the centered `<Handshake />` icon with `<img src={robotHandshakeImg} alt="MNIT robot handshake" className="h-full w-full object-cover rounded-xl" loading="lazy" />`.
+   - **"שלב השולח (Sender UX)"** column (rendered from the `cards` array): for that single card, render the sender screenshot instead of the `LayoutDashboard` icon — `<img src={senderUxImg} alt="Sender UX" className="h-full w-full object-cover rounded-xl" loading="lazy" />`.
+   - **"תצוגת מובייל"** column: same pattern, swap the `Smartphone` visual for `<img src={mobileUxImg} alt="Mobile UX" className="h-full w-full object-contain rounded-xl" loading="lazy" />` (contain — keeps the phone mockup uncropped).
+
+4. **Implementation note for the 3-column grid:** the current code maps a `cards` array and renders `<c.visual />` for every column. To support per-card images without touching the third (Tech Stack) column, extend each item with an optional `image?: string` + `fit?: "cover" | "contain"` field, then render `image ? <img ... /> : <c.visual ... />`. The Tech Stack column keeps its `Code2` icon unchanged.
+
+## Out of scope
+- The small header icon (`Sparkles` next to "הפתרון" heading) stays — only the large visual tile is replaced.
+- "הבעיה" card, Tech Stack column, roadmap strip, hero, CTAs, TopBar, footer — all untouched.
+- No styling tokens, no `styles.css`, no routing, no backend.
 
 ## Scope
 Frontend-only edit to `src/routes/index.tsx` (the landing page; project does not have `src/pages/Index.tsx`). No changes to routing, auth, API, DB, or any other component.
