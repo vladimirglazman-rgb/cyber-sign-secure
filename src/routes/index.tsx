@@ -25,6 +25,9 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { APP_VERSION } from "@/lib/app-version";
 import { UserManualModal } from "@/components/mnit/UserManualModal";
+import robotHandshakeImg from "@/assets/mnit-robot-handshake.png";
+import senderUxImg from "@/assets/mnit-sender-ux.png";
+import mobileUxImg from "@/assets/mnit-mobile-ux.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -198,7 +201,12 @@ function LandingPage() {
                 <h3 className="font-display text-lg font-bold text-foreground">הפתרון — תהליך דיגיטלי חלק</h3>
               </div>
               <div className="mb-4 flex aspect-video items-center justify-center rounded-xl border border-primary/30 bg-gradient-to-br from-primary/10 to-transparent glow-aqua">
-                <Handshake className="h-16 w-16 text-primary icon-glow" />
+                <img
+                  src={robotHandshakeImg}
+                  alt="MNIT robot handshake"
+                  loading="lazy"
+                  className="h-full w-full rounded-xl object-cover"
+                />
               </div>
               <p className="text-sm leading-relaxed text-muted-foreground">
                 אדם ובינה מלאכותית נפגשים — תהליך חתימה ברור, מאובטח ומובן לכולם.
@@ -220,18 +228,24 @@ function LandingPage() {
                 {
                   icon: Users,
                   visual: LayoutDashboard,
+                  image: senderUxImg,
+                  fit: "cover" as const,
                   title: "שלב השולח (Sender UX)",
                   desc: "הגדרת החוזה והחותמים: העלאת PDF, הוספת נמענים וסימון מקומות החתימה בממשק נקי וחכם.",
                 },
                 {
                   icon: Smartphone,
                   visual: Smartphone,
+                  image: mobileUxImg,
+                  fit: "contain" as const,
                   title: "תצוגת מובייל",
                   desc: "תהליך חתימה ברור ומובן לכולם — פינים צבעוניים, תמיכת מגע מלאה והבנה מיידית של מה לחתום.",
                 },
                 {
                   icon: ShieldCheck,
                   visual: Code2,
+                  image: undefined as string | undefined,
+                  fit: "cover" as const,
                   title: "טכנולוגיה ואבטחה",
                   desc: "נבנה ב-React, Tailwind ו-Supabase — תשתית מודרנית עם הצפנה מקצה לקצה ואימות דו-שלבי.",
                 },
@@ -243,8 +257,17 @@ function LandingPage() {
                     </div>
                     <h4 className="font-display text-base font-bold text-foreground">{c.title}</h4>
                   </div>
-                  <div className="mb-4 flex aspect-[4/3] items-center justify-center rounded-xl border border-primary/20 bg-gradient-to-br from-primary/10 to-transparent">
-                    <c.visual className="h-14 w-14 text-primary/80 icon-glow" />
+                  <div className="mb-4 flex aspect-[4/3] items-center justify-center overflow-hidden rounded-xl border border-primary/20 bg-gradient-to-br from-primary/10 to-transparent">
+                    {c.image ? (
+                      <img
+                        src={c.image}
+                        alt={c.title}
+                        loading="lazy"
+                        className={`h-full w-full rounded-xl ${c.fit === "contain" ? "object-contain" : "object-cover"}`}
+                      />
+                    ) : (
+                      <c.visual className="h-14 w-14 text-primary/80 icon-glow" />
+                    )}
                   </div>
                   <p className="text-sm leading-relaxed text-muted-foreground">{c.desc}</p>
                 </div>
