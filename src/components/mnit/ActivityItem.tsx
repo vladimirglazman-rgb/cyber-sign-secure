@@ -58,7 +58,7 @@ export function ActivityItem({ doc }: { doc: DocumentRow }) {
   return (
     <li className="flex flex-col gap-2 rounded-lg border border-primary/10 bg-primary/5 p-2.5">
       <div
-        className={`flex items-center gap-3 ${isSigned ? "cursor-pointer rounded-md transition hover:bg-primary/10" : ""}`}
+        className={`flex flex-col items-start gap-3 sm:flex-row sm:items-center ${isSigned ? "cursor-pointer rounded-md transition hover:bg-primary/10" : ""}`}
         onClick={isSigned ? () => setAuditOpen(true) : undefined}
         role={isSigned ? "button" : undefined}
         title={isSigned ? "הצג פרטי חתימה" : undefined}
@@ -66,11 +66,11 @@ export function ActivityItem({ doc }: { doc: DocumentRow }) {
         <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10 ring-1 ring-primary/30">
           <FileText className="h-4 w-4 text-primary" />
         </div>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-xs font-medium text-foreground">{doc.file_name}</p>
-          <p className="truncate text-[10px] text-muted-foreground">{doc.subject}</p>
+        <div className="w-full min-w-0 flex-1">
+          <p className="whitespace-normal break-words text-xs font-medium text-foreground">{doc.file_name}</p>
+          <p className="whitespace-normal break-words text-[10px] text-muted-foreground">{doc.subject}</p>
         </div>
-        <div className="flex flex-col items-end gap-1">
+        <div className="flex w-full flex-col items-start gap-1 sm:w-auto sm:items-end">
           <span
             className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ${cls[doc.status]}`}
           >
