@@ -87,7 +87,7 @@ export function AuditModal({ open, onOpenChange, documentId }: Props) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         dir="rtl"
-        className="glass-panel max-h-[90vh] max-w-2xl overflow-y-auto border-primary/30"
+        className="fixed inset-0 left-0 top-0 z-[100] flex h-full max-h-none w-full max-w-none translate-x-0 translate-y-0 flex-col overflow-y-auto rounded-none border-primary/30 bg-background p-6 sm:left-[50%] sm:top-[50%] sm:block sm:h-auto sm:max-h-[90vh] sm:w-full sm:max-w-2xl sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-2xl sm:bg-transparent sm:glass-panel"
       >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 font-display text-lg text-primary text-glow">
