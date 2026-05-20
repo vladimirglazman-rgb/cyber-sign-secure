@@ -1,3 +1,27 @@
+# Fix: Document Audit Modal Covers Only Half Screen on Mobile (RTL)
+
+## Problem
+On mobile, opening a signed document opens `AuditModal`, but the dashboard behind it bleeds through on the right side. Root cause: `DialogContent` uses `left-[50%] translate-x-[-50%]` centering with `max-w-lg` / `max-w-2xl` and a transparent `glass-panel` background, so on narrow viewports the panel doesn't fill the screen and the underlying app shows through (especially under RTL).
+
+## Fix (Tailwind-only, scoped to `AuditModal`)
+
+Edit `src/components/mnit/AuditModal.tsx` — only the `DialogContent` className:
+
+- Mobile: make it a true full-screen overlay
+  - `fixed inset-0 z-[100] w-full h-full max-w-none max-h-none rounded-none overflow-y-auto bg-background`
+  - Override the default Dialog centering: `left-0 top-0 translate-x-0 translate-y-0`
+- Desktop (`sm:`): restore the current centered glass card
+  - `sm:fixed sm:left-[50%] sm:top-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%]`
+  - `sm:h-auto sm:max-h-[90vh] sm:w-full sm:max-w-2xl sm:rounded-2xl sm:bg-transparent`
+- Keep `glass-panel border-primary/30` for the desktop look (the solid `bg-background` on mobile hides the dashboard; on `sm+` `bg-transparent` lets `glass-panel` show through).
+- Keep `dir="rtl"` so RTL rendering is preserved.
+
+No changes to backend, data fetching, routing, or any other component.
+
+## Technical notes
+- `DialogContent` (`src/components/ui/dialog.tsx`) is shared by other dialogs — do NOT edit it. Override on the instance only.
+- `z-[100]` sits above the app shell (sidebar, SendBar floating banner) which use lower z-indexes.
+- `overflow-y-auto` on the container itself lets long audit lists scroll on mobile without clipping.
 # Fix mobile truncation in "פעילות אחרונה" list
 
 Pure Tailwind class changes in `src/components/mnit/ActivityItem.tsx` and `src/components/mnit/Sidebar.tsx`. No data or logic changes.
