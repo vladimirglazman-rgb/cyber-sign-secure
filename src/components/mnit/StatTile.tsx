@@ -4,10 +4,10 @@ export function StatTile({ label, value, icon: Icon, tone: t = "default" }: { la
   return (
     <div className="glass-panel flex flex-col gap-1 p-3">
       <div className="flex items-center justify-between">
-        <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">{label}</span>
-        <Icon className={`h-4 w-4 ${tone[t]} icon-glow`} />
+        <span className="truncate text-[10px] text-muted-foreground">{label}</span>
+        <Icon className={`h-4 w-4 shrink-0 ${tone[t]}`} />
       </div>
-      <span className="font-display text-2xl font-bold text-foreground">{value}</span>
+      <span className="font-body text-2xl font-bold text-foreground">{value}</span>
     </div>
   );
 }
