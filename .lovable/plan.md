@@ -1,32 +1,36 @@
-# Replace Features Grid With 4-Step Journey
+# Add New Capabilities Section Between Workflow & Tech Stack
 
 ## Goal
-Replace the 3-column features grid directly below the Loom video on the landing page (`src/routes/index.tsx`) with an elegant, editorial 4-step user-journey section in Hebrew/RTL.
+Insert an elegant, minimalist capabilities section on the landing page (`src/routes/index.tsx`), placed directly between the existing 4-step workflow area and the Tech Stack section.
 
 ## Scope
 Frontend only — `src/routes/index.tsx`. No routing, button, or backend changes.
 
 ## Content
-- Section title (serif display, large):
-  "איך מתפעלים את הכלי – התהליך החדש, המדויק והחכם"
-- Intro paragraph (muted, body font):
-  "המערכת בנויה כך שכל תהליך החתימה הופך לזורם, אינטואיטיבי ומבוקר מקצה לקצה. ארבעה שלבים פשוטים — וכל המסמך חתום, מאומת ומוכן לשימוש."
-- Four steps (01–04), each with title + description from supplied copy:
-  1. שלב 1 – העלאה והגדרה
-  2. שלב 2 – הזרקת השדות
-  3. שלב 3 – שליחה חכמה
-  4. שלב 4 – ניטור ואימות
+
+### Section Title (centered, clean typography):
+"🔍 מה הכלי עוע בפועל (MVP – אבל כבר חזק מאוד)"
+
+### Capabilities List (8 items, clean checklist grid with minimal checkmark icons):
+1. טעינת מסמך – העלאת PDF או בחירת תבנית מוכנה.
+2. סימון מיקום חתימות – הצבת סיכות צבעוניות ושמיות לכל חותם.
+3. שליחה לחותמים – ליחיד, לקבוצה או לסדר חתימה מוגדר מראש.
+4. הזדהות רב־שכבתית – אימות זהות באמצעות SMS, אימייל, קוד חד‑פעמי או שכבות נוספות.
+5. חתימה לפי סיכה – כל חותם רואה את הסיכה שלו וחותם בדיוק במקום שיועד לו.
+6. ניהול תהליך מלא – המסמך לא חוזר עד שכל החותמים השלימו את חלקם.
+7. שקיפות מלאה – המחתים רואה בזמן אמת מי חתם, מי לא, ובאיזה תאריך ושעה.
+8. הגנה על מסמכים חתומים – עד לסיום התהליך, אף גורם לא יכול לפתוח או לשנות את המסמך החתום.
+
+### Future Vision Note (subtle premium text frame):
+"🌟 וזה רק ה‑MVP: המערכת תתרחב לפיצ’רים שלא קיימים היום בשום כלי בעולם — אוטומציות מתקדמות, אימותים חכמים, אינטגרציות עמוקות, ניהול תהליכים מורכבים ועוד. הכול בשבילכם, 24/7, בצורה מאובטחת, מהירה ומקצועית."
 
 ## Layout & Style
-- Replace the existing 3-tile grid (Lock / Zap / Sparkles) with the new section.
-- Container: `dir="rtl"`, `max-w-5xl`, generous spacing.
-- Header: small uppercase eyebrow ("Workflow"), serif `font-display` title (`text-4xl md:text-5xl`), intro paragraph (`text-lg text-muted-foreground max-w-3xl`), centered.
-- Steps in a 2-column responsive grid (`md:grid-cols-2 gap-8`) of editorial cards:
-  - Large serif numeral "01"–"04" in `text-primary`, `text-5xl font-display font-black`.
-  - Step title `font-display text-xl font-bold`.
-  - Description `text-sm md:text-base leading-relaxed text-muted-foreground`.
-  - Card: `border border-gray-200 bg-white p-8 text-right rounded-lg hover:border-gray-400 transition`.
-- Drop unused `Lock` and `Zap` icon imports; keep `Sparkles` (used by Tech Stack eyebrow).
+- Container: `dir="rtl"`, `max-w-5xl`, centered, generous vertical padding (`py-20` or similar) and top margin to separate from workflow.
+- Title: `font-display text-3xl md:text-4xl font-bold text-center` with bottom margin.
+- Capabilities grid: responsive 2-column grid on desktop (`md:grid-cols-2 gap-6`), single column on mobile. Each item in a clean card-like row or a simple flex row with a minimal checkmark icon (`Check` from lucide-react).
+- Each checklist item: `flex flex-row-reverse items-start gap-3 text-right` with icon on the right (RTL), body text `text-base text-foreground`.
+- Future vision: centered, within a subtle bordered/highlighted container (`rounded-xl border border-gray-200 bg-muted/30 p-8 max-w-3xl mx-auto mt-12 text-center` with `text-muted-foreground font-body`).
+- No additional state or business logic.
 
 ## Out of scope
-Hero, header nav, Loom video, Tech Stack, footer, routes, buttons.
+Hero, header nav, 4-step workflow, Tech Stack, footer, routes, buttons.
