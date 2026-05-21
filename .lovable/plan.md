@@ -1,79 +1,32 @@
-# Make hero headline a massive bold serif newspaper title
+# Replace Features Grid With 4-Step Journey
 
 ## Goal
-
-The hero copy on `/` already contains the correct Hebrew headline and sub-headline. Make the headline render as a massive, bold serif newspaper title with perfect RTL alignment, without touching surrounding buttons, links, or the Loom video.
-
-## Scope
-
-Frontend only, single file: `src/routes/index.tsx`, hero block only (lines ~102-113). No JSX structure changes outside class names.
-
-## Changes
-
-- Enlarge the `<h1>` from `text-3xl md:text-5xl` to a newspaper scale: `text-4xl sm:text-5xl md:text-6xl lg:text-7xl`.
-- Keep `font-display` (Playfair Display serif), bump weight to `font-black`, keep `leading-[1.05] tracking-tight`.
-- Widen the headline container to `max-w-5xl` so the long Hebrew sentence breathes.
-- Keep `dir="rtl"` on the wrapper and `text-right` on both the headline and sub-headline for clean RTL alignment.
-- Slightly enlarge the sub-headline to `text-lg md:text-xl` for better hierarchy; keep `font-body`, `text-muted-foreground`.
-- Do not touch the mobile badge chip, the Loom iframe, the header nav, or the CTA buttons below.
-
-## Verification
-
-- Visit `/` at the current viewport: headline reads as one big serif block, right-aligned RTL, no per-character wrapping.
-- Sub-headline sits directly below, smaller, also right-aligned RTL.
-- Loom video, badge, and CTA buttons unchanged.
-
-## Goal
-
-Fix the "פעילות אחרונה" activity cards so Hebrew filenames, badges, and action buttons render in normal RTL horizontal flow instead of collapsing into a single-letter vertical column.
+Replace the 3-column features grid directly below the Loom video on the landing page (`src/routes/index.tsx`) with an elegant, editorial 4-step user-journey section in Hebrew/RTL.
 
 ## Scope
+Frontend only — `src/routes/index.tsx`. No routing, button, or backend changes.
 
-Frontend presentation only. No business logic, data fetching, routing, copy-link behavior, WhatsApp behavior, or modal behavior will change.
+## Content
+- Section title (serif display, large):
+  "איך מתפעלים את הכלי – התהליך החדש, המדויק והחכם"
+- Intro paragraph (muted, body font):
+  "המערכת בנויה כך שכל תהליך החתימה הופך לזורם, אינטואיטיבי ומבוקר מקצה לקצה. ארבעה שלבים פשוטים — וכל המסמך חתום, מאומת ומוכן לשימוש."
+- Four steps (01–04), each with title + description from supplied copy:
+  1. שלב 1 – העלאה והגדרה
+  2. שלב 2 – הזרקת השדות
+  3. שלב 3 – שליחה חכמה
+  4. שלב 4 – ניטור ואימות
 
-Files to update:
+## Layout & Style
+- Replace the existing 3-tile grid (Lock / Zap / Sparkles) with the new section.
+- Container: `dir="rtl"`, `max-w-5xl`, generous spacing.
+- Header: small uppercase eyebrow ("Workflow"), serif `font-display` title (`text-4xl md:text-5xl`), intro paragraph (`text-lg text-muted-foreground max-w-3xl`), centered.
+- Steps in a 2-column responsive grid (`md:grid-cols-2 gap-8`) of editorial cards:
+  - Large serif numeral "01"–"04" in `text-primary`, `text-5xl font-display font-black`.
+  - Step title `font-display text-xl font-bold`.
+  - Description `text-sm md:text-base leading-relaxed text-muted-foreground`.
+  - Card: `border border-gray-200 bg-white p-8 text-right rounded-lg hover:border-gray-400 transition`.
+- Drop unused `Lock` and `Zap` icon imports; keep `Sparkles` (used by Tech Stack eyebrow).
 
-- `src/components/mnit/ActivityItem.tsx`
-- `src/components/mnit/Sidebar.tsx` only if the list wrapper still constrains child width
-
-## Planned structure
-
-Each activity item will become a stacked block card:
-
-```text
-Activity card
-└─ Row 1: [status/meta badge] [filename + subject] [file icon]
-└─ Row 2: [העתק קישור] [וואטסאפ] [signer name]
-```
-
-## Changes
-
-### Activity item card
-
-- Set the outer `<li>` to a stable block layout: `flex flex-col w-full text-right p-3` with `box-border`, `min-w-0`, and `dir="rtl"`.
-- Replace the current mixed row/meta layout with two clear rows:
-  - Top row: file icon, filename/subject text, and status/date metadata side-by-side.
-  - Bottom row: signer action controls below the filename area.
-- Give the filename wrapper `flex-1 w-full min-w-0 text-right` so filenames have real horizontal space.
-- Remove restrictive typography widths that can compress text to 0px.
-- Keep Hebrew text in a clean sans-serif body style and avoid letter spacing/tracking in this component.
-
-### Action row
-
-- Render pending signer actions with `mt-2 flex flex-row-reverse justify-start gap-2`.
-- Keep both buttons as `shrink-0 whitespace-nowrap` so "העתק קישור" and "וואטסאפ" remain intact.
-- Keep the signer name as a normal RTL text element with `min-w-0` and truncation only if needed.
-
-### Sidebar wrapper safety
-
-- Ensure the activity list wrapper remains `w-full min-w-0 box-border` and does not add a width constraint that squeezes cards.
-- Preserve existing padding that keeps the sidebar away from the screen edge.
-
-## Verification
-
-After implementation, verify on `/app` at the current desktop viewport:
-
-- File names in "פעילות אחרונה" flow horizontally RTL, not letter-by-letter vertically.
-- Status badges remain aligned in the top row.
-- Copy link and WhatsApp buttons remain horizontally aligned below the text.
-- No card content is clipped on the right edge.
+## Out of scope
+Hero, header nav, Loom video, Tech Stack, footer, routes, buttons.
