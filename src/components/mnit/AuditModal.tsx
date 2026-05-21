@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, ExternalLink, ShieldCheck, Clock, Globe, User, FileText, Download, X } from "lucide-react";
+import {
+  Loader2,
+  ExternalLink,
+  ShieldCheck,
+  Clock,
+  Globe,
+  User,
+  FileText,
+  Download,
+  X,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -79,9 +89,7 @@ export function AuditModal({ open, onOpenChange, documentId }: Props) {
     }
   };
 
-  const hasSignedRecipient = (data?.recipients ?? []).some(
-    (r) => r.signature_data_url,
-  );
+  const hasSignedRecipient = (data?.recipients ?? []).some((r) => r.signature_data_url);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -217,7 +225,10 @@ export function AuditModal({ open, onOpenChange, documentId }: Props) {
                 </div>
 
                 {r.signed_user_agent && (
-                  <p className="truncate text-[10px] text-muted-foreground/80" title={r.signed_user_agent}>
+                  <p
+                    className="truncate text-[10px] text-muted-foreground/80"
+                    title={r.signed_user_agent}
+                  >
                     {r.signed_user_agent}
                   </p>
                 )}
