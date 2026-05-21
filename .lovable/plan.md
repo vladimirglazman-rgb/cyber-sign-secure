@@ -1,23 +1,25 @@
-# CSS-Only Button Contrast Fix — AuditModal
+# Modal Close Button Structural Reset — AuditModal
 
 ## Goal
-Improve text readability of the two action buttons inside the signature verification modal by switching them to high-contrast solid colors.
+Restore the signature verification modal to the default shadcn/Radix Dialog structure with a single, working native close (X) button — top-right, clickable above the overlay.
+
+## Scope
+Only `src/components/mnit/AuditModal.tsx`. No changes to `dialog.tsx`, `index.tsx`, sidebar, or global CSS.
 
 ## Changes
-In `src/components/mnit/AuditModal.tsx`, update **only** the `className` attributes of:
 
-1. **"הורד מסמך חתום"** button (line ~130)
-2. **"פתח מסמך מקור"** anchor (line ~145)
+1. **Simplify `<DialogContent>` className** — remove the heavy custom override classes (`fixed inset-0`, `translate-x-0`, `data-[state=closed]:hidden`, `sm:bg-transparent sm:glass-panel`, `border-primary/30`, etc.) that conflict with the default Radix positioning and obscure the built-in close button. Keep only minimal additions on top of the shadcn defaults:
+   - `dir="rtl"`
+   - `className="max-w-2xl max-h-[90vh] overflow-y-auto"`
 
-### Class updates for both elements
-- Replace `bg-primary` with `bg-blue-600`
-- Replace `text-primary-foreground` with `text-white`
-- Replace `hover:bg-primary/90` with `hover:bg-blue-700`
-- Keep all other classes, structural markup, `onClick` handlers, and modal wrapper exactly as-is.
+2. **Remove `pr-10` from `<DialogHeader>`** — no longer needed once default layout is restored.
+
+3. **Verify no custom close buttons exist** — confirm there are no extra `<DialogClose>`, circular `×`, or floating close elements in the JSX. The native close button shipped by `DialogContent` in `src/components/ui/dialog.tsx` is the only close affordance.
+
+4. **Click reliability** — the default `<DialogPrimitive.Close>` in `dialog.tsx` is already `absolute right-4 top-4`. Once the custom `fixed inset-0 ... z-[100]` content classes are removed, it sits above the overlay (overlay is `z-50`, content is `z-50`, close is inside content) and is naturally clickable. No `dialog.tsx` edits needed.
 
 ## Out of scope
-- Modal wrapper / `DialogContent`
-- Close (X) button / `DialogClose`
-- `DialogHeader` layout
-- Any event handlers or logic
-- Any other component or page
+- `src/components/ui/dialog.tsx`
+- The two action buttons' styling (already fixed)
+- Audit data fetching, signature rendering, download logic
+- Any other file
