@@ -11,6 +11,7 @@ import {
   Database,
   Brain,
   Cloud,
+  Check,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { APP_VERSION } from "@/lib/app-version";
@@ -198,6 +199,45 @@ function LandingPage() {
         </section>
 
         {/* Technology Stack */}
+        {/* MVP capabilities */}
+        <section className="mt-24 w-full max-w-5xl" dir="rtl">
+          <div className="mb-12 text-center">
+            <h2 className="font-display text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+              🔍 מה הכלי עושה בפועל (MVP – אבל כבר חזק מאוד)
+            </h2>
+            <div className="mx-auto mt-6 h-px w-24 bg-gray-300" />
+          </div>
+          <ul className="grid gap-5 md:grid-cols-2 md:gap-6">
+            {[
+              "טעינת מסמך – העלאת PDF או בחירת תבנית מוכנה.",
+              "סימון מיקום חתימות – הצבת סיכות צבעוניות ושמיות לכל חותם.",
+              "שליחה לחותמים – ליחיד, לקבוצה או לסדר חתימה מוגדר מראש.",
+              "הזדהות רב־שכבתית – אימות זהות באמצעות SMS, אימייל, קוד חד\u2011פעמי או שכבות נוספות.",
+              "חתימה לפי סיכה – כל חותם רואה את הסיכה שלו וחותם בדיוק במקום שיועד לו.",
+              "ניהול תהליך מלא – המסמך לא חוזר עד שכל החותמים השלימו את חלקם.",
+              "שקיפות מלאה – המחתים רואה בזמן אמת מי חתם, מי לא, ובאיזה תאריך ושעה.",
+              "הגנה על מסמכים חתומים – עד לסיום התהליך, אף גורם לא יכול לפתוח או לשנות את המסמך החתום.",
+            ].map((item) => (
+              <li
+                key={item}
+                className="flex flex-row-reverse items-start gap-3 rounded-lg border border-gray-200 bg-white p-5 text-right"
+              >
+                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <Check className="h-3.5 w-3.5" strokeWidth={3} />
+                </span>
+                <p className="font-body text-base leading-relaxed text-foreground">
+                  {item}
+                </p>
+              </li>
+            ))}
+          </ul>
+          <div className="mx-auto mt-12 max-w-3xl rounded-xl border border-gray-200 bg-muted/40 p-8 text-center">
+            <p className="font-body text-base leading-relaxed text-muted-foreground md:text-lg">
+              🌟 וזה רק ה‑MVP: המערכת תתרחב לפיצ׳רים שלא קיימים היום בשום כלי בעולם — אוטומציות מתקדמות, אימותים חכמים, אינטגרציות עמוקות, ניהול תהליכים מורכבים ועוד. הכול בשבילכם, 24/7, בצורה מאובטחת, מהירה ומקצועית.
+            </p>
+          </div>
+        </section>
+
         <section className="mt-28 w-full max-w-5xl border-t border-gray-200 pt-16" dir="rtl">
           <div className="mb-10 text-center">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-[10px] font-body uppercase tracking-[0.3em] text-muted-foreground">
