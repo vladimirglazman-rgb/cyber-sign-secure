@@ -6,11 +6,6 @@ import {
   Sparkles,
   Smartphone,
   BookOpen,
-  Code2,
-  Paintbrush,
-  Database,
-  Brain,
-  Cloud,
   Check,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -249,26 +244,26 @@ function LandingPage() {
             </h2>
             <div className="mx-auto mt-6 h-px w-24 bg-gray-300" />
           </div>
-          <div className="mx-auto grid max-w-4xl gap-6 sm:grid-cols-2 md:grid-cols-3">
+          <div
+            dir="ltr"
+            className="mx-auto flex max-w-3xl flex-wrap items-center justify-center gap-3"
+          >
             {[
-              { icon: Code2, name: "React & Vite", desc: "חוויית משתמש מהירה במיוחד, יציבה ומודרנית." },
-              { icon: Paintbrush, name: "Tailwind CSS", desc: "עיצוב רספונסיבי, נקי וחדשני המותאם לכל מכשיר." },
-              { icon: Database, name: "Supabase", desc: "מסד נתונים מאובטח בענן, ניהול משתמשים ותשתית Backend חזקה." },
-              { icon: Brain, name: "AI Engine", desc: "מנוע בינה מלאכותית מתקדם לעיבוד, ניתוח ושכלול מסמכים אוטומטי." },
-              { icon: Cloud, name: "Cloudflare", desc: "הגנת DDoS, אבטחת DNS ותעודות SSL להגנה מקסימלית על המידע." },
-            ].map((t) => (
-              <div
-                key={t.name}
-                className="group rounded-lg border border-gray-200 bg-white p-6 text-right transition hover:border-gray-400"
+              "React",
+              "Vite",
+              "TypeScript",
+              "Tailwind CSS",
+              "TanStack Start",
+              "Supabase",
+              "AI Engine",
+              "Cloudflare",
+            ].map((name) => (
+              <span
+                key={name}
+                className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-800"
               >
-                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-md border border-gray-200 bg-muted">
-                  <t.icon className="h-5 w-5 text-primary" />
-                </div>
-                <h3 className="mb-2 font-display text-lg font-bold tracking-tight text-foreground">
-                  {t.name}
-                </h3>
-                <p className="text-xs leading-relaxed text-muted-foreground">{t.desc}</p>
-              </div>
+                {name}
+              </span>
             ))}
           </div>
         </section>
