@@ -1,42 +1,40 @@
-# Fix duplicate / broken close button in AuditModal
+# Ultimate close fix for AuditModal
 
 ## Problem
 
-`src/components/mnit/AuditModal.tsx` currently renders two close affordances:
+The signature verification modal's visible X is still not clickable because it
+is rendered as a floating/absolute close control outside or above the wrong
+visual layer. It can end up outside the white modal card area or underneath a
+layer that intercepts pointer events.
 
-1. A custom blue circular `DialogClose` added at top-left.
-2. The built-in gray X from the shared `DialogContent` at top-right.
+## Changes
 
-Neither closes the modal. The custom `DialogContent` className uses
-`fixed inset-0 ... z-[100]` on mobile and a glass panel on desktop. Inner
-content layers (header, scroll container, glass background) cover the
-built-in Radix close button, so pointer events never reach it.
+Edit `src/components/mnit/AuditModal.tsx` only.
 
-## Changes (single file)
+1. Stop relying on the shared `DialogContent` built-in absolute close button for
+   this modal by hiding that descendant close button from this modal's
+   `DialogContent` className.
+2. Add exactly one close button inside the modal's own content, in the top
+   header row of the white/modal card area.
+3. Use a normal lucide `X` icon, not a custom floating circular clone.
+4. Wire the click directly to the parent dismissal prop already used by the
+   component:
 
-`src/components/mnit/AuditModal.tsx` only:
+   ```tsx
+   onClick={() => onOpenChange(false)}
+   ```
 
-1. Remove the custom top-left close block entirely, and drop `DialogClose`
-   from the `@/components/ui/dialog` import.
-2. Keep `DialogHeader` right-padded so the title clears the single top-right X.
-3. Force the built-in top-right close button to sit above all modal layers
-   without editing the shared dialog primitive: add an arbitrary-selector
-   utility on `DialogContent` that targets its descendant close button and
-   sets `position: relative`, `z-index: 50`, and `pointer-events: auto`.
-   Concretely, append a Tailwind arbitrary selector class to the
-   `DialogContent` className that targets the inner close button (matched
-   by its `absolute right-4 top-4` positioning) and bumps its stacking and
-   pointer events.
-4. Preserve the high-contrast action buttons ("פתח מסמך מקור" /
-   "הורד מסמך חתום") exactly as they are.
-5. The close click flows through Radix's built-in `DialogPrimitive.Close`,
-   which fires `onOpenChange(false)` — the exact prop passed by the parent.
-   No new local state is introduced.
+5. Apply the requested interaction guarantees to the real button:
+
+   ```text
+   relative z-[9999] pointer-events-auto cursor-pointer p-2
+   ```
+
+6. Keep the existing high-contrast document action buttons unchanged:
+   `bg-primary text-primary-foreground shadow hover:bg-primary/90`.
 
 ## Out of scope
 
-- The shared `src/components/ui/dialog.tsx` (no edits, keeps every other
-  dialog stable).
-- Audit fetch, download handler, signature image, recipient list,
-  IP/timestamp formatting.
-- Any other modal or page.
+- No edits to `src/components/ui/dialog.tsx`.
+- No changes to audit trail text, signature image rendering, timestamps, IP
+  display, downloads, fetches, verification logic, or backend code.
