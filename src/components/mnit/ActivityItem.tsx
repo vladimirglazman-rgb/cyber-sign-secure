@@ -56,77 +56,95 @@ export function ActivityItem({ doc }: { doc: DocumentRow }) {
   };
   const isSigned = doc.status === "signed";
   return (
-    <li className="box-border block w-full min-w-0 rounded-lg border border-primary/10 bg-primary/5 p-2.5" dir="rtl">
-      <div
-        className={`box-border flex w-full min-w-0 flex-row-reverse items-start justify-start gap-3 ${isSigned ? "cursor-pointer rounded-md transition hover:bg-primary/10" : ""}`}
-        onClick={isSigned ? () => setAuditOpen(true) : undefined}
-        role={isSigned ? "button" : undefined}
-        title={isSigned ? "הצג פרטי חתימה" : undefined}
-      >
+    <li
+      className={`box-border flex w-full min-w-0 flex-col gap-2 rounded-lg border border-primary/10 bg-primary/5 p-3 text-right font-body ${isSigned ? "cursor-pointer transition hover:bg-primary/10" : ""}`}
+      dir="rtl"
+      onClick={isSigned ? () => setAuditOpen(true) : undefined}
+      role={isSigned ? "button" : undefined}
+      title={isSigned ? "הצג פרטי חתימה" : undefined}
+    >
+      {/* Row 1: icon + filename + badge */}
+      <div className="box-border flex w-full min-w-0 flex-row-reverse items-start gap-2">
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10 ring-1 ring-primary/30">
           <FileText className="h-4 w-4 text-primary" />
         </div>
-        <div className="block w-full min-w-0 flex-1 text-right">
-          <p className="block w-full min-w-0 whitespace-normal break-words text-right text-xs font-medium text-foreground">{doc.file_name}</p>
-          <p className="block w-full min-w-0 whitespace-normal break-words text-right text-[10px] text-muted-foreground">{doc.subject}</p>
-        </div>
-        <div className="flex w-auto shrink-0 flex-col items-end gap-1 text-right">
-          <span
-            className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ${cls[doc.status]}`}
-          >
-            {label[doc.status]}
-          </span>
-          {signers.length > 0 && (
-            <span className="text-[9px] text-primary/80">
-              {signedCount}/{signers.length} חתמו
-            </span>
-          )}
-          <span className="text-[10px] text-muted-foreground">
-            {datePart}
-            <span className="mx-1 text-primary/50">|</span>
-            <span className="text-[9px] text-primary/70">{timePart}</span>
-          </span>
-          {doc.version && (
-            <span className="font-body text-[9px] text-primary/80">
-              גרסה {doc.version}
-            </span>
-          )}
-          {isSigned && (
-            <span className="inline-flex items-center gap-1 text-[9px] text-primary/80">
-              <Eye className="h-2.5 w-2.5" /> פרטי חתימה
-            </span>
+        <div className="min-w-0 flex-1 text-right">
+          <p className="w-full break-words text-right text-xs font-medium text-foreground">
+            {doc.file_name}
+          </p>
+          {doc.subject && (
+            <p className="w-full break-words text-right text-[10px] text-muted-foreground">
+              {doc.subject}
+            </p>
           )}
         </div>
+        <span
+          className={`shrink-0 whitespace-nowrap rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ${cls[doc.status]}`}
+        >
+          {label[doc.status]}
+        </span>
       </div>
+
+      {/* Meta line */}
+      <div className="flex w-full flex-row-reverse flex-wrap items-center gap-x-2 gap-y-1 text-[10px] text-muted-foreground">
+        <span className="whitespace-nowrap">
+          {datePart}
+          <span className="mx-1 text-primary/50">|</span>
+          <span className="text-[9px] text-primary/70">{timePart}</span>
+        </span>
+        {signers.length > 0 && (
+          <span className="whitespace-nowrap text-[9px] text-primary/80">
+            {signedCount}/{signers.length} חתמו
+          </span>
+        )}
+        {doc.version && (
+          <span className="whitespace-nowrap text-[9px] text-primary/80">
+            גרסה {doc.version}
+          </span>
+        )}
+        {isSigned && (
+          <span className="inline-flex items-center gap-1 whitespace-nowrap text-[9px] text-primary/80">
+            <Eye className="h-2.5 w-2.5" /> פרטי חתימה
+          </span>
+        )}
+      </div>
+
+      {/* Row 2: signer actions */}
       {pendingSigners.length > 0 && (
-        <ul className="box-border flex w-full min-w-0 flex-col gap-1 ps-1">
+        <ul className="box-border flex w-full min-w-0 flex-col gap-2">
           {pendingSigners.map((r) => (
-            <li key={r.id} className="box-border flex w-full min-w-0 flex-row-reverse items-center justify-start gap-2">
-              <span className="min-w-0 flex-1 truncate text-right text-[10px] text-muted-foreground">
+            <li
+              key={r.id}
+              className="box-border flex w-full min-w-0 flex-col gap-1"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span className="w-full min-w-0 truncate text-right text-[10px] text-muted-foreground">
                 {r.name}
               </span>
-              <button
-                type="button"
-                onClick={() => r.signing_token && copy(r.signing_token, r.name)}
-                className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md border border-primary/60 bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary transition hover:bg-primary/25"
-                title="העתק קישור חתימה"
-              >
-                {copiedId === r.signing_token ? (
-                  <Check className="h-3 w-3" />
-                ) : (
-                  <Link2 className="h-3 w-3" />
-                )}
-                {copiedId === r.signing_token ? "הועתק" : "העתק קישור"}
-              </button>
-              <button
-                type="button"
-                onClick={() => r.signing_token && sendWhatsApp(r.signing_token, r.phone, r.name)}
-                className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md border border-emerald-400/40 bg-emerald-400/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 transition hover:bg-emerald-400/20"
-                title="שלח בוואטסאפ"
-              >
-                <MessageCircle className="h-3 w-3" />
-                וואטסאפ
-              </button>
+              <div className="mt-1 flex flex-row-reverse justify-start gap-2">
+                <button
+                  type="button"
+                  onClick={() => r.signing_token && copy(r.signing_token, r.name)}
+                  className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md border border-primary/60 bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary transition hover:bg-primary/25"
+                  title="העתק קישור חתימה"
+                >
+                  {copiedId === r.signing_token ? (
+                    <Check className="h-3 w-3" />
+                  ) : (
+                    <Link2 className="h-3 w-3" />
+                  )}
+                  {copiedId === r.signing_token ? "הועתק" : "העתק קישור"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => r.signing_token && sendWhatsApp(r.signing_token, r.phone, r.name)}
+                  className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md border border-emerald-400/40 bg-emerald-400/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 transition hover:bg-emerald-400/20"
+                  title="שלח בוואטסאפ"
+                >
+                  <MessageCircle className="h-3 w-3" />
+                  וואטסאפ
+                </button>
+              </div>
             </li>
           ))}
         </ul>
