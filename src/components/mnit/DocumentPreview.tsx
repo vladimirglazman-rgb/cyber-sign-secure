@@ -523,12 +523,8 @@ function FullscreenPinModal({
                     }}
                   >
                     <span
-                      className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-sm border bg-background/85 px-1.5 py-0.5 text-[10px] font-semibold"
-                      style={{
-                        borderColor: color.border,
-                        color: color.text,
-                        textShadow: `0 0 6px ${color.hex}`,
-                      }}
+                      className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-sm border border-gray-300 bg-white px-1.5 py-0.5 text-[10px] font-bold text-gray-950 shadow-sm"
+                      style={{ borderColor: color.hex }}
                     >
                       {r.name || "נמען"}
                     </span>
