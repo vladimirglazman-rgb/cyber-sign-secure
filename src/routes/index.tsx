@@ -7,7 +7,6 @@ import {
   Lock,
   Zap,
   Smartphone,
-  Handshake,
   BookOpen,
   Code2,
   Paintbrush,
