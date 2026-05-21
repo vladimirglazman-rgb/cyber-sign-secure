@@ -11,6 +11,10 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { APP_VERSION } from "@/lib/app-version";
 import { UserManualModal } from "@/components/mnit/UserManualModal";
+import workflowStep1 from "@/assets/workflow-step-1-upload.png";
+import workflowStep2 from "@/assets/workflow-step-2-fields.png";
+import workflowStep3 from "@/assets/workflow-step-3-send.png";
+import workflowStep4 from "@/assets/workflow-step-4-monitor.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -152,42 +156,58 @@ function LandingPage() {
             </p>
             <div className="mx-auto mt-6 h-px w-24 bg-gray-300" />
           </div>
-          <div className="grid gap-8 md:grid-cols-2">
+          <div className="space-y-6 md:space-y-8">
             {[
               {
                 num: "01",
                 title: "שלב 1 – העלאה והגדרה",
                 desc: "מעלים מסמך או בוחרים תבנית מוכנה, מגדירים את החותמים (בודדים או קבוצות), מסדרים את סדר החתימה ומגדירים הרשאות.",
+                img: workflowStep1,
               },
               {
                 num: "02",
                 title: "שלב 2 – הזרקת השדות",
                 desc: "גוררים שדות דינמיים — חתימה, תאריך, טקסט, שדות חובה ועוד — וממקמים אותם בדיוק במקום הנדרש במסמך. כל חותם מקבל \u201Cסיכה\u201D צבעונית ושמית שמסמנת לו את מיקום החתימה.",
+                img: workflowStep2,
               },
               {
                 num: "03",
                 title: "שלב 3 – שליחה חכמה",
                 desc: "בלחיצה אחת המערכת מפיצה את הבקשה לחתימה, מפעילה תזכורות אוטומטיות, מנהלת סדרי חתימה ומוודאת שהכול מתקדם בלי שתצטרך לרדוף אחרי אף אחד.",
+                img: workflowStep3,
               },
               {
                 num: "04",
                 title: "שלב 4 – ניטור ואימות",
                 desc: "עוקבים בזמן אמת אחרי סטטוס החתימות ב\u2011Dashboard: מי חתם, מתי, מאיזה מכשיר ומה מצב המסמך. בסיום מופק דו\u201Dח ביקורת (Audit Trail) משפטי, חתום ומאובטח — הוכחה מלאה לתהליך תקין.",
+                img: workflowStep4,
               },
             ].map((s) => (
               <div
                 key={s.num}
-                className="rounded-lg border border-gray-200 bg-white p-8 text-right transition hover:border-gray-400"
+                className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md md:p-8"
               >
-                <div className="mb-4 font-display text-5xl font-black leading-none text-primary">
-                  {s.num}
+                <div className="grid items-center gap-6 md:grid-cols-2 md:gap-10">
+                  <div className="aspect-[4/3] w-full overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+                    <img
+                      src={s.img}
+                      alt={s.title}
+                      loading="lazy"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <div className="text-right">
+                    <div className="mb-3 font-display text-5xl font-black leading-none text-primary">
+                      {s.num}
+                    </div>
+                    <h3 className="mb-3 font-display text-xl font-bold text-foreground md:text-2xl">
+                      {s.title}
+                    </h3>
+                    <p className="text-sm leading-relaxed text-muted-foreground md:text-base">
+                      {s.desc}
+                    </p>
+                  </div>
                 </div>
-                <h3 className="mb-3 font-display text-xl font-bold text-foreground">
-                  {s.title}
-                </h3>
-                <p className="text-sm leading-relaxed text-muted-foreground md:text-base">
-                  {s.desc}
-                </p>
               </div>
             ))}
           </div>
