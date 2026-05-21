@@ -141,39 +141,61 @@ function LandingPage() {
           </Link>
         </div>
 
-        {/* Feature tiles */}
-        <div className="mt-24 grid w-full max-w-5xl gap-6 md:grid-cols-3">
-          {[
-            {
-              icon: Lock,
-              title: "אבטחה ברמה משפטית",
-              desc: "הצפנה מקצה לקצה, audit trail מלא ותאימות לחוק החתימה האלקטרונית.",
-            },
-            {
-              icon: Zap,
-              title: "מהיר ופשוט",
-              desc: "העלו מסמך, סמנו מקום חתימה ושלחו ללקוח בפחות מ-30 שניות.",
-            },
-            {
-              icon: Sparkles,
-              title: "AI מובנה",
-              desc: "כתיבה חכמה של הודעות שליחה ואופטימיזציה אוטומטית של המסמך.",
-            },
-          ].map((f) => (
-            <div
-              key={f.title}
-              className="rounded-lg border border-gray-200 bg-white p-8 text-right transition hover:border-gray-400"
-            >
-              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-md border border-gray-200 bg-muted">
-                <f.icon className="h-5 w-5 text-primary" />
-              </div>
-              <h3 className="mb-2 font-display text-xl font-bold text-foreground">
-                {f.title}
-              </h3>
-              <p className="text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
+        {/* 4-step user journey */}
+        <section className="mt-24 w-full max-w-5xl" dir="rtl">
+          <div className="mb-12 flex flex-col items-center text-center">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-[10px] font-body uppercase tracking-[0.3em] text-muted-foreground">
+              <Sparkles className="h-3.5 w-3.5" />
+              <span>Workflow</span>
             </div>
-          ))}
-        </div>
+            <h2 className="font-display text-3xl font-black leading-tight tracking-tight text-foreground sm:text-4xl md:text-5xl">
+              איך מתפעלים את הכלי – התהליך החדש, המדויק והחכם
+            </h2>
+            <p className="mt-5 max-w-3xl font-body text-base leading-relaxed text-muted-foreground md:text-lg">
+              המערכת בנויה כך שכל תהליך החתימה הופך לזורם, אינטואיטיבי ומבוקר מקצה לקצה. ארבעה שלבים פשוטים — וכל המסמך חתום, מאומת ומוכן לשימוש.
+            </p>
+            <div className="mx-auto mt-6 h-px w-24 bg-gray-300" />
+          </div>
+          <div className="grid gap-8 md:grid-cols-2">
+            {[
+              {
+                num: "01",
+                title: "שלב 1 – העלאה והגדרה",
+                desc: "מעלים מסמך או בוחרים תבנית מוכנה, מגדירים את החותמים (בודדים או קבוצות), מסדרים את סדר החתימה ומגדירים הרשאות.",
+              },
+              {
+                num: "02",
+                title: "שלב 2 – הזרקת השדות",
+                desc: "גוררים שדות דינמיים — חתימה, תאריך, טקסט, שדות חובה ועוד — וממקמים אותם בדיוק במקום הנדרש במסמך. כל חותם מקבל \u201Cסיכה\u201D צבעונית ושמית שמסמנת לו את מיקום החתימה.",
+              },
+              {
+                num: "03",
+                title: "שלב 3 – שליחה חכמה",
+                desc: "בלחיצה אחת המערכת מפיצה את הבקשה לחתימה, מפעילה תזכורות אוטומטיות, מנהלת סדרי חתימה ומוודאת שהכול מתקדם בלי שתצטרך לרדוף אחרי אף אחד.",
+              },
+              {
+                num: "04",
+                title: "שלב 4 – ניטור ואימות",
+                desc: "עוקבים בזמן אמת אחרי סטטוס החתימות ב\u2011Dashboard: מי חתם, מתי, מאיזה מכשיר ומה מצב המסמך. בסיום מופק דו\u201Dח ביקורת (Audit Trail) משפטי, חתום ומאובטח — הוכחה מלאה לתהליך תקין.",
+              },
+            ].map((s) => (
+              <div
+                key={s.num}
+                className="rounded-lg border border-gray-200 bg-white p-8 text-right transition hover:border-gray-400"
+              >
+                <div className="mb-4 font-display text-5xl font-black leading-none text-primary">
+                  {s.num}
+                </div>
+                <h3 className="mb-3 font-display text-xl font-bold text-foreground">
+                  {s.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-muted-foreground md:text-base">
+                  {s.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
 
         {/* Technology Stack */}
         <section className="mt-28 w-full max-w-5xl border-t border-gray-200 pt-16" dir="rtl">
