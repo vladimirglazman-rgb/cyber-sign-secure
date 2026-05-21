@@ -1,4 +1,27 @@
-# Refactor recent activity cards to stop vertical text collapse
+# Make hero headline a massive bold serif newspaper title
+
+## Goal
+
+The hero copy on `/` already contains the correct Hebrew headline and sub-headline. Make the headline render as a massive, bold serif newspaper title with perfect RTL alignment, without touching surrounding buttons, links, or the Loom video.
+
+## Scope
+
+Frontend only, single file: `src/routes/index.tsx`, hero block only (lines ~102-113). No JSX structure changes outside class names.
+
+## Changes
+
+- Enlarge the `<h1>` from `text-3xl md:text-5xl` to a newspaper scale: `text-4xl sm:text-5xl md:text-6xl lg:text-7xl`.
+- Keep `font-display` (Playfair Display serif), bump weight to `font-black`, keep `leading-[1.05] tracking-tight`.
+- Widen the headline container to `max-w-5xl` so the long Hebrew sentence breathes.
+- Keep `dir="rtl"` on the wrapper and `text-right` on both the headline and sub-headline for clean RTL alignment.
+- Slightly enlarge the sub-headline to `text-lg md:text-xl` for better hierarchy; keep `font-body`, `text-muted-foreground`.
+- Do not touch the mobile badge chip, the Loom iframe, the header nav, or the CTA buttons below.
+
+## Verification
+
+- Visit `/` at the current viewport: headline reads as one big serif block, right-aligned RTL, no per-character wrapping.
+- Sub-headline sits directly below, smaller, also right-aligned RTL.
+- Loom video, badge, and CTA buttons unchanged.
 
 ## Goal
 
