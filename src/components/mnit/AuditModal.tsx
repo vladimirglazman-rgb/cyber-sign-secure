@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, ExternalLink, ShieldCheck, Clock, Globe, User, FileText, Download } from "lucide-react";
+import {
+  Loader2,
+  ExternalLink,
+  ShieldCheck,
+  Clock,
+  Globe,
+  User,
+  FileText,
+  Download,
+  X,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -79,23 +89,33 @@ export function AuditModal({ open, onOpenChange, documentId }: Props) {
     }
   };
 
-  const hasSignedRecipient = (data?.recipients ?? []).some(
-    (r) => r.signature_data_url,
-  );
+  const hasSignedRecipient = (data?.recipients ?? []).some((r) => r.signature_data_url);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         dir="rtl"
-        className="fixed inset-0 left-0 top-0 z-[100] flex h-full max-h-none w-full max-w-none translate-x-0 translate-y-0 flex-col overflow-y-auto rounded-none border-primary/30 bg-background p-6 data-[state=closed]:hidden data-[state=closed]:animate-none sm:left-[50%] sm:top-[50%] sm:block sm:h-auto sm:max-h-[90vh] sm:w-full sm:max-w-2xl sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-2xl sm:bg-transparent sm:glass-panel [&>button.absolute]:z-50 [&>button.absolute]:pointer-events-auto [&>button.absolute]:bg-background/90 [&>button.absolute]:opacity-100 [&>button.absolute]:rounded-full [&>button.absolute]:p-1.5 [&>button.absolute]:shadow"
+        className="fixed inset-0 left-0 top-0 z-[100] flex h-full max-h-none w-full max-w-none translate-x-0 translate-y-0 flex-col overflow-y-auto rounded-none border-primary/30 bg-background p-6 data-[state=closed]:hidden data-[state=closed]:animate-none sm:left-[50%] sm:top-[50%] sm:block sm:h-auto sm:max-h-[90vh] sm:w-full sm:max-w-2xl sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-2xl sm:bg-transparent sm:glass-panel [&>button.absolute]:hidden"
       >
-        <DialogHeader className="pr-10">
-          <DialogTitle className="flex items-center gap-2 font-display text-lg text-primary text-glow">
-            <ShieldCheck className="h-5 w-5" /> מסלול חתימה מאומת
-          </DialogTitle>
-          <DialogDescription className="text-xs text-muted-foreground">
-            {data?.subject ?? "פרטי חתימה דיגיטלית"}
-          </DialogDescription>
+        <DialogHeader className="relative z-10 space-y-0 text-right">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1 space-y-1.5">
+              <DialogTitle className="flex items-center gap-2 font-display text-lg text-primary text-glow">
+                <ShieldCheck className="h-5 w-5" /> מסלול חתימה מאומת
+              </DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground">
+                {data?.subject ?? "פרטי חתימה דיגיטלית"}
+              </DialogDescription>
+            </div>
+            <button
+              type="button"
+              aria-label="סגור"
+              onClick={() => onOpenChange(false)}
+              className="relative z-[9999] pointer-events-auto cursor-pointer p-2 text-muted-foreground transition-colors hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
         </DialogHeader>
 
         {loading && (
@@ -205,7 +225,10 @@ export function AuditModal({ open, onOpenChange, documentId }: Props) {
                 </div>
 
                 {r.signed_user_agent && (
-                  <p className="truncate text-[10px] text-muted-foreground/80" title={r.signed_user_agent}>
+                  <p
+                    className="truncate text-[10px] text-muted-foreground/80"
+                    title={r.signed_user_agent}
+                  >
                     {r.signed_user_agent}
                   </p>
                 )}
