@@ -56,21 +56,21 @@ export function ActivityItem({ doc }: { doc: DocumentRow }) {
   };
   const isSigned = doc.status === "signed";
   return (
-    <li className="flex flex-col gap-2 rounded-lg border border-primary/10 bg-primary/5 p-2.5">
+    <li className="flex w-full min-w-0 flex-col gap-2 rounded-lg border border-primary/10 bg-primary/5 p-2.5">
       <div
-        className={`flex flex-col items-start gap-3 sm:flex-row sm:items-center ${isSigned ? "cursor-pointer rounded-md transition hover:bg-primary/10" : ""}`}
+        className={`flex w-full min-w-0 flex-col items-start gap-3 sm:flex-row sm:items-center ${isSigned ? "cursor-pointer rounded-md transition hover:bg-primary/10" : ""}`}
         onClick={isSigned ? () => setAuditOpen(true) : undefined}
         role={isSigned ? "button" : undefined}
         title={isSigned ? "הצג פרטי חתימה" : undefined}
       >
-        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10 ring-1 ring-primary/30">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10 ring-1 ring-primary/30">
           <FileText className="h-4 w-4 text-primary" />
         </div>
         <div className="w-full min-w-0 flex-1">
-          <p className="whitespace-normal break-words text-xs font-medium text-foreground">{doc.file_name}</p>
-          <p className="whitespace-normal break-words text-[10px] text-muted-foreground">{doc.subject}</p>
+          <p className="whitespace-normal break-words text-right text-xs font-medium text-foreground">{doc.file_name}</p>
+          <p className="whitespace-normal break-words text-right text-[10px] text-muted-foreground">{doc.subject}</p>
         </div>
-        <div className="flex w-full flex-col items-start gap-1 sm:w-auto sm:items-end">
+        <div className="flex w-full shrink-0 flex-col items-start gap-1 sm:w-auto sm:items-end">
           <span
             className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ${cls[doc.status]}`}
           >
@@ -87,7 +87,7 @@ export function ActivityItem({ doc }: { doc: DocumentRow }) {
             <span className="text-[9px] text-primary/70">{timePart}</span>
           </span>
           {doc.version && (
-            <span className="font-display text-[9px] tracking-wider text-primary/80 text-glow">
+            <span className="font-body text-[9px] text-primary/80">
               גרסה {doc.version}
             </span>
           )}
@@ -99,16 +99,16 @@ export function ActivityItem({ doc }: { doc: DocumentRow }) {
         </div>
       </div>
       {pendingSigners.length > 0 && (
-        <ul className="flex flex-col gap-1 ps-1">
+        <ul className="flex w-full min-w-0 flex-col gap-1 ps-1">
           {pendingSigners.map((r) => (
-            <li key={r.id} className="flex items-center gap-2">
-              <span className="min-w-0 flex-1 truncate text-[10px] text-muted-foreground">
+            <li key={r.id} className="flex w-full min-w-0 items-center gap-2">
+              <span className="min-w-0 flex-1 truncate text-right text-[10px] text-muted-foreground">
                 {r.name}
               </span>
               <button
                 type="button"
                 onClick={() => r.signing_token && copy(r.signing_token, r.name)}
-                className="inline-flex items-center gap-1 rounded-md border border-primary/60 bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary glow-aqua transition hover:bg-primary/25"
+                className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md border border-primary/60 bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary transition hover:bg-primary/25"
                 title="העתק קישור חתימה"
               >
                 {copiedId === r.signing_token ? (
@@ -121,7 +121,7 @@ export function ActivityItem({ doc }: { doc: DocumentRow }) {
               <button
                 type="button"
                 onClick={() => r.signing_token && sendWhatsApp(r.signing_token, r.phone, r.name)}
-                className="inline-flex items-center gap-1 rounded-md border border-emerald-400/40 bg-emerald-400/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-200 transition hover:bg-emerald-400/20"
+                className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md border border-emerald-400/40 bg-emerald-400/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 transition hover:bg-emerald-400/20"
                 title="שלח בוואטסאפ"
               >
                 <MessageCircle className="h-3 w-3" />
