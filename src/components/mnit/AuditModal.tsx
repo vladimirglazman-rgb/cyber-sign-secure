@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogClose,
 } from "@/components/ui/dialog";
 import { getAuthHeaders } from "@/lib/auth-headers";
 import {
@@ -89,7 +90,13 @@ export function AuditModal({ open, onOpenChange, documentId }: Props) {
         dir="rtl"
         className="fixed inset-0 left-0 top-0 z-[100] flex h-full max-h-none w-full max-w-none translate-x-0 translate-y-0 flex-col overflow-y-auto rounded-none border-primary/30 bg-background p-6 data-[state=closed]:hidden data-[state=closed]:animate-none sm:left-[50%] sm:top-[50%] sm:block sm:h-auto sm:max-h-[90vh] sm:w-full sm:max-w-2xl sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-2xl sm:bg-transparent sm:glass-panel"
       >
-        <DialogHeader>
+        <DialogClose
+          aria-label="סגור"
+          className="absolute left-4 top-4 z-20 inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground shadow hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring"
+        >
+          <span aria-hidden="true" className="text-base leading-none">×</span>
+        </DialogClose>
+        <DialogHeader className="pr-10">
           <DialogTitle className="flex items-center gap-2 font-display text-lg text-primary text-glow">
             <ShieldCheck className="h-5 w-5" /> מסלול חתימה מאומת
           </DialogTitle>
@@ -120,7 +127,7 @@ export function AuditModal({ open, onOpenChange, documentId }: Props) {
                   type="button"
                   onClick={handleDownload}
                   disabled={downloading}
-                  className="inline-flex items-center gap-1 rounded-md border border-primary/60 bg-primary/15 px-2 py-1 text-[11px] font-semibold text-primary glow-aqua hover:bg-primary/25 disabled:opacity-60"
+                  className="inline-flex items-center gap-1 rounded-md bg-primary px-2.5 py-1 text-[11px] font-semibold text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-60"
                 >
                   {downloading ? (
                     <Loader2 className="h-3 w-3 animate-spin" />
@@ -135,7 +142,7 @@ export function AuditModal({ open, onOpenChange, documentId }: Props) {
                   href={data.fileUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 rounded-md border border-primary/60 bg-primary/15 px-2 py-1 text-[11px] font-semibold text-primary glow-aqua hover:bg-primary/25"
+                  className="inline-flex items-center gap-1 rounded-md bg-primary px-2.5 py-1 text-[11px] font-semibold text-primary-foreground shadow hover:bg-primary/90"
                 >
                   <ExternalLink className="h-3 w-3" /> פתח מסמך מקור
                 </a>
