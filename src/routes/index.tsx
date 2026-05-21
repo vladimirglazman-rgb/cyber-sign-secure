@@ -7,7 +7,6 @@ import {
   Lock,
   Zap,
   Smartphone,
-  Handshake,
   BookOpen,
   Code2,
   Paintbrush,
@@ -54,25 +53,7 @@ function LandingPage() {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      {/* Decorative wireframe / network overlay */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-0 opacity-40">
-        <svg className="absolute inset-0 h-full w-full" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <radialGradient id="netFade" cx="50%" cy="40%" r="60%">
-              <stop offset="0%" stopColor="rgba(48,255,247,0.35)" />
-              <stop offset="100%" stopColor="rgba(48,255,247,0)" />
-            </radialGradient>
-          </defs>
-          <g stroke="url(#netFade)" strokeWidth="0.6" fill="none">
-            {Array.from({ length: 14 }).map((_, i) => (
-              <line key={`h-${i}`} x1="0" y1={`${(i + 1) * 7}%`} x2="100%" y2={`${(i + 1) * 5 + 10}%`} />
-            ))}
-            {Array.from({ length: 14 }).map((_, i) => (
-              <line key={`v-${i}`} x1={`${(i + 1) * 7}%`} y1="0" x2={`${(i + 1) * 5 + 10}%`} y2="100%" />
-            ))}
-          </g>
-        </svg>
-      </div>
+      {/* Editorial: clean paper background, no overlay */}
 
       {/* Top bar */}
       <header className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
@@ -93,9 +74,9 @@ function LandingPage() {
           <button
             type="button"
             onClick={() => setManualOpen(true)}
-            className="group inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-3 py-1.5 text-xs font-display tracking-wider text-secondary transition hover:border-primary/70 hover:text-primary hover:bg-primary/10 hover:shadow-[0_0_12px_rgba(48,255,247,0.6)]"
+            className="group inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-body tracking-wide text-foreground transition hover:border-gray-400 hover:text-primary"
           >
-            <BookOpen className="h-4 w-4 transition group-hover:drop-shadow-[0_0_8px_rgba(48,255,247,0.9)]" />
+            <BookOpen className="h-4 w-4" />
             <span>מדריך למשתמש 📘</span>
           </button>
           <Link
@@ -106,7 +87,7 @@ function LandingPage() {
           </Link>
           <button
             onClick={handleStart}
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 font-display text-xs font-bold uppercase tracking-[0.18em] text-primary-foreground glow-aqua transition hover:brightness-110"
+            className="inline-flex items-center gap-2 rounded-md bg-foreground px-4 py-2 font-body text-xs font-semibold uppercase tracking-[0.18em] text-background transition hover:bg-primary"
           >
             מתחילים עכשיו
             <ArrowLeft className="h-4 w-4" />
@@ -116,22 +97,19 @@ function LandingPage() {
 
       {/* Hero */}
       <main className="relative z-10 mx-auto flex max-w-7xl flex-col items-center px-6 pb-24 pt-16 text-center md:pt-28">
-        {/* MNIT CYBER AI Hero with handshake graphic */}
+        {/* MNIT CYBER AI Hero */}
         <div className="relative w-full">
-          <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-10">
-            <Handshake className="text-primary" size={300} />
-          </div>
           <div className="relative z-10 flex flex-col items-center">
-            <h1 className="font-display text-5xl font-extrabold tracking-tight text-foreground md:text-6xl">
+            <h1 className="font-display text-5xl font-extrabold tracking-tight text-foreground md:text-7xl">
               MNIT{" "}
-              <span className="text-primary text-glow drop-shadow-[0_0_15px_rgba(48,255,247,0.5)]">
+              <span className="text-primary italic">
                 CYBER AI
               </span>
             </h1>
-            <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
+            <p className="mt-6 max-w-2xl font-body text-base leading-relaxed text-muted-foreground md:text-lg">
               ניהול חכם, מאובטח ומבוסס AI לכל היבטי העסק שלך.
             </p>
-            <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm text-primary/90">
+            <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-sm text-foreground">
               <Smartphone className="h-4 w-4" />
               <span>מותאם באופן מלא למכשירים ניידים</span>
             </div>
@@ -140,7 +118,7 @@ function LandingPage() {
 
         {/* Marketing video */}
         <div
-          className="mx-auto mt-10 w-full max-w-3xl overflow-hidden rounded-xl border border-primary/30 glow-aqua"
+          className="mx-auto mt-12 w-full max-w-3xl overflow-hidden rounded-xl border border-gray-200"
           style={{ position: "relative", paddingBottom: "56.25%", height: 0 }}
         >
           <iframe
@@ -152,24 +130,24 @@ function LandingPage() {
           />
         </div>
 
-        <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
+        <div className="mt-12 flex flex-col items-center gap-3 sm:flex-row">
           <button
             onClick={handleStart}
-            className="inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-4 font-display text-sm font-bold uppercase tracking-[0.2em] text-primary-foreground glow-aqua animate-pulse-glow transition hover:brightness-110"
+            className="inline-flex items-center gap-2 rounded-md bg-foreground px-8 py-4 font-body text-sm font-semibold uppercase tracking-[0.2em] text-background transition hover:bg-primary"
           >
             מתחילים עכשיו
             <ArrowLeft className="h-4 w-4" />
           </button>
           <Link
             to="/auth"
-            className="rounded-xl border border-primary/30 px-8 py-4 font-display text-sm font-medium uppercase tracking-[0.2em] text-foreground/90 transition hover:border-primary/60 hover:text-primary"
+            className="rounded-md border border-gray-300 px-8 py-4 font-body text-sm font-medium uppercase tracking-[0.2em] text-foreground transition hover:border-foreground hover:text-primary"
           >
             יש לי חשבון
           </Link>
         </div>
 
         {/* Feature tiles */}
-        <div className="mt-20 grid w-full max-w-5xl gap-4 md:grid-cols-3">
+        <div className="mt-24 grid w-full max-w-5xl gap-6 md:grid-cols-3">
           {[
             {
               icon: Lock,
@@ -189,12 +167,12 @@ function LandingPage() {
           ].map((f) => (
             <div
               key={f.title}
-              className="glass-panel p-6 text-right transition hover:border-primary/50"
+              className="rounded-lg border border-gray-200 bg-white p-8 text-right transition hover:border-gray-400"
             >
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/40">
-                <f.icon className="h-5 w-5 text-primary icon-glow" />
+              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-md border border-gray-200 bg-muted">
+                <f.icon className="h-5 w-5 text-primary" />
               </div>
-              <h3 className="mb-1 font-display text-base font-bold text-foreground">
+              <h3 className="mb-2 font-display text-xl font-bold text-foreground">
                 {f.title}
               </h3>
               <p className="text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
@@ -203,18 +181,18 @@ function LandingPage() {
         </div>
 
         {/* Technology Stack */}
-        <section className="mt-24 w-full max-w-5xl" dir="rtl">
+        <section className="mt-28 w-full max-w-5xl border-t border-gray-200 pt-16" dir="rtl">
           <div className="mb-10 text-center">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-[10px] font-display uppercase tracking-[0.3em] text-primary/90">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-[10px] font-body uppercase tracking-[0.3em] text-muted-foreground">
               <Sparkles className="h-3.5 w-3.5" />
               <span>Tech Stack</span>
             </div>
-            <h2 className="font-display text-3xl font-extrabold tracking-tight text-foreground md:text-4xl">
-              <span className="text-primary text-glow">הטכנולוגיה</span> שמאחורי המערכת
+            <h2 className="font-display text-4xl font-extrabold tracking-tight text-foreground md:text-5xl">
+              <span className="italic text-primary">הטכנולוגיה</span> שמאחורי המערכת
             </h2>
-            <div className="mx-auto mt-4 h-px w-24 bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
+            <div className="mx-auto mt-6 h-px w-24 bg-gray-300" />
           </div>
-          <div className="mx-auto grid max-w-4xl gap-4 sm:grid-cols-2 md:grid-cols-3">
+          <div className="mx-auto grid max-w-4xl gap-6 sm:grid-cols-2 md:grid-cols-3">
             {[
               { icon: Code2, name: "React & Vite", desc: "חוויית משתמש מהירה במיוחד, יציבה ומודרנית." },
               { icon: Paintbrush, name: "Tailwind CSS", desc: "עיצוב רספונסיבי, נקי וחדשני המותאם לכל מכשיר." },
@@ -224,12 +202,12 @@ function LandingPage() {
             ].map((t) => (
               <div
                 key={t.name}
-                className="glass-panel group p-5 text-right transition hover:border-primary/60 hover:shadow-[0_0_24px_-6px_rgba(48,255,247,0.55)]"
+                className="group rounded-lg border border-gray-200 bg-white p-6 text-right transition hover:border-gray-400"
               >
-                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/40 transition group-hover:bg-primary/25">
-                  <t.icon className="h-5 w-5 text-primary icon-glow" />
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-md border border-gray-200 bg-muted">
+                  <t.icon className="h-5 w-5 text-primary" />
                 </div>
-                <h3 className="mb-1 font-display text-sm font-bold tracking-wide text-foreground">
+                <h3 className="mb-2 font-display text-lg font-bold tracking-tight text-foreground">
                   {t.name}
                 </h3>
                 <p className="text-xs leading-relaxed text-muted-foreground">{t.desc}</p>
@@ -240,36 +218,36 @@ function LandingPage() {
 
       </main>
 
-      <footer className="relative z-10 border-t border-primary/10 py-8">
+      <footer className="relative z-10 border-t border-gray-200 py-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-6 text-center">
           <div className="flex flex-col items-center gap-3 text-sm text-muted-foreground md:flex-row md:gap-4">
             <span>© 2026 MNIT Cyber AI Hub.</span>
-            <span className="hidden text-primary/30 md:inline">|</span>
+            <span className="hidden text-gray-300 md:inline">|</span>
             <a
               href="mailto:vladimirglazman@gmail.com"
-              className="transition-colors hover:text-primary hover:text-glow"
+              className="transition-colors hover:text-primary"
             >
               vladimirglazman@gmail.com
             </a>
-            <span className="hidden text-primary/30 md:inline">|</span>
+            <span className="hidden text-gray-300 md:inline">|</span>
             <a
               href="tel:0526134890"
-              className="transition-colors hover:text-primary hover:text-glow"
+              className="transition-colors hover:text-primary"
               dir="ltr"
             >
               052-613-4890
             </a>
-            <span className="hidden text-primary/30 md:inline">|</span>
+            <span className="hidden text-gray-300 md:inline">|</span>
             <a
               href="https://www.linkedin.com/in/vladimirglazman"
               target="_blank"
               rel="noopener noreferrer"
-              className="transition-colors hover:text-primary hover:text-glow"
+              className="transition-colors hover:text-primary"
             >
               LinkedIn
             </a>
           </div>
-          <div className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground/60">
+          <div className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
             MNIT Sign · {APP_VERSION}
           </div>
         </div>
