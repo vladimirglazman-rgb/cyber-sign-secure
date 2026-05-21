@@ -13,7 +13,7 @@ export function Workspace() {
   const removePath = (id: string) => setPaths((s) => { const n = { ...s }; delete n[id]; return n; });
   const resetPaths = () => setPaths({});
   return (
-    <div className="grid gap-4 px-4 pb-6 md:grid-cols-[280px_minmax(0,1fr)_360px] md:pr-6 lg:pr-8">
+    <div className="box-border grid gap-4 px-4 pb-6 pr-6 md:grid-cols-[280px_minmax(0,1fr)_minmax(380px,400px)] md:pr-8 lg:pr-10">
       <Sidebar />
       <div className="flex flex-col gap-4">
         <Step1Upload api={api} paths={paths} setPath={setPath} removePath={removePath} />
