@@ -63,7 +63,7 @@ export function Sidebar() {
             ) : docs.length === 0 ? (
               <p className="text-xs text-muted-foreground">עדיין אין מסמכים — העלה את הראשון.</p>
             ) : (
-              <ul className="flex w-full min-w-0 flex-col gap-2 overflow-y-auto pe-1 pb-24">
+              <ul className="box-border flex w-full min-w-0 flex-col gap-2 overflow-y-auto px-1 pe-3 pb-24">
                 {docs.slice(0, 8).map((d) => <ActivityItem key={d.id} doc={d} />)}
               </ul>
             )}

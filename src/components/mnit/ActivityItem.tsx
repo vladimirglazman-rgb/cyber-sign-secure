@@ -56,9 +56,9 @@ export function ActivityItem({ doc }: { doc: DocumentRow }) {
   };
   const isSigned = doc.status === "signed";
   return (
-    <li className="block w-full min-w-[240px] rounded-lg border border-primary/10 bg-primary/5 p-2.5" dir="rtl">
+    <li className="box-border block w-full min-w-0 rounded-lg border border-primary/10 bg-primary/5 p-2.5" dir="rtl">
       <div
-        className={`flex w-full min-w-[220px] flex-row-reverse items-start justify-start gap-3 ${isSigned ? "cursor-pointer rounded-md transition hover:bg-primary/10" : ""}`}
+        className={`box-border flex w-full min-w-0 flex-row-reverse items-start justify-start gap-3 ${isSigned ? "cursor-pointer rounded-md transition hover:bg-primary/10" : ""}`}
         onClick={isSigned ? () => setAuditOpen(true) : undefined}
         role={isSigned ? "button" : undefined}
         title={isSigned ? "הצג פרטי חתימה" : undefined}
@@ -66,9 +66,9 @@ export function ActivityItem({ doc }: { doc: DocumentRow }) {
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10 ring-1 ring-primary/30">
           <FileText className="h-4 w-4 text-primary" />
         </div>
-        <div className="block w-full min-w-[150px] flex-1 basis-[150px] text-right">
-          <p className="block w-full min-w-[150px] whitespace-normal break-words text-right text-xs font-medium text-foreground">{doc.file_name}</p>
-          <p className="block w-full min-w-[150px] whitespace-normal break-words text-right text-[10px] text-muted-foreground">{doc.subject}</p>
+        <div className="block w-full min-w-0 flex-1 text-right">
+          <p className="block w-full min-w-0 whitespace-normal break-words text-right text-xs font-medium text-foreground">{doc.file_name}</p>
+          <p className="block w-full min-w-0 whitespace-normal break-words text-right text-[10px] text-muted-foreground">{doc.subject}</p>
         </div>
         <div className="flex w-auto shrink-0 flex-col items-end gap-1 text-right">
           <span
@@ -99,10 +99,10 @@ export function ActivityItem({ doc }: { doc: DocumentRow }) {
         </div>
       </div>
       {pendingSigners.length > 0 && (
-        <ul className="flex w-full min-w-[220px] flex-col gap-1 ps-1">
+        <ul className="box-border flex w-full min-w-0 flex-col gap-1 ps-1">
           {pendingSigners.map((r) => (
-            <li key={r.id} className="flex w-full min-w-[220px] flex-row-reverse items-center justify-start gap-2">
-              <span className="min-w-[150px] flex-1 truncate text-right text-[10px] text-muted-foreground">
+            <li key={r.id} className="box-border flex w-full min-w-0 flex-row-reverse items-center justify-start gap-2">
+              <span className="min-w-0 flex-1 truncate text-right text-[10px] text-muted-foreground">
                 {r.name}
               </span>
               <button
