@@ -4,8 +4,6 @@ import {
   ShieldCheck,
   ArrowLeft,
   Sparkles,
-  Lock,
-  Zap,
   Smartphone,
   BookOpen,
   Code2,
