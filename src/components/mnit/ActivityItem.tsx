@@ -56,6 +56,7 @@ export function ActivityItem({ doc }: { doc: DocumentRow }) {
   };
   const isSigned = doc.status === "signed";
   return (
+    <>
     <li
       className={`box-border flex w-full min-w-0 flex-col gap-2 rounded-lg border border-primary/10 bg-primary/5 p-3 text-right font-body ${isSigned ? "cursor-pointer transition hover:bg-primary/10" : ""}`}
       dir="rtl"
@@ -149,9 +150,10 @@ export function ActivityItem({ doc }: { doc: DocumentRow }) {
           ))}
         </ul>
       )}
-      {isSigned && (
-        <AuditModal open={auditOpen} onOpenChange={setAuditOpen} documentId={doc.id} />
-      )}
     </li>
+    {isSigned && (
+      <AuditModal open={auditOpen} onOpenChange={setAuditOpen} documentId={doc.id} />
+    )}
+    </>
   );
 }
