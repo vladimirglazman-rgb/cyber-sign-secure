@@ -99,15 +99,12 @@ function LandingPage() {
       <main className="relative z-10 mx-auto flex max-w-7xl flex-col items-center px-6 pb-24 pt-16 text-center md:pt-28">
         {/* MNIT CYBER AI Hero */}
         <div className="relative w-full">
-          <div className="relative z-10 flex flex-col items-center">
-            <h1 className="font-display text-5xl font-extrabold tracking-tight text-foreground md:text-7xl">
-              MNIT{" "}
-              <span className="text-primary italic">
-                CYBER AI
-              </span>
+          <div className="relative z-10 flex flex-col items-center" dir="rtl">
+            <h1 className="max-w-4xl text-right font-display text-3xl font-extrabold leading-tight tracking-tight text-foreground md:text-5xl">
+              חתימה מרחוק מבטלת את הצורך לנסוע או לטוס רק כדי להחתים אדם בחו״ל, ומספקת אימות זהות חזק יותר מחתימה רגילה.
             </h1>
-            <p className="mt-6 max-w-2xl font-body text-base leading-relaxed text-muted-foreground md:text-lg">
-              ניהול חכם, מאובטח ומבוסס AI לכל היבטי העסק שלך.
+            <p className="mt-6 max-w-3xl text-right font-body text-base leading-relaxed text-muted-foreground md:text-lg">
+              באמצעות אימות דו־שלבי, תיעוד מלא וזיהוי דיגיטלי — יודעים בדיוק מי חתם, מתי, ואי אפשר לזייף את זה.
             </p>
             <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-sm text-foreground">
               <Smartphone className="h-4 w-4" />
