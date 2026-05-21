@@ -127,7 +127,7 @@ export function AuditModal({ open, onOpenChange, documentId }: Props) {
                   type="button"
                   onClick={handleDownload}
                   disabled={downloading}
-                  className="inline-flex items-center gap-1 rounded-md bg-primary px-2.5 py-1 text-[11px] font-semibold text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-60"
+                  className="inline-flex items-center gap-1 rounded-md bg-blue-600 px-2.5 py-1 text-[11px] font-semibold text-white shadow hover:bg-blue-700 disabled:opacity-60"
                 >
                   {downloading ? (
                     <Loader2 className="h-3 w-3 animate-spin" />
@@ -142,7 +142,7 @@ export function AuditModal({ open, onOpenChange, documentId }: Props) {
                   href={data.fileUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 rounded-md bg-primary px-2.5 py-1 text-[11px] font-semibold text-primary-foreground shadow hover:bg-primary/90"
+                  className="inline-flex items-center gap-1 rounded-md bg-blue-600 px-2.5 py-1 text-[11px] font-semibold text-white shadow hover:bg-blue-700"
                 >
                   <ExternalLink className="h-3 w-3" /> פתח מסמך מקור
                 </a>
