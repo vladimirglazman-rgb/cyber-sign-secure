@@ -1,3 +1,43 @@
+# Fix: AuditModal X button does nothing
+
+## Root cause
+
+`ActivityItem` renders the signed-document row as a clickable `<li>` with
+`onClick={() => setAuditOpen(true)}`. `AuditModal` is rendered as a child of
+that same `<li>`.
+
+Radix portals `DialogContent` to `document.body` in the DOM, but **React
+synthetic events still bubble through the React tree**. So when the user
+clicks the built-in `<DialogPrimitive.Close>` (the X), the sequence is:
+
+1. Radix `onOpenChange(false)` fires → `setAuditOpen(false)`.
+2. The click event keeps bubbling up the React tree and hits the `<li>`'s
+   `onClick`, which calls `setAuditOpen(true)` again.
+3. Net result: the modal reopens on the same tick and looks unresponsive.
+
+The state wiring itself (`open`/`onOpenChange` between `ActivityItem` and
+`AuditModal` → `Dialog`) is already correct. The bug is the parent row's
+click handler swallowing every click that happens inside the portaled modal.
+
+## Fix (single file: `src/components/mnit/ActivityItem.tsx`)
+
+Render `<AuditModal>` outside the clickable `<li>` so its event tree no
+longer bubbles into the row's `onClick`. Concretely:
+
+- Wrap the current `<li>` and the `<AuditModal>` in a React fragment.
+- Move `{isSigned && <AuditModal ... />}` to be a sibling of `<li>`, not a
+  child.
+
+No style changes. No changes to `AuditModal.tsx`, `dialog.tsx`, routes, or
+any other file. The `Dialog open={open} onOpenChange={onOpenChange}` wiring
+inside `AuditModal` already works — it just needs to stop being re-triggered
+by the parent row.
+
+## Out of scope
+
+- `src/components/ui/dialog.tsx`
+- `AuditModal.tsx` internals (close button, layout, styles)
+- Any other component or route
 # Modal Close Button Structural Reset — AuditModal
 
 ## Goal
