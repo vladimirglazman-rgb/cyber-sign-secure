@@ -24,17 +24,17 @@ export function Sidebar() {
         >
           <span className="flex items-center gap-2">
             <Shield className="h-4 w-4 text-primary icon-glow" />
-            <span className="font-display text-sm tracking-wider text-primary text-glow">
+            <span className="font-body text-sm font-semibold text-primary whitespace-nowrap">
               פאנל ניהול
             </span>
           </span>
-          <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+          <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground shrink-0">
             Admin
           </span>
         </Link>
       )}
       <section className="glass-panel p-4">
-        <h3 className="mb-3 font-display text-sm uppercase tracking-[0.2em] text-primary text-glow">סטטיסטיקה</h3>
+        <h3 className="mb-3 font-body text-sm font-semibold text-primary text-right">סטטיסטיקה</h3>
         <div className="grid grid-cols-2 gap-2">
           <StatTile label="סה״כ" value={stats.total} icon={FileText} />
           <StatTile label="נחתמו" value={stats.signed} icon={CheckCircle2} tone="success" />
@@ -47,11 +47,11 @@ export function Sidebar() {
           type="button"
           onClick={() => setActivityOpen(!open)}
           aria-expanded={open}
-          className="mb-3 flex w-full items-center justify-between gap-2 font-display text-sm uppercase tracking-[0.2em] text-primary text-glow transition hover:opacity-90"
+          className="mb-3 flex w-full min-w-0 items-center justify-between gap-2 font-body text-sm font-semibold text-primary transition hover:opacity-90"
         >
-          <span>פעילות אחרונה</span>
+          <span className="truncate text-right">פעילות אחרונה</span>
           <ChevronDown
-            className={`h-4 w-4 icon-glow transition-transform duration-300 ${open ? "rotate-180" : "rotate-0"}`}
+            className={`h-4 w-4 shrink-0 transition-transform duration-300 ${open ? "rotate-180" : "rotate-0"}`}
           />
         </button>
         <div
@@ -63,7 +63,7 @@ export function Sidebar() {
             ) : docs.length === 0 ? (
               <p className="text-xs text-muted-foreground">עדיין אין מסמכים — העלה את הראשון.</p>
             ) : (
-              <ul className="flex flex-col gap-2 overflow-y-auto pe-1 pb-24">
+              <ul className="flex w-full min-w-0 flex-col gap-2 overflow-y-auto pe-1 pb-24">
                 {docs.slice(0, 8).map((d) => <ActivityItem key={d.id} doc={d} />)}
               </ul>
             )}
@@ -71,7 +71,7 @@ export function Sidebar() {
         </div>
       </section>
       <div
-        className="mt-auto inline-flex items-center justify-center gap-2 self-start rounded-md border border-primary/40 bg-primary/5 px-2.5 py-1 font-display text-[10px] tracking-[0.18em] text-primary glow-aqua"
+        className="mt-auto inline-flex items-center justify-center gap-2 self-start whitespace-nowrap rounded-md border border-primary/40 bg-primary/5 px-2.5 py-1 font-body text-[10px] text-primary"
         title="גרסת תוכנה"
       >
         <span className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_6px_var(--primary)]" />
