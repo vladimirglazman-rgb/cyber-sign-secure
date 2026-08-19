@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import type { SignatureRequestApi } from "@/hooks/use-signature-request";
 import { isValidEmail } from "@/hooks/use-signature-request";
-import { createSignatureRequest } from "@/server/documents.functions";
+import { createSignatureRequest } from "@/lib/documents.functions";
 import { getAuthHeaders } from "@/lib/auth-headers";
 import { APP_VERSION } from "@/lib/app-version";
 import { UpgradeModal } from "@/components/mnit/UpgradeModal";

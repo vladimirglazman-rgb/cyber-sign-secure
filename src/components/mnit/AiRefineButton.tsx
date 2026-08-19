@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Sparkles, Loader2, Check, X } from "lucide-react";
 import { toast } from "sonner";
-import { refineText } from "@/server/ai.functions";
+import { refineText } from "@/lib/ai.functions";
 import { getAuthHeaders } from "@/lib/auth-headers";
 
 type Props = {
