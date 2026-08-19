@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SignTokenRouteImport } from './routes/sign.$token'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as ApiPublicDemoRequestRouteImport } from './routes/api/public/demo-request'
 import { Route as ApiPreviewSplatRouteImport } from './routes/api/preview.$'
 
 const AuthRoute = AuthRouteImport.update({
@@ -46,6 +47,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const ApiPublicDemoRequestRoute = ApiPublicDemoRequestRouteImport.update({
+  id: '/api/public/demo-request',
+  path: '/api/public/demo-request',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPreviewSplatRoute = ApiPreviewSplatRouteImport.update({
   id: '/api/preview/$',
   path: '/api/preview/$',
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AuthenticatedAppRoute
   '/sign/$token': typeof SignTokenRoute
   '/api/preview/$': typeof ApiPreviewSplatRoute
+  '/api/public/demo-request': typeof ApiPublicDemoRequestRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/app': typeof AuthenticatedAppRoute
   '/sign/$token': typeof SignTokenRoute
   '/api/preview/$': typeof ApiPreviewSplatRoute
+  '/api/public/demo-request': typeof ApiPublicDemoRequestRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/_authenticated/app': typeof AuthenticatedAppRoute
   '/sign/$token': typeof SignTokenRoute
   '/api/preview/$': typeof ApiPreviewSplatRoute
+  '/api/public/demo-request': typeof ApiPublicDemoRequestRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -87,8 +96,16 @@ export interface FileRouteTypes {
     | '/app'
     | '/sign/$token'
     | '/api/preview/$'
+    | '/api/public/demo-request'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/admin' | '/app' | '/sign/$token' | '/api/preview/$'
+  to:
+    | '/'
+    | '/auth'
+    | '/admin'
+    | '/app'
+    | '/sign/$token'
+    | '/api/preview/$'
+    | '/api/public/demo-request'
   id:
     | '__root__'
     | '/'
@@ -98,6 +115,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app'
     | '/sign/$token'
     | '/api/preview/$'
+    | '/api/public/demo-request'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -106,6 +124,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   SignTokenRoute: typeof SignTokenRoute
   ApiPreviewSplatRoute: typeof ApiPreviewSplatRoute
+  ApiPublicDemoRequestRoute: typeof ApiPublicDemoRequestRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -152,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/api/public/demo-request': {
+      id: '/api/public/demo-request'
+      path: '/api/public/demo-request'
+      fullPath: '/api/public/demo-request'
+      preLoaderRoute: typeof ApiPublicDemoRequestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/preview/$': {
       id: '/api/preview/$'
       path: '/api/preview/$'
@@ -182,6 +208,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   SignTokenRoute: SignTokenRoute,
   ApiPreviewSplatRoute: ApiPreviewSplatRoute,
+  ApiPublicDemoRequestRoute: ApiPublicDemoRequestRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

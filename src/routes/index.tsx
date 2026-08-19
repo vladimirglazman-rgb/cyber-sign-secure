@@ -7,10 +7,12 @@ import {
   Smartphone,
   BookOpen,
   Check,
+  CalendarClock,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { APP_VERSION } from "@/lib/app-version";
 import { UserManualModal } from "@/components/mnit/UserManualModal";
+import { DemoRequestModal } from "@/components/mnit/DemoRequestModal";
 import workflowStep1 from "@/assets/workflow-step-1-upload.png";
 import workflowStep2 from "@/assets/workflow-step-2-fields.png";
 import workflowStep3 from "@/assets/workflow-step-3-send.png";
@@ -39,6 +41,7 @@ function LandingPage() {
   const navigate = useNavigate();
   const [authed, setAuthed] = useState(false);
   const [manualOpen, setManualOpen] = useState(false);
+  const [demoOpen, setDemoOpen] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setAuthed(!!data.session));
@@ -99,10 +102,10 @@ function LandingPage() {
         <div className="relative w-full">
           <div className="relative z-10 flex flex-col items-center" dir="rtl">
             <h1 className="w-full max-w-5xl text-right font-display text-4xl font-black leading-[1.05] tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl">
-              חתימה מרחוק מבטלת את הצורך לנסוע או לטוס רק כדי להחתים אדם בחו״ל, ומספקת אימות זהות חזק יותר מחתימה רגילה.
+              חתימה מרחוק שמבטלת את הצורך לנסוע או לטוס רק כדי להחתים אדם — עם תיעוד מלא של תהליך החתימה.
             </h1>
             <p className="mt-6 w-full max-w-3xl text-right font-body text-lg leading-relaxed text-muted-foreground md:text-xl">
-              באמצעות אימות דו־שלבי, תיעוד מלא וזיהוי דיגיטלי — יודעים בדיוק מי חתם, מתי, ואי אפשר לזייף את זה.
+              באמצעות אימות דו-שלבי ותיעוד דיגיטלי מלא — יודעים בדיוק מי חתם, מתי ומאיפה.
             </p>
             <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-sm text-foreground">
               <Smartphone className="h-4 w-4" />
@@ -132,6 +135,13 @@ function LandingPage() {
           >
             מתחילים עכשיו
             <ArrowLeft className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => setDemoOpen(true)}
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-8 py-4 font-body text-sm font-semibold uppercase tracking-[0.2em] text-primary-foreground transition hover:opacity-90"
+          >
+            <CalendarClock className="h-4 w-4" />
+            תיאום דמו של 15 דקות
           </button>
           <Link
             to="/auth"
@@ -326,6 +336,7 @@ function LandingPage() {
       </footer>
 
       <UserManualModal open={manualOpen} onOpenChange={setManualOpen} />
+      <DemoRequestModal open={demoOpen} onOpenChange={setDemoOpen} />
     </div>
   );
 }
