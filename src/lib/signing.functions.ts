@@ -1,24 +1,19 @@
 import { createServerFn } from "@tanstack/react-start";
-import { z } from "zod";
 import { getRequest } from "@tanstack/react-start/server";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { createHash } from "crypto";
-
-const tokenSchema = z.object({ token: z.string().min(20).max(200) });
-const dualSchema = tokenSchema.extend({
-  idNumber: z.string().min(4).max(40),
-  phone: z.string().min(4).max(40),
-});
-const signSchema = dualSchema.extend({
-  signature: z.string().min(50).max(200000),
-});
-
-const normalizePhone = (s: string) => s.replace(/\D+/g, "");
-const MISMATCH_MSG = "פרטי הזיהוי (ת.ז. או טלפון) אינם תואמים את רישומי המערכת.";
+import {
+  tokenSchema,
+  dualSchema,
+  signSchema,
+  nextSignerSchema,
+  normalizePhone,
+  MISMATCH_MSG,
+} from "./signing.schemas";
 
 export const peekToken = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => tokenSchema.parse(d))
   .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { createHash } = await import("crypto");
     const { data: rows, error } = await supabaseAdmin.rpc("peek_signing_token", {
       _token: data.token,
     });
@@ -34,6 +29,8 @@ export const peekToken = createServerFn({ method: "POST" })
 export const verifySigner = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => dualSchema.parse(d))
   .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { createHash } = await import("crypto");
     const idTrim = data.idNumber.trim();
     const phoneTrim = data.phone.trim();
     const idHash = createHash("sha256").update(idTrim).digest("hex");
@@ -133,6 +130,8 @@ export const verifySigner = createServerFn({ method: "POST" })
 export const submitSignature = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => signSchema.parse(d))
   .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { createHash } = await import("crypto");
     const req = getRequest();
     const ip =
       req?.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
@@ -178,12 +177,10 @@ export const submitSignature = createServerFn({ method: "POST" })
   });
 
 export const findNextSignerForPhone = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) =>
-    z
-      .object({ token: z.string().min(20).max(200), phone: z.string().min(4).max(40) })
-      .parse(d),
-  )
+  .inputValidator((d: unknown) => nextSignerSchema.parse(d))
   .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { createHash } = await import("crypto");
     const phoneNorm = normalizePhone(data.phone);
     const { data: current } = await supabaseAdmin
       .from("recipients")
