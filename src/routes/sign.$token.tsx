@@ -17,7 +17,7 @@ import {
   verifySigner,
   submitSignature,
   findNextSignerForPhone,
-} from "@/server/signing.functions";
+} from "@/lib/signing.functions";
 import { SignatureCanvas, type SignatureCanvasHandle } from "@/components/mnit/SignatureCanvas";
 import { SignerPdfViewer, type SigCoord } from "@/components/mnit/SignerPdfViewer";
 import { MNIT_LEGAL_TERMS } from "@/content/mnit-legal-terms";

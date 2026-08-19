@@ -13,7 +13,7 @@ import {
   downloadSignedDocument,
   getDocumentAudit,
   type DocumentAudit,
-} from "@/server/documents.functions";
+} from "@/lib/documents.functions";
 
 type Props = {
   open: boolean;

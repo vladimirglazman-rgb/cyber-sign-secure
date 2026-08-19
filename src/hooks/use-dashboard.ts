@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { listMyDocuments } from "@/server/documents.functions";
+import { listMyDocuments } from "@/lib/documents.functions";
 import { getAuthHeaders } from "@/lib/auth-headers";
 
 export function useDashboard() {

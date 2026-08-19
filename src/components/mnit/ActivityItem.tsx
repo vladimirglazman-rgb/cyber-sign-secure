@@ -1,7 +1,7 @@
 import { FileText, Link2, Check, MessageCircle, Eye } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import type { DocumentRow } from "@/server/documents.functions";
+import type { DocumentRow } from "@/lib/documents.functions";
 import { AuditModal } from "./AuditModal";
 const label: Record<DocumentRow["status"], string> = {
   pending: "ממתין",

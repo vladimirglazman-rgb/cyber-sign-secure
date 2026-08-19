@@ -9,7 +9,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { SignatureCanvas, type SignatureCanvasHandle } from "./SignatureCanvas";
-import { submitSignature } from "@/server/signing.functions";
+import { submitSignature } from "@/lib/signing.functions";
 
 type Props = {
   open: boolean;
