@@ -198,6 +198,44 @@ function AuthPage() {
           </div>
         </div>
       )}
+      {showReset && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 p-4 backdrop-blur-md"
+          onClick={() => setShowReset(false)}
+        >
+          <div
+            dir="rtl"
+            onClick={(e) => e.stopPropagation()}
+            className="glass-panel relative w-full max-w-md overflow-hidden border border-primary/40 p-6 text-right"
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="font-display text-lg font-bold text-primary">איפוס סיסמה</h2>
+              <button
+                type="button"
+                onClick={() => setShowReset(false)}
+                className="rounded-md px-2 py-1 text-sm text-muted-foreground hover:text-foreground"
+              >
+                ✕
+              </button>
+            </div>
+            {resetSent ? (
+              <p className="text-sm text-foreground/90">אם האימייל קיים במערכת, נשלח קישור לאיפוס סיסמה</p>
+            ) : (
+              <form onSubmit={onResetSubmit} className="flex flex-col gap-3">
+                <label className="block text-xs font-medium text-muted-foreground">אימייל</label>
+                <input dir="ltr" type="email" value={resetEmail} onChange={(e) => setResetEmail(e.target.value)} required
+                  className="w-full rounded-md border border-primary/20 bg-background/50 px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+                <button type="submit" disabled={resetLoading}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 font-display text-sm font-bold text-primary-foreground transition hover:brightness-110 disabled:opacity-50">
+                  {resetLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                  שלח קישור לאיפוס
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
