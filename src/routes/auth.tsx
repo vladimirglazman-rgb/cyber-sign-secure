@@ -26,6 +26,19 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showReset, setShowReset] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetSent, setResetSent] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
+  const onResetSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); setResetLoading(true);
+    try {
+      await supabase.auth.resetPasswordForEmail(resetEmail, { redirectTo: `${window.location.origin}/reset-password` });
+    } catch { /* neutral response regardless of outcome */ }
+    setResetSent(true); setResetLoading(false);
+  };
+
   useEffect(() => { supabase.auth.getSession().then(({ data }) => { if (data.session) navigate({ to: "/app" }); }); }, [navigate]);
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
