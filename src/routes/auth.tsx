@@ -107,9 +107,29 @@ function AuthPage() {
           </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-muted-foreground">סיסמה</label>
-            <input dir="ltr" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6}
-              className="w-full rounded-md border border-primary/20 bg-background/50 px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+            <div className="relative">
+              <input dir="ltr" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6}
+                className="w-full rounded-md border border-primary/20 bg-background/50 py-2 pl-10 pr-3 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? "הסתר סיסמה" : "הצג סיסמה"}
+                className="absolute left-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground transition hover:text-primary"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            {mode === "login" && (
+              <button
+                type="button"
+                onClick={() => { setResetEmail(email); setResetSent(false); setShowReset(true); }}
+                className="mt-1.5 text-xs font-medium text-primary underline-offset-2 hover:underline"
+              >
+                שכחתי סיסמה?
+              </button>
+            )}
           </div>
+
           {mode === "signup" && (
             <label className="mt-1 flex cursor-pointer items-start gap-2 text-xs text-muted-foreground">
               <input
