@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ShieldCheck, Loader2, ShieldAlert, Rocket, Wallet, Star, CheckCircle2, Scale, BrainCircuit, Headphones } from "lucide-react";
+import { ShieldCheck, Loader2, ShieldAlert, Rocket, Wallet, Star, CheckCircle2, Scale, BrainCircuit, Headphones, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { MNIT_LEGAL_TERMS } from "@/content/mnit-legal-terms";
@@ -26,6 +26,19 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showReset, setShowReset] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetSent, setResetSent] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
+  const onResetSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); setResetLoading(true);
+    try {
+      await supabase.auth.resetPasswordForEmail(resetEmail, { redirectTo: `${window.location.origin}/reset-password` });
+    } catch { /* neutral response regardless of outcome */ }
+    setResetSent(true); setResetLoading(false);
+  };
+
   useEffect(() => { supabase.auth.getSession().then(({ data }) => { if (data.session) navigate({ to: "/app" }); }); }, [navigate]);
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
@@ -107,9 +120,29 @@ function AuthPage() {
           </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-muted-foreground">סיסמה</label>
-            <input dir="ltr" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6}
-              className="w-full rounded-md border border-primary/20 bg-background/50 px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+            <div className="relative">
+              <input dir="ltr" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6}
+                className="w-full rounded-md border border-primary/20 bg-background/50 py-2 pl-10 pr-3 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? "הסתר סיסמה" : "הצג סיסמה"}
+                className="absolute left-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground transition hover:text-primary"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            {mode === "login" && (
+              <button
+                type="button"
+                onClick={() => { setResetEmail(email); setResetSent(false); setShowReset(true); }}
+                className="mt-1.5 text-xs font-medium text-primary underline-offset-2 hover:underline"
+              >
+                שכחתי סיסמה?
+              </button>
+            )}
           </div>
+
           {mode === "signup" && (
             <label className="mt-1 flex cursor-pointer items-start gap-2 text-xs text-muted-foreground">
               <input
@@ -165,6 +198,44 @@ function AuthPage() {
           </div>
         </div>
       )}
+      {showReset && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 p-4 backdrop-blur-md"
+          onClick={() => setShowReset(false)}
+        >
+          <div
+            dir="rtl"
+            onClick={(e) => e.stopPropagation()}
+            className="glass-panel relative w-full max-w-md overflow-hidden border border-primary/40 p-6 text-right"
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="font-display text-lg font-bold text-primary">איפוס סיסמה</h2>
+              <button
+                type="button"
+                onClick={() => setShowReset(false)}
+                className="rounded-md px-2 py-1 text-sm text-muted-foreground hover:text-foreground"
+              >
+                ✕
+              </button>
+            </div>
+            {resetSent ? (
+              <p className="text-sm text-foreground/90">אם האימייל קיים במערכת, נשלח קישור לאיפוס סיסמה</p>
+            ) : (
+              <form onSubmit={onResetSubmit} className="flex flex-col gap-3">
+                <label className="block text-xs font-medium text-muted-foreground">אימייל</label>
+                <input dir="ltr" type="email" value={resetEmail} onChange={(e) => setResetEmail(e.target.value)} required
+                  className="w-full rounded-md border border-primary/20 bg-background/50 px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+                <button type="submit" disabled={resetLoading}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 font-display text-sm font-bold text-primary-foreground transition hover:brightness-110 disabled:opacity-50">
+                  {resetLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                  שלח קישור לאיפוס
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
