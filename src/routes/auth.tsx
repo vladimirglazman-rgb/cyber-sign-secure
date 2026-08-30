@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ShieldCheck, Loader2, ShieldAlert, Rocket, Wallet, Star, CheckCircle2, Scale, BrainCircuit, Headphones } from "lucide-react";
+import { ShieldCheck, Loader2, ShieldAlert, Rocket, Wallet, Star, CheckCircle2, Scale, BrainCircuit, Headphones, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { MNIT_LEGAL_TERMS } from "@/content/mnit-legal-terms";
