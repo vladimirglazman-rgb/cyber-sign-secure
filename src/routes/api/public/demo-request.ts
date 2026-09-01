@@ -64,6 +64,33 @@ export const Route = createFileRoute("/api/public/demo-request")({
             if (!res.ok) {
               console.error(`DEMO_REQUEST_EMAIL_FAILED [${res.status}]: ${await res.text()}`);
             }
+
+            // Send a Telegram notification as well. This is best-effort and must
+            // not block the successful response if it fails.
+            const telegramKey = process.env["TELEGRAM_API_KEY"];
+            if (lovableKey && telegramKey) {
+              try {
+                const text = `🔔 פנייה חדשה ל-SIGN\nשם: ${parsed.fullName}\nטלפון: ${parsed.phone}\nמייל: ${parsed.email}`;
+                const telegramRes = await fetch("https://connector-gateway.lovable.dev/telegram/sendMessage", {
+                  method: "POST",
+                  headers: {
+                    Authorization: `Bearer ${lovableKey}`,
+                    "X-Connection-Api-Key": telegramKey,
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    chat_id: "5780229482",
+                    text,
+                    parse_mode: "HTML",
+                  }),
+                });
+                if (!telegramRes.ok) {
+                  console.error(`DEMO_REQUEST_TELEGRAM_FAILED [${telegramRes.status}]: ${await telegramRes.text()}`);
+                }
+              } catch (e) {
+                console.error("DEMO_REQUEST_TELEGRAM_ERROR", e);
+              }
+            }
           } else {
             console.warn("DEMO_REQUEST_EMAIL_SKIPPED: email provider not connected");
           }
