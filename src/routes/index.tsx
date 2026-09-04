@@ -7,7 +7,7 @@ import {
   Smartphone,
   BookOpen,
   Check,
-  CalendarClock,
+  MessageSquareText,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { APP_VERSION } from "@/lib/app-version";
@@ -138,10 +138,10 @@ function LandingPage() {
           </button>
           <button
             onClick={() => setDemoOpen(true)}
-            className="inline-flex items-center gap-2 rounded-md bg-primary px-8 py-4 font-body text-sm font-semibold uppercase tracking-[0.2em] text-primary-foreground transition hover:opacity-90"
+            className="animate-cta-pulse inline-flex items-center gap-3 rounded-xl bg-blue-600 px-10 py-5 font-body text-lg font-bold text-white shadow-lg transition hover:bg-blue-700 hover:shadow-xl md:text-xl"
           >
-            <CalendarClock className="h-4 w-4" />
-            תיאום דמו של 15 דקות
+            <MessageSquareText className="h-6 w-6" />
+            רוצה לדעת עוד? השאירו הודעה
           </button>
           <Link
             to="/auth"

@@ -16,27 +16,30 @@ export type Database = {
     Tables: {
       demo_requests: {
         Row: {
-          company: string
+          company: string | null
           created_at: string
-          email: string
+          email: string | null
           full_name: string
           id: string
+          message: string | null
           phone: string
         }
         Insert: {
-          company: string
+          company?: string | null
           created_at?: string
-          email: string
+          email?: string | null
           full_name: string
           id?: string
+          message?: string | null
           phone: string
         }
         Update: {
-          company?: string
+          company?: string | null
           created_at?: string
-          email?: string
+          email?: string | null
           full_name?: string
           id?: string
+          message?: string | null
           phone?: string
         }
         Relationships: []
