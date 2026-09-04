@@ -7,7 +7,7 @@ import {
   Smartphone,
   BookOpen,
   Check,
-  CalendarClock,
+  MessageSquareText,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { APP_VERSION } from "@/lib/app-version";
