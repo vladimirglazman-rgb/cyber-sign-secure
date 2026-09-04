@@ -3,9 +3,8 @@ import { z } from "zod";
 
 const schema = z.object({
   fullName: z.string().trim().min(2).max(100),
-  company: z.string().trim().min(2).max(120),
   phone: z.string().trim().min(9).max(20),
-  email: z.string().trim().email().max(255),
+  message: z.string().trim().min(1).max(500),
 });
 
 const escape = (s: string) =>
@@ -25,9 +24,8 @@ export const Route = createFileRoute("/api/public/demo-request")({
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { error } = await supabaseAdmin.from("demo_requests").insert({
           full_name: parsed.fullName,
-          company: parsed.company,
           phone: parsed.phone,
-          email: parsed.email,
+          message: parsed.message,
         });
         if (error) {
           console.error("DEMO_REQUEST_INSERT_FAILED", error.message);
@@ -41,11 +39,10 @@ export const Route = createFileRoute("/api/public/demo-request")({
           const resendKey = process.env["RESEND_API_KEY"];
           if (lovableKey && resendKey) {
             const html = `<div dir="rtl" style="font-family:Arial,sans-serif">
-              <h2>בקשת דמו חדשה מ-MNIT Sign</h2>
-              <p><strong>שם מלא:</strong> ${escape(parsed.fullName)}</p>
-              <p><strong>משרד / חברה:</strong> ${escape(parsed.company)}</p>
+              <h2>פנייה חדשה מ-MNIT Sign</h2>
+              <p><strong>שם:</strong> ${escape(parsed.fullName)}</p>
               <p><strong>טלפון:</strong> ${escape(parsed.phone)}</p>
-              <p><strong>אימייל:</strong> ${escape(parsed.email)}</p>
+              <p><strong>הודעה:</strong> ${escape(parsed.message)}</p>
             </div>`;
             const res = await fetch("https://connector-gateway.lovable.dev/resend/emails", {
               method: "POST",
@@ -57,7 +54,7 @@ export const Route = createFileRoute("/api/public/demo-request")({
               body: JSON.stringify({
                 from: "MNIT Sign <onboarding@resend.dev>",
                 to: ["eitanglazman@gmail.com"],
-                subject: `בקשת דמו חדשה — ${parsed.fullName}`,
+                subject: `פנייה חדשה — ${parsed.fullName}`,
                 html,
               }),
             });
@@ -70,7 +67,7 @@ export const Route = createFileRoute("/api/public/demo-request")({
             const telegramKey = process.env["TELEGRAM_API_KEY"];
             if (lovableKey && telegramKey) {
               try {
-                const text = `🔔 פנייה חדשה ל-SIGN\nשם: ${parsed.fullName}\nטלפון: ${parsed.phone}\nמייל: ${parsed.email}`;
+                const text = `🔔 פנייה חדשה ל-SIGN\nשם: ${parsed.fullName}\nטלפון: ${parsed.phone}\nהודעה: ${parsed.message}`;
                 const telegramRes = await fetch("https://connector-gateway.lovable.dev/telegram/sendMessage", {
                   method: "POST",
                   headers: {
